@@ -1,13 +1,13 @@
 using DruidsCornerAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Web.Resource;
+using Microsoft.AspNetCore.Mvc.Filters;
+using System.Diagnostics;
 
 namespace DruidsCornerAPI.Controllers
 {
-    [Authorize]
     [ApiController]
-    [Route("[controller]")]
+    [Route("recipe")]
     //[RequiredScope(RequiredScopesConfigurationKey = "AzureAd:Scopes")]
     public class RecipeController : ControllerBase
     {
@@ -18,10 +18,12 @@ namespace DruidsCornerAPI.Controllers
             _logger = logger;
         }
 
+        [Authorize]
         [HttpGet(Name = "ListAllRecipes")]
         public async Task<IActionResult> ListAllRecipes()
         {
-            return Ok("");
+            return Ok("This is a fake recipe !");
         }
+
     }
 }

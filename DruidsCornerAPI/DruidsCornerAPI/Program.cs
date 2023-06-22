@@ -1,3 +1,4 @@
+using DruidsCornerAPI.AuthenticationHandlers;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -13,12 +14,15 @@ using Microsoft.Identity.Web.Resource;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Diagnostics;
 using System.Text;
 
 namespace DruidsCornerAPI
 {
     public class Program
     {
+        public static readonly string OAuth2Scheme = "OAuth2";
+
 
         public static void AddOpenApi(IServiceCollection services)
         {
@@ -30,17 +34,17 @@ namespace DruidsCornerAPI
                     Title = "Druid's Corner API",
                     Description = "Web service for Druid's Corner application stacks. Provides various services around recipes such as viewing, editing, converting, querying, etc."
                 });
-                //options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                //{
-                //    In = ParameterLocation.Header,
-                //    Description = "Please enter a valid token",
-                //    Name = "Authorization",
-                //    Type = SecuritySchemeType.Http,
-                //    BearerFormat = "JWT",
-                //    Scheme = "Bearer"
-                //});
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please enter a valid token",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    Scheme = JwtBearerDefaults.AuthenticationScheme
+                }) ;
 
-                options.AddSecurityDefinition("OAuth2", new OpenApiSecurityScheme
+                options.AddSecurityDefinition(OAuth2Scheme, new OpenApiSecurityScheme
                 {
                     Description = "Please enter a valid token",
                     Name = "OAuth2 authorization",
@@ -60,35 +64,37 @@ namespace DruidsCornerAPI
                             }
                         }
                     },
-                    Scheme = "OAuth2",
+                    Scheme = OAuth2Scheme,
+                    In = ParameterLocation.Header
                 }) ;
 
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     // Dictionary<OpenApiSecurityScheme, IList<string>> 
-                    //{
-                    //    new OpenApiSecurityScheme
-                    //    {
-                    //        Reference = new OpenApiReference
-                    //        {
-                    //            Type=ReferenceType.SecurityScheme,
-                    //            Id="Bearer"
-                    //        }
-                    //    },
-                    //    new string[]{}
-                    //},
                     {
                         new OpenApiSecurityScheme
                         {
                             Reference = new OpenApiReference
                             {
                                 Type=ReferenceType.SecurityScheme,
-                                Id="OAuth2"
+                                Id="Bearer"
+                            }
+                        },
+                        new string[]{}
+                    },
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type=ReferenceType.SecurityScheme,
+                                Id=OAuth2Scheme
                             }
                         },
                         new string[]{}
                     }
-                });
+                }                
+                );
             });
         }
 
@@ -101,48 +107,47 @@ namespace DruidsCornerAPI
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
-                // If authentication is required, and no cookie is present, use Okta (configured below) to sign in
-                options.DefaultChallengeScheme = "OAuth2";
-
-                //options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                //options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-                //     .AddJwtBearer(options =>
-                // {
-                //     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                //     {
-                //         ValidateIssuer = true,
-                //         ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
-                //         ValidateAudience = true,
-                //         ValidAudience = builder.Configuration["JwtSettings:Audience"],
-                //         ValidateLifetime = true,
-                //         ClockSkew = TimeSpan.Zero,
-                //         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]!))
-                //     };
-                // })
-                .AddCookie()
-                .AddGoogle("OAuth2", options =>
+                // If authentication is required, and no cookie is present use Jwt decoding
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddCookie()
+              .AddScheme<BasicAuthenticationOptions, GoogleOauth2AuthenticationHandler>(OAuth2Scheme, options =>
+              {
+                  //
+              })
+              //.AddGoogle(OAuth2Scheme, options =>
+              //{
+              //    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+              //    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+              //})
+              .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
-                options.AccessType = "offline";
-                options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-                options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-            }); ;
+                options.Audience = builder.Configuration["Authentication:Google:ClientId"];
+                options.Authority = "https://accounts.google.com";
+                options.ClaimsIssuer = "https://accounts.google.com";
+                //options.TokenValidationParameters = new TokenValidationParameters
+                //{
+                //    RequireAudience = true,
+                //    RequireExpirationTime = true,
+                //};
+            });
+              //.AddScheme<BasicAuthenticationOptions, GoogleOauth2AuthenticationHandler>("Custom", null);
         }
+
 
 
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
-            //builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
-
+            var webAppOptions = new WebApplicationOptions
+            {
+                Args = args
+            };
+            var builder = WebApplication.CreateBuilder(webAppOptions);
+            
             builder.Services.AddControllers();
+            
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             AddOpenApi(builder.Services);
-            // builder.Services.AddSwaggerGenNewtonsoftSupport();
 
             builder.Services.AddCors(o =>
             {
@@ -156,26 +161,35 @@ namespace DruidsCornerAPI
                            //Swagger headers
                            "api_key", "authorization", "x-requested-with",
                            "Access-Control-Allow-Origin")
-                        .WithOrigins(new string[] {"https://oauth2.googleapis.com"});
+                        .WithOrigins(new string[] {"https://localhost"});
                 });
             });
 
-            //builder.Services.AddIdentityCore<IdentityUser>()
-            //    .AddRoles<IdentityRole>()
-            //    .AddEntityFrameworkStores<CarListDbContext>();
             SetAuthentication(builder);
             
+            // Nice questions : https://stackoverflow.com/questions/72966528/can-api-key-and-jwt-token-be-used-in-the-same-net-6-webapi
             builder.Services.AddAuthorization(options =>
             {
-                options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                var jwtPolicy = new AuthorizationPolicyBuilder()
                     .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
                     .RequireAuthenticatedUser()
                     .Build();
+                options.FallbackPolicy = jwtPolicy;
+                options.DefaultPolicy = jwtPolicy;
+
+                var googleOauthPolicy = new AuthorizationPolicyBuilder()
+                    .AddAuthenticationSchemes(OAuth2Scheme)
+                    .RequireAuthenticatedUser()
+                    .Build();
+
+                // Custom policy to handle google cloud related stuff
+                options.AddPolicy(OAuth2Scheme, googleOauthPolicy);
             });
 
             var app = builder.Build();
-
+            
             // Configure the HTTP request pipeline.
+            app.UseCors("AllowAll");
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
@@ -184,11 +198,9 @@ namespace DruidsCornerAPI
             });
 
             app.UseHttpsRedirection();
-
+            app.UseHttpLogging();
             app.UseAuthentication();
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();
