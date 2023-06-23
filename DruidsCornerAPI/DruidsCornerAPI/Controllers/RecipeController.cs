@@ -7,9 +7,12 @@ using System.Diagnostics;
 
 namespace DruidsCornerAPI.Controllers
 {
+    /// <summary>
+    /// Operates on recipes.
+    /// </summary>
     [ApiController]
+    [Authorize]
     [Route("recipe")]
-    //[RequiredScope(RequiredScopesConfigurationKey = "AzureAd:Scopes")]
     public class RecipeController : ControllerBase
     {
         private readonly ILogger<RecipeController> _logger;
@@ -21,7 +24,10 @@ namespace DruidsCornerAPI.Controllers
             _recipeService = recipeService;
         }
 
-        [Authorize]
+        /// <summary>
+        /// Retrieves all available recipes
+        /// </summary>
+        /// <returns></returns>
         [HttpGet(Name = "ListAllRecipes")]
         public async Task<IActionResult> ListAllRecipes()
         {
@@ -29,6 +35,21 @@ namespace DruidsCornerAPI.Controllers
             if(allRecipes.Count != 0)
             {
                 return Ok(allRecipes);
+            }
+            return StatusCode(500, "Internal Server Error");
+        }
+
+        /// <summary>
+        /// Retrieves all available recipes
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("byname", Name = "Get a single recipe")]
+        public async Task<IActionResult> FetchSingle([FromQuery] string name)
+        {
+            var recipe= await _recipeService.GetRecipeByNameAsync(name);
+            if (recipe != null)
+            {
+                return Ok(recipe);
             }
             return StatusCode(500, "Internal Server Error");
         }

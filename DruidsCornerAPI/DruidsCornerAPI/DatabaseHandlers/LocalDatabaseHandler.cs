@@ -1,5 +1,6 @@
 ﻿using DruidsCornerAPI.Models.Config;
 using DruidsCornerAPI.Models.DiyDog;
+using DruidsCornerAPI.Tools;
 using System.Text.Json;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -13,6 +14,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
         private DirectoryInfo _recipesDir;
 
         private List<Recipe> _cachedRecipes;
+        private JsonSerializerOptions _jsonOptions;
 
         public LocalDatabaseHandler(DeployedDatabaseConfig config)
         {
@@ -25,6 +27,8 @@ namespace DruidsCornerAPI.DatabaseHandlers
             _imagesDir = new DirectoryInfo(config.ImagesFolderPath);
             _pdfPagesDir = new DirectoryInfo(config.PdfPagesFolderPath);
             _recipesDir = new DirectoryInfo(config.RecipesFolderPath);
+            _cachedRecipes = new List<Recipe>();
+            _jsonOptions = JsonOptionsProvider.GetModelsJsonOptions();
         }
 
 
@@ -49,7 +53,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
             foreach (var recipeFile in files)
             {
                 var file = recipeFile.OpenRead();
-                var parsedRecipe = await JsonSerializer.DeserializeAsync<Recipe>(file);
+                var parsedRecipe = await JsonSerializer.DeserializeAsync<Recipe>(file, _jsonOptions);
 
                 if (parsedRecipe != null)
                 {
@@ -60,10 +64,10 @@ namespace DruidsCornerAPI.DatabaseHandlers
             return allRecipesList;
         }
 
-        public async Task<List<Recipe>> GetAllRecipeAsync(bool noCaching = false)
+        public async Task<List<Recipe>> GetAllRecipesAsync(bool noCaching = false)
         {
             // Speeding up subsequent calls
-            if(_cachedRecipes.Count != 0 && noCaching == false)
+            if(_cachedRecipes!= null && _cachedRecipes.Count != 0 && noCaching == false)
             {
                 return _cachedRecipes;
             }
@@ -75,12 +79,12 @@ namespace DruidsCornerAPI.DatabaseHandlers
             if (allRecipesMonoFile != null)
             {
                 var file = allRecipesMonoFile.OpenRead();
-                var parsedAllRecipesList = await JsonSerializer.DeserializeAsync<List<Recipe>>(file);
+                var parsedAllRecipesList = await JsonSerializer.DeserializeAsync<AllRecipesCollection>(file, _jsonOptions);
                 file.Close();
 
                 if(parsedAllRecipesList != null)
                 {
-                    allRecipesList = parsedAllRecipesList;
+                    allRecipesList = parsedAllRecipesList.Recipes;
                 }
                 // If the monolithic file has parsing issues, 
                 // Try with the individual ones if we happen to have them at hands as well
@@ -109,14 +113,14 @@ namespace DruidsCornerAPI.DatabaseHandlers
         protected async Task<Recipe?> ReadSingleRecipeAsync(FileInfo fileSource)
         {
             var file = fileSource.OpenRead();
-            var recipe = await JsonSerializer.DeserializeAsync<Recipe>(file);
+            var recipe = await JsonSerializer.DeserializeAsync<Recipe>(file, _jsonOptions);
             file.Close();
             return recipe;
         }
 
-        public async Task<Recipe?> GetRecipe(uint number, bool noCaching = false)
+        public async Task<Recipe?> GetRecipeByNumberAsync(uint number, bool noCaching = false)
         {
-            if(_cachedRecipes.Count != 0 && noCaching == false)
+            if(_cachedRecipes != null && _cachedRecipes.Count != 0 && noCaching == false)
             {
                 var cachedRecipe = _cachedRecipes.First<Recipe>(r => r.Number == number);
                 if(cachedRecipe != null)
@@ -145,9 +149,9 @@ namespace DruidsCornerAPI.DatabaseHandlers
             return recipeList.First(r => r.Name == name);
         }
 
-        public async Task<Recipe?> GetRecipe(string name, bool noCaching = false)
+        public async Task<Recipe?> GetRecipeByNameAsync(string name, bool noCaching = false)
         {
-            if (_cachedRecipes.Count != 0)
+            if (_cachedRecipes != null && _cachedRecipes.Count != 0)
             {
                 var cachedRecipe = FindByName(name, _cachedRecipes);
                 if (cachedRecipe != null)
@@ -156,7 +160,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
                 }
             }
 
-            var allRecipes = await GetAllRecipeAsync(noCaching);
+            var allRecipes = await GetAllRecipesAsync(noCaching);
             var matchingRecipe = FindByName(name, allRecipes);
             return matchingRecipe;
         }

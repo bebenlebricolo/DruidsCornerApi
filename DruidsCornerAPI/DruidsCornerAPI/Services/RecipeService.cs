@@ -21,7 +21,7 @@ namespace DruidsCornerAPI.Services
         private ILogger<RecipeService> _logger;
         private static string DBModeEnvVarName = "DBMode";
 
-        public RecipeService(IConfiguration configuration, Logger<RecipeService> logger)
+        public RecipeService(IConfiguration configuration, ILogger<RecipeService> logger)
         {
             _configuration = configuration;
             _logger = logger;
@@ -38,36 +38,58 @@ namespace DruidsCornerAPI.Services
             return deployedDb;
         }
 
-
-        public async Task<List<Recipe>> GetAllRecipesAsync()
+        protected DatabaseSourceMode GetMode()
         {
-            var dbModeEnum = DatabaseSourceMode.LocalMode;
+            DatabaseSourceMode dbModeEnum;
+           
             var dbModeEnv = Environment.GetEnvironmentVariable(DBModeEnvVarName);
-            if(false == Enum.TryParse(dbModeEnv, out dbModeEnum))
+            if (false == Enum.TryParse(dbModeEnv, out dbModeEnum))
             {
                 // Enforce the LocalMode anyway
                 dbModeEnum = DatabaseSourceMode.LocalMode;
             }
+            return dbModeEnum;
+        }
 
+        protected IDatabaseHandler GetDatabaseHandler(DatabaseSourceMode dbMode) 
+        {
             // Local deployment needs proper path handling
-            if(dbModeEnum == DatabaseSourceMode.LocalMode)
+            if (dbMode == DatabaseSourceMode.LocalMode)
             {
                 var deployedConfig = new DeployedDatabaseConfig();
                 var parsingSuccess = deployedConfig.FromConfig(_configuration);
-                if(!parsingSuccess)
+                if (!parsingSuccess)
                 {
                     throw new ConfigException("Could not read configuration (appsettings), failing short.");
                 }
 
                 var dbHandler = new LocalDatabaseHandler(deployedConfig);
-                return await dbHandler.GetAllRecipeAsync();
+                return dbHandler;
             }
-            else
-            {
-                throw new NotImplementedException("Whoops ! Not there yet!");
-            }
+        
+            throw new NotImplementedException("Whoops ! Not there yet!");
         }
 
+        public async Task<List<Recipe>> GetAllRecipesAsync()
+        {
+            var dbMode = GetMode();
+            var dbHandler = GetDatabaseHandler(dbMode);
 
+            return await dbHandler.GetAllRecipesAsync();
+        }
+
+        /// <summary>
+        /// Fetches a single recipe by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<Recipe?> GetRecipeByNameAsync(string name)
+        {
+            var dbMode = GetMode();
+            var dbHandler = GetDatabaseHandler(dbMode);
+
+            return await dbHandler.GetRecipeByNameAsync(name);
+        }
     }
 }

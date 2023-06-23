@@ -187,6 +187,7 @@ namespace DruidsCornerAPI
                 options.AddPolicy(OAuth2Scheme, googleOauthPolicy);
             });
 
+            builder.Logging.AddConsole();
 
             // Registering available services
             builder.Services.AddSingleton<RecipeService>();
