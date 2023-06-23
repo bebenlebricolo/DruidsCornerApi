@@ -1,6 +1,7 @@
 ﻿using DruidsCornerAPI.Models.Config;
 using DruidsCornerAPI.Models.DiyDog;
 using DruidsCornerAPI.Tools;
+using Microsoft.Extensions.Azure;
 using System.Text.Json;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -132,8 +133,13 @@ namespace DruidsCornerAPI.DatabaseHandlers
             var matchingFile = _recipesDir.GetFiles("*.json").First(f =>
             {
                 var right = f.Name.Split('_')[1];
-                var decodedNumber = uint.Parse(right.Replace(".json", ""));
-                return decodedNumber == number;
+                var numberString = right.Replace(".json", "");
+                uint decoded = 0;
+                if(uint.TryParse(numberString, out decoded))
+                {
+                    return decoded == number;
+                }
+                return false;
             });
             
             Recipe? recipe = null;
@@ -163,6 +169,39 @@ namespace DruidsCornerAPI.DatabaseHandlers
             var allRecipes = await GetAllRecipesAsync(noCaching);
             var matchingRecipe = FindByName(name, allRecipes);
             return matchingRecipe;
+        }
+
+        public async Task<Stream?> GetRecipeImageAsync(uint number, bool noCaching = false)
+        {
+            var recipe = await GetRecipeByNumberAsync(number, noCaching);
+            if (recipe != null)
+            {
+                // This path is a local path relative to Root Folder
+                var filePath = new FileInfo((recipe.Image as FileRecord).Path);
+                var candidate = _imagesDir.GetFiles(filePath.Name).First();
+                if (candidate != null)
+                {
+                   return new BufferedStream(candidate.OpenRead());
+                }
+            }
+            return null;
+        }
+
+        public async Task<Stream?> GetRecipePdfPageAsync(uint number, bool noCaching = false)
+        {
+            var recipe = await GetRecipeByNumberAsync(number, noCaching);
+            if (recipe != null)
+            {
+                // This path is a local path relative to Root Folder
+                //var filePath = new FileInfo((recipe.PdfPage as FileRecord).Path);
+                var baseName = $"page_{number}.pdf";
+                var candidate = _pdfPagesDir.GetFiles(baseName).First();
+                if (candidate != null)
+                {
+                    return new BufferedStream(candidate.OpenRead());
+                }
+            }
+            return null;
         }
     }
 }

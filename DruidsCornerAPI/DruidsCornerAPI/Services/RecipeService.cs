@@ -91,5 +91,35 @@ namespace DruidsCornerAPI.Services
 
             return await dbHandler.GetRecipeByNameAsync(name);
         }
+
+
+        /// <summary>
+        /// Fetches a single recipe by number
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns></returns>
+        public async Task<Recipe?> GetRecipeByNumberAsync(uint number)
+        {
+            var dbMode = GetMode();
+            var dbHandler = GetDatabaseHandler(dbMode);
+
+            return await dbHandler.GetRecipeByNumberAsync(number);
+        }
+
+        public async Task<Stream?> GetRecipeImageAsync(uint number)
+        {
+            var dbMode = GetMode();
+            var dbHandler = GetDatabaseHandler(dbMode);
+
+            return await dbHandler.GetRecipeImageAsync(number);
+        }
+
+        public async Task<Stream?> GetRecipePdfPageAsync(uint number)
+        {
+            var dbMode = GetMode();
+            var dbHandler = GetDatabaseHandler(dbMode);
+
+            return await dbHandler.GetRecipePdfPageAsync(number);
+        }
     }
 }

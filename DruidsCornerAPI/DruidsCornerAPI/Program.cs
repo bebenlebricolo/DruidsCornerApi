@@ -141,7 +141,6 @@ namespace DruidsCornerAPI
         }
 
 
-
         public static void Main(string[] args)
         {
             var webAppOptions = new WebApplicationOptions
@@ -150,6 +149,8 @@ namespace DruidsCornerAPI
             };
             var builder = WebApplication.CreateBuilder(webAppOptions);
             
+            // We need custom converters because some types within the Recipe object are polymorphic (DataRecord, FileRecord, CloudRecord)
+            // So we need custom converters in order to represent them nicely
             builder.Services.AddControllers().AddJsonOptions(options =>
              {
                  options.JsonSerializerOptions.WriteIndented = true;

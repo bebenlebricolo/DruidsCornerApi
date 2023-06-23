@@ -9,6 +9,10 @@ namespace DruidsCornerAPI.DatabaseHandlers
         public Task<Recipe?> GetRecipeByNameAsync(string name, bool noCaching = false);
 
         public Task<List<Recipe>> GetAllRecipesAsync(bool noCaching = false);
-    
+
+        public Task<Stream?> GetRecipeImageAsync(uint number, bool noCaching = false);
+        
+        public Task<Stream?> GetRecipePdfPageAsync(uint number, bool noCaching = false);
+
     }
 }
