@@ -1,5 +1,7 @@
 using DruidsCornerAPI.AuthenticationHandlers;
+using DruidsCornerAPI.Models.DiyDog;
 using DruidsCornerAPI.Services;
+using DruidsCornerAPI.Tools;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -9,14 +11,18 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.Resource;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System;
 using System.Diagnostics;
 using System.Text;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace DruidsCornerAPI
 {
@@ -144,8 +150,14 @@ namespace DruidsCornerAPI
             };
             var builder = WebApplication.CreateBuilder(webAppOptions);
             
-            builder.Services.AddControllers();
-            
+            builder.Services.AddControllers().AddJsonOptions(options =>
+             {
+                 options.JsonSerializerOptions.WriteIndented = true;
+                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                 options.JsonSerializerOptions.Converters.Add(new DataRecordPolymorphicConverter());
+             });
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             AddOpenApi(builder.Services);

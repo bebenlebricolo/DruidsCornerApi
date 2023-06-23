@@ -1,4 +1,5 @@
 using DruidsCornerAPI.Models;
+using DruidsCornerAPI.Models.DiyDog;
 using DruidsCornerAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,6 +30,9 @@ namespace DruidsCornerAPI.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet(Name = "ListAllRecipes")]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(typeof(AllRecipesCollection), 200)]
+
         public async Task<IActionResult> ListAllRecipes()
         {
             var allRecipes = await _recipeService.GetAllRecipesAsync();
