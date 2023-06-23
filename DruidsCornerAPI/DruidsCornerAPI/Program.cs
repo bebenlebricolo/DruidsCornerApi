@@ -1,4 +1,5 @@
 using DruidsCornerAPI.AuthenticationHandlers;
+using DruidsCornerAPI.Services;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -185,6 +186,11 @@ namespace DruidsCornerAPI
                 // Custom policy to handle google cloud related stuff
                 options.AddPolicy(OAuth2Scheme, googleOauthPolicy);
             });
+
+
+            // Registering available services
+            builder.Services.AddSingleton<RecipeService>();
+
 
             var app = builder.Build();
             

@@ -1,4 +1,5 @@
 using DruidsCornerAPI.Models;
+using DruidsCornerAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -12,17 +13,24 @@ namespace DruidsCornerAPI.Controllers
     public class RecipeController : ControllerBase
     {
         private readonly ILogger<RecipeController> _logger;
+        private RecipeService _recipeService;
 
-        public RecipeController(ILogger<RecipeController> logger)
+        public RecipeController(ILogger<RecipeController> logger, RecipeService recipeService)
         {
             _logger = logger;
+            _recipeService = recipeService;
         }
 
         [Authorize]
         [HttpGet(Name = "ListAllRecipes")]
         public async Task<IActionResult> ListAllRecipes()
         {
-            return Ok("This is a fake recipe !");
+            var allRecipes = await _recipeService.GetAllRecipesAsync();
+            if(allRecipes.Count != 0)
+            {
+                return Ok(allRecipes);
+            }
+            return StatusCode(500, "Internal Server Error");
         }
 
     }
