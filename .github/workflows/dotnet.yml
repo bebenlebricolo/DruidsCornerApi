@@ -20,7 +20,14 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.0.x
-    
+
+    - name: Set commit status as pending
+      uses: myrotvorets/set-commit-status-action@master
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        status: pending
+        context: Build and test API
+  
     - name: Restore dependencies
       run: dotnet restore DruidsCornerAPI
     
@@ -37,3 +44,10 @@ jobs:
         name: test-results
         path: DruidsCornerAPI/DruidsCornerUnitTests/TestResults/TestResults.xml
     
+    - name: Set final commit status
+      uses: myrotvorets/set-commit-status-action@master
+      if: always()
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        status: ${{ job.status }}
+        context: Build and test API
