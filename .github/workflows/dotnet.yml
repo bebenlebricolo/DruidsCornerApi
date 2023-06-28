@@ -29,3 +29,10 @@ jobs:
     
     - name: Test
       run: dotnet test DruidsCornerAPI/DruidsCornerUnitTests/DruidsCornerUnitTests.csproj -l:junit -c Release --verbosity normal
+
+    - name: Archive Test Results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: DruidsCornerAPI/DruidsCornerUnitTests/TestResults/TestResults.xml
