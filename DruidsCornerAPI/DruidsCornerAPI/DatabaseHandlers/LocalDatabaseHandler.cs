@@ -152,7 +152,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
 
         protected Recipe? FindByName(string name, List<Recipe> recipeList)
         {
-            return recipeList.First(r => r.Name == name);
+            return recipeList.First(r => r.Name.ToLower() == name.ToLower());
         }
 
         public async Task<Recipe?> GetRecipeByNameAsync(string name, bool noCaching = false)

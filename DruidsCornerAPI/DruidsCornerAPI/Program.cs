@@ -23,6 +23,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.Reflection;
 
 namespace DruidsCornerAPI
 {
@@ -102,6 +103,8 @@ namespace DruidsCornerAPI
                     }
                 }                
                 );
+
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
             });
         }
 
