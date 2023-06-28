@@ -9,8 +9,9 @@ In order to build the api you'll need :
 
 Then run the commands :
 ```bash
-  dotnet build DruidsCornerApi
-  dotnet build DruidsCornerApi -c <Release/Debug>
+  dotnet build DruidsCornerAPI
+  dotnet build DruidsCornerAPI -c <Release/Debug>
+  dotnet build DruidsCornerAPI/DruidsCornerAPI.sln -c <Release/Debug>  # Builds the whole solution
 ```
 
 # Run the api locally (against localhost:<port number>)
@@ -18,6 +19,14 @@ For debugging purposes/development process, you might need to run the API locall
 
 ```bash
   dotnet run --project DruidsCornerAPI/DruidsCornerAPI
+```
+
+# Run the tests
+
+After building the whole solution (or the individual test project), we can run the tests now
+```bash
+  dotnet test DruidsCornerAPI/DruidsCornerUnitTests 
+  dotnet test DruidsCornerAPI/DruidsCornerUnitTests -l:junit # Outputs TestResults.xml in the DruidsCornerUnitTests/TestResults/ folder
 ```
 
 # Environment variables setup
