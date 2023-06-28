@@ -72,9 +72,9 @@ namespace DruidsCornerAPI.DatabaseHandlers
             {
                 return _cachedRecipes;
             }
-            
+
             var allRecipesList = new List<Recipe>();
-            
+
             var availableRecipes = _recipesDir.GetFiles("*.json");
             var allRecipesMonoFile = availableRecipes.First<FileInfo>(f => f.Name == "all_recipes.json");
             if (allRecipesMonoFile != null)
@@ -87,11 +87,11 @@ namespace DruidsCornerAPI.DatabaseHandlers
                 {
                     allRecipesList = parsedAllRecipesList.Recipes;
                 }
-                // If the monolithic file has parsing issues, 
+                // If the monolithic file has parsing issues,
                 // Try with the individual ones if we happen to have them at hands as well
             }
-            
-            
+
+
             // If at this point the allRecipesList is still empty, try to read individual files
             // from disk
             if(allRecipesList.Count == 0)
@@ -101,8 +101,8 @@ namespace DruidsCornerAPI.DatabaseHandlers
 
             // Don't use cache, this will force subsequent calls to perform Disk Access
             // And it won't fill the RAM
-            // Note that this is not a "Stateless" server anymore if we do caching, 
-            // But as this is general "public" data which will be available to anyone in read only mode, 
+            // Note that this is not a "Stateless" server anymore if we do caching,
+            // But as this is general "public" data which will be available to anyone in read only mode,
             // We can cache it and speed up response times.
             if(noCaching == false)
             {
@@ -141,9 +141,9 @@ namespace DruidsCornerAPI.DatabaseHandlers
                 }
                 return false;
             });
-            
+
             Recipe? recipe = null;
-            if(matchingFile != null) 
+            if(matchingFile != null)
             {
                 recipe = await ReadSingleRecipeAsync(matchingFile);
             }
@@ -151,7 +151,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
         }
 
         protected Recipe? FindByName(string name, List<Recipe> recipeList)
-        {   
+        {
             return recipeList.First(r => r.Name == name);
         }
 

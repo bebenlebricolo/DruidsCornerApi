@@ -28,7 +28,7 @@ namespace DruidsCornerUnitTests.Models.Google
             var configuration = builder.Build();
 
             var deployedDatabaseConfig = new DeployedDatabaseConfig();
-            Assert.IsTrue(deployedDatabaseConfig.FromConfig(configuration));
+            Assert.IsFalse(deployedDatabaseConfig.FromConfig(configuration));
             Assert.AreEqual(deployedDatabaseConfig.RootFolderPath, "Value1");
             Assert.AreEqual(deployedDatabaseConfig.ImagesFolderPath, "Value2");
             Assert.AreEqual(deployedDatabaseConfig.PdfPagesFolderPath, "Value3");

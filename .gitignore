@@ -1,4 +1,6 @@
 .vs
+.venv
+.vscode
 [Bb]uild
 bin
 obj

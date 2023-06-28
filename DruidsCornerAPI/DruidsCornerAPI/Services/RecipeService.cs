@@ -10,8 +10,8 @@ namespace DruidsCornerAPI.Services
     /// </summary>
     public enum DatabaseSourceMode
     {
-        LocalMode, // Database will be retrieved locally (using the appsettings.json configuration)
-        CloudMode, // Database will be retrieved from Cloud Storage
+        Local, // Database will be retrieved locally (using the appsettings.json configuration)
+        Cloud, // Database will be retrieved from Cloud Storage
         Unknown    // Default, used to encode the "Failure" mode, when input data parsing is unsuccessful.
     }
 
@@ -19,7 +19,7 @@ namespace DruidsCornerAPI.Services
     {
         private readonly IConfiguration _configuration;
         private ILogger<RecipeService> _logger;
-        private static string DBModeEnvVarName = "DBMode";
+        private static string DBModeEnvVarName = "DRUIDSCORNERAPI_DBMODE";
 
         public RecipeService(IConfiguration configuration, ILogger<RecipeService> logger)
         {
@@ -46,7 +46,7 @@ namespace DruidsCornerAPI.Services
             if (false == Enum.TryParse(dbModeEnv, out dbModeEnum))
             {
                 // Enforce the LocalMode anyway
-                dbModeEnum = DatabaseSourceMode.LocalMode;
+                dbModeEnum = DatabaseSourceMode.Local;
             }
             return dbModeEnum;
         }
@@ -54,7 +54,7 @@ namespace DruidsCornerAPI.Services
         protected IDatabaseHandler GetDatabaseHandler(DatabaseSourceMode dbMode) 
         {
             // Local deployment needs proper path handling
-            if (dbMode == DatabaseSourceMode.LocalMode)
+            if (dbMode == DatabaseSourceMode.Local)
             {
                 var deployedConfig = new DeployedDatabaseConfig();
                 var parsingSuccess = deployedConfig.FromConfig(_configuration);
