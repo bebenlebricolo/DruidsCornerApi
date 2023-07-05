@@ -47,3 +47,41 @@ So first, we need to set the secrets :
 ```bash
 dotnet user-secrets set "Authentication:Google:ClientId" "<ClientID>" -p DruidsCornerAPI/DruidsCornerAPI
 ```
+
+# Build and publishing the API remotely
+
+## Requirements 
+* Having Docker installed
+* Gcloud cli tools for api publishing
+  * Install gcloud tools from Google download areas (tried with linux distro managed packages but they prevent further gcloud plugin installation so better resort to the original installers in gcloud...)
+
+## Docker build
+```bash
+cd DruidsCornerApi
+
+# Both service account and sa key files are required to build this image
+# -> This allows docker to download DiyDogExtracted database directly from GS buckets through service account authentication
+export SERVICE_ACCOUNT="Myservice_account"
+export SA_KEYFILE="$(cat somefile.json)"
+docker build . -t druidscornerapi-build --build-arg SERVICE_ACCOUNT=$SERVICE_ACCOUNT --build-arg SA_KEYFILE=$SA_KEYFILE
+```
+
+## Publish docker image to container registry 
+### Base configuration
+```bash
+  gcloud init
+  gcloud config set projects <google cloud project id>
+  gcloud auth login
+  # Or via a service account (scenario when image is built and pushed from servers, like from Github or Azure Dev Ops)
+  gcloud auth activate-service-account <ACCOUNT> --key-file=<KEY-FILE>
+  gcloud auth configure-docker europe-docker.pkg.dev # docker container registry is hosted in europe for now, this can change.
+```
+
+***Note : for service account authentication, [google has made a page available for that](https://cloud.google.com/artifact-registry/docs/docker/authentication?hl=fr)***
+
+### Publishing
+```bash
+  docker tag [IMAGE] gcr.io/[PROJECT-ID]/[IMAGE]
+  docker push gcr.io/[PROJECT-ID]/[IMAGE]
+  
+```
