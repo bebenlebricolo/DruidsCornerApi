@@ -13,10 +13,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
     steps:
     - name: Build Docker image
-      working-directory: DruidsCornerApi/
       run : docker build . -t druidscornerapi-build --build-arg SA_KEYFILE=${{ secrets.DRUIDS_CORNER_CLOUD_CICD_SA_KEYFILE}} --build-arg BUCKET_DBPATH=${{ secrets.DRUIDS_CORNER_CLOUD_BUCKET_DBPATH}}
 
     - name: Test

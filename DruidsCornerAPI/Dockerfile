@@ -23,6 +23,7 @@ RUN apt-get install -y  \
     python3-dev         \
     python3-setuptools  \
     python3-pip         \
+    unzip               \
     vim
 
 # Cannot use the debian-packaged google cloud sdk tools because it comes with a bundle python
@@ -68,6 +69,7 @@ FROM build as dbprep
 
 # Download the database using gsutil now
 RUN gsutil cp ${BUCKET_DBPATH} /tmp/diydog-db.zip
+RUN mkdir -p /${ROOT_DIR}/app/publish/diydog-db
 RUN unzip /tmp/diydog-db.zip -d /${ROOT_DIR}/app/publish/diydog-db
 
 #WORKDIR /app

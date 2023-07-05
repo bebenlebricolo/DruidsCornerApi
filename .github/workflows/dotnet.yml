@@ -37,11 +37,4 @@ jobs:
         name: test-results
         path: DruidsCornerAPI/DruidsCornerUnitTests/TestResults/TestResults.xml
       
-    - name : Forcing status check
-      if : always()
-      run : |
-        echo "Job status = ${{ job.status }}"
-        if [ ${{ job.status }} == "success" ] ; then
-          exit 0
-        fi
-        exit 1
+    
