@@ -68,7 +68,9 @@ RUN dotnet publish /${ROOT_DIR}/DruidsCornerAPI/DruidsCornerAPI.csproj -c Releas
 FROM build as dbprep
 
 # Download the database using gsutil now
-RUN gsutil cp ${BUCKET_DBPATH} /tmp/diydog-db.zip
+RUN echo "${BUCKET_DBPATH}" > /tmp/test.txt
+RUN cat /tmp/test.txt
+RUN gsutil cp gs://druidscornercloud-bucket/DiyDogExracted/diydog-db.zip /tmp/diydog-db.zip
 RUN mkdir -p /${ROOT_DIR}/app/publish/diydog-db
 RUN unzip /tmp/diydog-db.zip -d /${ROOT_DIR}/app/publish/diydog-db
 
