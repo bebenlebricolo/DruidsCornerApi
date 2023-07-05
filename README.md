@@ -1,4 +1,4 @@
-[![DruidsCornerApi build and test](https://github.com/bebenlebricolo/DruidsCornerApi/actions/workflows/dotnet.yml/badge.svg?branch=main)](https://github.com/bebenlebricolo/DruidsCornerApi/actions/workflows/dotnet.yml)
+[![DruidsCornerApi build and test](https://github.com/bebenlebricolo/DruidsCornerApi/actions/workflows/dotnet.yml/badge.svg?branch=main)](https://github.com/bebenlebricolo/DruidsCornerApi/actions/workflows/dotnet.yml) [![Docker build and Push](https://github.com/bebenlebricolo/DruidsCornerApi/actions/workflows/docker_image.yml/badge.svg)](https://github.com/bebenlebricolo/DruidsCornerApi/actions/workflows/docker_image.yml)
 
 # DruidsCornerApi
 Druid's Corner API
