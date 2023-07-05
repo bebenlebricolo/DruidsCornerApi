@@ -1,0 +1,34 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: DruidsCornerApi Docker image build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Build Docker image
+      working-directory: DruidsCornerApi/
+      run : docker build . -t druidscornerapi-build --build-arg SA_KEYFILE=${{ secrets.DRUIDS_CORNER_CLOUD_CICD_SA_KEYFILE}} --build-arg BUCKET_DBPATH=${{ secrets.DRUIDS_CORNER_CLOUD_BUCKET_DBPATH}}
+
+    - name: Test
+      run: docker run --name testing_container "dotnet" "test" "DruidsCornerAPI/DruidsCornerUnitTests/DruidsCornerUnitTests.csproj" "-l:junit" "-c" "Release" "--verbosity" "normal"
+
+    - name: Retrieve tests results
+      run: docker cp testing_container:DruidsCornerAPI/DruidsCornerUnitTests/TestResults/TestResults.xml TestResults/TestResults.xml
+
+    - name: Archive Test Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: TestResults/TestResults.xml
+      
+    
