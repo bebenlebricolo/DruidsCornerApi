@@ -1,13 +1,18 @@
 using DruidsCornerAPI.AuthenticationHandlers;
 using DruidsCornerAPI.Models.DiyDog;
 using DruidsCornerAPI.Services;
+using DruidsCornerAPI.Models.Config;
 using DruidsCornerAPI.Tools;
-using Google.Apis.Auth.OAuth2;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OAuth;
+
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
+
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -208,10 +213,23 @@ namespace DruidsCornerAPI
             // Registering available services
             builder.Services.AddSingleton<RecipeService>();
 
+            var slidingPolicy = "sliding";
+            var rateLimitingOptions = new WebRateLimits();
+            rateLimitingOptions.FromConfig(builder.Configuration);
+            builder.Services.AddRateLimiter(_ => _
+                .AddSlidingWindowLimiter(policyName: slidingPolicy, options =>
+                {
+                    options.PermitLimit = rateLimitingOptions.PermitLimit;
+                    options.Window = TimeSpan.FromSeconds(rateLimitingOptions.WindowSeconds);
+                    options.SegmentsPerWindow = rateLimitingOptions.SegmentsPerWindow;
+                    options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    options.QueueLimit = rateLimitingOptions.QueueLimit;
+                }));
 
             var app = builder.Build();
             
             // Configure the HTTP request pipeline.
+            app.UseRateLimiter();
             app.UseCors("AllowAll");
             app.UseSwagger();
             app.UseSwaggerUI(options =>
@@ -224,7 +242,7 @@ namespace DruidsCornerAPI
             app.UseHttpLogging();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.MapControllers();
+            app.MapControllers().RequireRateLimiting(slidingPolicy);
 
             app.Run();
         }
