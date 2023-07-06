@@ -17,6 +17,9 @@ inputs:
     required: true
     type: string
   
+  keyfile:
+    required: true
+    type: string
 
 
 
@@ -26,11 +29,13 @@ runs:
   steps:
   - name: Build base image
     working-directory: DruidsCornerAPI 
+    shell: bash
     run : |
-      docker build -f Dockerfile.base . -t druidscornerapi-base --build-arg SA_KEYFILE='${{ secrets.DRUIDS_CORNER_CLOUD_CICD_SA_KEYFILE }}' --build-arg BUCKET_DBPATH='${{ inputs.db-path }}'
+      docker build -f Dockerfile.base . -t druidscornerapi-base --build-arg SA_KEYFILE='${{ inputs.keyfile }}' --build-arg BUCKET_DBPATH=${{ inputs.dbpath }}
       docker tag druidscornerapi-base ${{ inputs.gcrtag }}/druidscornerapi-base:${{ inputs.imgtag }}
 
   - name: Publish image
+    shell: bash
     run : |
       docker push ${{ inputs.gcrtag }}/druidscornerapi-base:${{ inputs.imgtag }}
     

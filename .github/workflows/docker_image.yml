@@ -42,12 +42,13 @@ jobs:
         gcloud auth configure-docker $CONTAINER_REG_ZONE
 
     - name: Build base image
-      uses: "./.github/template/base_image" #Just need to pass the path from action
-      if: github.event.inputs.build_base == true
+      uses: "./.github/template/base_image"
+      if: github.event.inputs.build_base == 'true'
       with:
         dbpath: $BUCKET_DBPATH
         gcrtag: $CONTAINER_REG_ZONE/$GCP_PROJECT_ID/$CONTAINER_REGISTRY
         imgtag : $IMAGE_TAG
+        keyfile: ${{ secrets.DRUIDS_CORNER_CLOUD_CICD_SA_KEYFILE }}
 
     - name: Build Docker image (with UnitTests)
       working-directory: DruidsCornerAPI 
