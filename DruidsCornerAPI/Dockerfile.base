@@ -18,13 +18,8 @@ RUN apt-get update -y
 RUN apt-get install -y  \
     apt-transport-https \
     ca-certificates     \
-    gnupg               \
     curl                \
-    python3-dev         \
-    python3-setuptools  \
-    python3-pip         \
-    unzip               \
-    vim
+    unzip               
 
 # Cannot use the debian-packaged google cloud sdk tools because it comes with a bundle python
 # Which makes it very hard to modify. Gcloud sdk version : (437.0.1-0)
@@ -60,3 +55,4 @@ RUN gsutil cp ${BUCKET_DBPATH} /tmp/diydog-db.zip
 RUN mkdir -p /app/deployed/diydog-db
 RUN unzip /tmp/diydog-db.zip -d /app/deployed/diydog-db
 RUN mv /app/deployed/diydog-db/deployed/* /app/deployed/diydog-db/ && rm -r /app/deployed/diydog-db/deployed
+RUN rm /tmp/diydog-db.zip

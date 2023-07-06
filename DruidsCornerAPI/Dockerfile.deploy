@@ -1,4 +1,4 @@
-FROM gcr.io/druids-corner-cloud/druidscornerapi-base as build
+FROM europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-base as build
 
 # Take the whole sources, we also want to embed the tests in order to run them from within the container (as part of CI/CD worfklow)
 COPY  . ${ROOT_DIR}
