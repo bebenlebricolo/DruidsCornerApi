@@ -23,7 +23,6 @@ env:
   CONTAINER_REGISTRY : druidscornercloud-registry
   GCP_PROJECT_ID : druids-corner-cloud
   IMAGE_TAG: latest
-  GCRTAG: $CONTAINER_REG_ZONE/$GCP_PROJECT_ID/$CONTAINER_REGISTRY
 
 jobs:
   build:
@@ -31,28 +30,23 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Login to GCR
-      uses: docker/login-action@v2
-      with:
-        registry: gcr.io
-        username: _json_key
-        password: ${{ secrets.DRUIDS_CORNER_CLOUD_CICD_SA_KEYFILE }}
+    - name: Authenticate docker with GCloud
+      run: |
+        printf '%s' '${{ secrets.DRUIDS_CORNER_CLOUD_CICD_SA_KEYFILE }}' > keyfile.json
+        gcloud auth activate-service-account '${{ secrets.DRUIDS_CORNER_CLOUD_CICD_SA }}' --key-file=keyfile.json
+        gcloud auth configure-docker $CONTAINER_REG_ZONE
 
     - name: Build base image
       uses: "./.github/template/base_image" #Just need to pass the path from action
       if: github.event.inputs.build_base == true
       with:
         dbpath: $BUCKET_DBPATH
-        gcrtag: $GCRTAG
+        gcrtag: $CONTAINER_REG_ZONE/$GCP_PROJECT_ID/$CONTAINER_REGISTRY
         imgtag : $IMAGE_TAG
 
     - name: Build Docker image (with UnitTests)
       working-directory: DruidsCornerAPI 
       run : |
-        printf '%s' '${{ secrets.DRUIDS_CORNER_CLOUD_CICD_SA_KEYFILE }}' > keyfile.json
-        gcloud auth activate-service-account '${{ secrets.DRUIDS_CORNER_CLOUD_CICD_SA }}' --key-file=keyfile.json
-        gcloud auth configure-docker $CONTAINER_REG_ZONE
-
         docker build -f Dockerfile.deploy --target build . -t druidscornerapi-build
 
     - name: Test
@@ -76,7 +70,7 @@ jobs:
     
     - name: Publish image
       run : |
-        docker push gcr.io/druids-corner-cloud/druidscornerapi-base
+        docker push $CONTAINER_REG_ZONE/$GCP_PROJECT_ID/$CONTAINER_REGISTRY/druidscornerapi-deploy:$IMAGE_TAG
         
         
       
