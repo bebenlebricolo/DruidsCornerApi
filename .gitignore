@@ -4,6 +4,7 @@
 [Bb]uild
 bin
 obj
-TestDatabase
+diydog-db
 TestResults
 DiyDogExtractedDb
+published

@@ -1,0 +1,15 @@
+FROM gcr.io/druids-corner-cloud/druidscornerapi-base as build
+
+# Take the whole sources, we also want to embed the tests in order to run them from within the container (as part of CI/CD worfklow)
+COPY  . ${ROOT_DIR}
+WORKDIR /${ROOT_DIR}
+
+# Build the whole thing in Release mode
+RUN dotnet build DruidsCornerAPI.sln -c Release
+RUN dotnet publish /${ROOT_DIR}/DruidsCornerAPI/DruidsCornerAPI.csproj -c Release -o /app/deployed /p:UseAppHost=false
+
+# Stipped down version
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS druidscornerapi-deploy
+WORKDIR /app
+COPY --from=build /app/deployed .
+ENTRYPOINT ["dotnet", "DruidsCornerAPI.dll"]
