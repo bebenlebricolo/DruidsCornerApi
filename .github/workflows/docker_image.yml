@@ -49,6 +49,10 @@ jobs:
     - name: Build Docker image (with UnitTests)
       working-directory: DruidsCornerAPI 
       run : |
+        printf '%s' '${{ secrets.DRUIDS_CORNER_CLOUD_CICD_SA_KEYFILE }}' > keyfile.json
+        gcloud auth activate-service-account '${{ secrets.DRUIDS_CORNER_CLOUD_CICD_SA }}' --key-file=keyfile.json
+        gcloud auth configure-docker $CONTAINER_REG_ZONE
+
         docker build -f Dockerfile.deploy --target build . -t druidscornerapi-build
 
     - name: Test
