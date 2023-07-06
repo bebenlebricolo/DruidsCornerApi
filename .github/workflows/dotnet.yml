@@ -6,8 +6,13 @@ name: .NET Build and Test
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'DruidsCornerAPI/**'
+  
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'DruidsCornerAPI/**'
 
 jobs:
   build:
