@@ -69,7 +69,6 @@ jobs:
     - name: Build Docker image for deployment (stripped down version)
       working-directory: DruidsCornerAPI 
       run : |
-        echo $GITHUB_CONTEXT
         docker build -f Dockerfile.deploy . -t druidscornerapi-deploy
         docker tag druidscornerapi-deploy $CONTAINER_REG_ZONE/$GCP_PROJECT_ID/$CONTAINER_REGISTRY/druidscornerapi-deploy:$IMAGE_TAG
     
