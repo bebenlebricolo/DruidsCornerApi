@@ -17,9 +17,10 @@ namespace DruidsCornerUnitTests.Models.Google
             var appSettings = @"{
                 ""DeployedDatabaseConfig"":{
                     ""RootFolderPath"" : ""Value1"",
-                    ""ImagesFolderPath"" : ""Value2"",
-                    ""PdfPagesFolderPath"" : ""Value3"",
-                    ""RecipesFolderPath"" : ""Value4""
+                    ""ImagesFolderName"" : ""Value2"",
+                    ""PdfPagesFolderName"" : ""Value3"",
+                    ""RecipesFolderName"" : ""Value4"",
+                    ""IndexedDbFolderName"" : ""Value5""
                   }
             }";
             var builder = new ConfigurationBuilder();
@@ -30,9 +31,10 @@ namespace DruidsCornerUnitTests.Models.Google
             var deployedDatabaseConfig = new DeployedDatabaseConfig();
             Assert.IsFalse(deployedDatabaseConfig.FromConfig(configuration));
             Assert.AreEqual(deployedDatabaseConfig.RootFolderPath, "Value1");
-            Assert.AreEqual(deployedDatabaseConfig.ImagesFolderPath, "Value2");
-            Assert.AreEqual(deployedDatabaseConfig.PdfPagesFolderPath, "Value3");
-            Assert.AreEqual(deployedDatabaseConfig.RecipesFolderPath, "Value4");
+            Assert.AreEqual(deployedDatabaseConfig.ImagesFolderName, "Value2");
+            Assert.AreEqual(deployedDatabaseConfig.PdfPagesFolderName, "Value3");
+            Assert.AreEqual(deployedDatabaseConfig.RecipesFolderName, "Value4");
+            Assert.AreEqual(deployedDatabaseConfig.IndexedDbFolderName, "Value5");
         }
     }
 }

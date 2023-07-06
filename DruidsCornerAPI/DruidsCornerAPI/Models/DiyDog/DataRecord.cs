@@ -7,11 +7,14 @@ using System.Text.Json.Serialization;
 namespace DruidsCornerAPI.Models.DiyDog
 {
 
+    /// <summary>
+    /// Encodes which kind or record we are facing (either a local file source or a Cloud Record)
+    /// </summary>
     public enum RecordKind
     {
-        FileSource,
-        CloudRecord,
-        Unknown
+        FileSource,     // File record (local database, json based)
+        CloudRecord,    // Cloud record (remote distributed database)
+        Unknown         // Default value
     }
 
     /// <summary>
@@ -20,12 +23,24 @@ namespace DruidsCornerAPI.Models.DiyDog
     /// </summary>
     public class DataRecordPolymorphicConverter : JsonConverter<DataRecord>
     {
+        /// <summary>
+        /// Checks the incoming type can be converted into the DataRecord.
+        /// </summary>
+        /// <param name="typeToConvert"></param>
+        /// <returns></returns>
         public override bool CanConvert(Type typeToConvert)
         {
             return typeof(DataRecord).IsAssignableFrom(typeToConvert);
         }
 
 
+        /// <summary>
+        /// Reads a datarecord from a Json object (custom decoder)
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="typeToConvert"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public override DataRecord Read( ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (reader.TokenType != JsonTokenType.StartObject)
@@ -100,6 +115,12 @@ namespace DruidsCornerAPI.Models.DiyDog
             throw new JsonException();
         }
 
+        /// <summary>
+        /// Polymorphically encodes the DataRecord based on the actual object type.
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="record"></param>
+        /// <param name="options"></param>
         public override void Write(Utf8JsonWriter writer, DataRecord record, JsonSerializerOptions options)
         {
             writer.WriteStartObject();
@@ -109,6 +130,9 @@ namespace DruidsCornerAPI.Models.DiyDog
     }
 
    
+    /// <summary>
+    /// Base Data record class, used to provide an interface to the two underlying types
+    /// </summary>
     public abstract class DataRecord
     {
         public RecordKind Kind { get; set; } = RecordKind.Unknown;

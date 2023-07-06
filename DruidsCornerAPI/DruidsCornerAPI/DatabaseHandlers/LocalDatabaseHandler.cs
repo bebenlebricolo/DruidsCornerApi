@@ -25,9 +25,9 @@ namespace DruidsCornerAPI.DatabaseHandlers
         private void InitDirectories(DeployedDatabaseConfig config)
         {
             _deployedDBDir = new DirectoryInfo(config.RootFolderPath);
-            _imagesDir = new DirectoryInfo(config.ImagesFolderPath);
-            _pdfPagesDir = new DirectoryInfo(config.PdfPagesFolderPath);
-            _recipesDir = new DirectoryInfo(config.RecipesFolderPath);
+            _imagesDir = new DirectoryInfo(config.ImagesFolderName);
+            _pdfPagesDir = new DirectoryInfo(config.PdfPagesFolderName);
+            _recipesDir = new DirectoryInfo(config.RecipesFolderName);
             _cachedRecipes = new List<Recipe>();
             _jsonOptions = JsonOptionsProvider.GetModelsJsonOptions();
         }

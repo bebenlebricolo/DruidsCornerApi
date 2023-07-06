@@ -1,9 +1,17 @@
 ﻿using Microsoft.Extensions.Primitives;
+using System.IO;
 
 namespace DruidsCornerAPI.Models.Config
 {
+    /// <summary>
+    /// Models out the locally deployed database configuration (used in an appsettings.json)
+    /// </summary>
+    /// <value></value>
     public record DeployedDatabaseConfig
     {
+        /// <summary>
+        /// Base section name for the local deployed Database Config stuff
+        /// </summary>
         public static readonly string SectionName = "DeployedDatabaseConfig";
 
         ///<summary>
@@ -15,23 +23,28 @@ namespace DruidsCornerAPI.Models.Config
         /// <summary>
         /// Encodes the location of RootFolderPath in the locally deployed file-based database
         /// </summary>
-        public string RootFolderPath { get; set; } = string.Empty;
+        public string RootFolderPath { get; set; } = Path.GetTempPath();
 
         /// <summary>
         /// Encodes the location of the Images folder, in the deployed context environment
         /// </summary>
-        public string ImagesFolderPath { get; set; } = string.Empty;
+        public string ImagesFolderName { get; set; } = "images";
 
         /// <summary>
         /// Encodes the location of the Pdf pages folder, in the deployed context environment
         /// </summary>
-        public string PdfPagesFolderPath { get; set; } = string.Empty;
+        public string PdfPagesFolderName { get; set; } = "pdf_pages";
 
         /// <summary>
         /// Encodes the location of the Recipes folder, in the deployed context environment
         /// </summary>
-        public string RecipesFolderPath { get; set; } = string.Empty;
+        public string RecipesFolderName { get; set; } = "recipes";
 
+
+        /// <summary>
+        /// Encodes the name of reversed indexed databases
+        /// </summary>
+        public string IndexedDbFolderName { get; set; } = "dbanalysis";
 
         /// <summary>
         /// Tries to read members from the "DeployedDatabaseConfig" section
@@ -41,15 +54,17 @@ namespace DruidsCornerAPI.Models.Config
         public bool FromConfigSection(IConfigurationSection section)
         {
             bool success = true;
-            var rootFolderPath = section.GetValue<string>(nameof(RootFolderPath));
-            var pdfPagesFolderPath = section.GetValue<string>(nameof(PdfPagesFolderPath));
-            var imagesFolderPath = section.GetValue<string>(nameof(ImagesFolderPath));
-            var recipesFolderPath = section.GetValue<string>(nameof(RecipesFolderPath));
+            var rootFolderName = section.GetValue<string>(nameof(RootFolderPath));
+            var pdfPagesFolderName = section.GetValue<string>(nameof(PdfPagesFolderName));
+            var imagesFolderName = section.GetValue<string>(nameof(ImagesFolderName));
+            var recipesFolderName = section.GetValue<string>(nameof(RecipesFolderName));
+            var indexedDbFolderName = section.GetValue<string>(nameof(IndexedDbFolderName));
 
-            RootFolderPath = rootFolderPath ?? string.Empty;
-            PdfPagesFolderPath = pdfPagesFolderPath?? string.Empty;
-            ImagesFolderPath = imagesFolderPath ?? string.Empty;
-            RecipesFolderPath = recipesFolderPath ?? string.Empty;
+            RootFolderPath = rootFolderName ?? RootFolderPath;
+            PdfPagesFolderName = pdfPagesFolderName ?? PdfPagesFolderName;
+            ImagesFolderName = imagesFolderName ?? ImagesFolderName;
+            RecipesFolderName = recipesFolderName ?? RecipesFolderName;
+            IndexedDbFolderName = indexedDbFolderName ?? IndexedDbFolderName;
 
             // String substitution with env variable value
             string? deployedEnvVarValue = Environment.GetEnvironmentVariable(DeployedDBEnvVarName);
@@ -57,16 +72,15 @@ namespace DruidsCornerAPI.Models.Config
             if (Path.Exists(deployedEnvVarValue))
             {
                 RootFolderPath = RootFolderPath.Replace(envVarPattern, deployedEnvVarValue);
-                PdfPagesFolderPath = PdfPagesFolderPath.Replace(envVarPattern, deployedEnvVarValue);
-                ImagesFolderPath = ImagesFolderPath.Replace(envVarPattern, deployedEnvVarValue);
-                RecipesFolderPath = RecipesFolderPath.Replace(envVarPattern, deployedEnvVarValue);
             }
 
             // Path.Exists() already takes care about potentially null-values as well.
             success &= Path.Exists(RootFolderPath);
-            success &= Path.Exists(PdfPagesFolderPath);
-            success &= Path.Exists(ImagesFolderPath);
-            success &= Path.Exists(RecipesFolderPath);
+            
+            success &= Path.Exists(Path.Combine(RootFolderPath, PdfPagesFolderName));
+            success &= Path.Exists(Path.Combine(RootFolderPath, ImagesFolderName));
+            success &= Path.Exists(Path.Combine(RootFolderPath, RecipesFolderName));
+            success &= Path.Exists(Path.Combine(RootFolderPath, IndexedDbFolderName));
 
             return success;
         }

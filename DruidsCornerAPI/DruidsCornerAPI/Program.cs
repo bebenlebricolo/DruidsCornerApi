@@ -32,12 +32,15 @@ using System.Reflection;
 
 namespace DruidsCornerAPI
 {
+    /// <summary>
+    /// Base program class
+    /// </summary>
     public class Program
     {
-        public static readonly string OAuth2Scheme = "OAuth2";
+        protected static readonly string OAuth2Scheme = "OAuth2";
 
 
-        public static void AddOpenApi(IServiceCollection services)
+        private static void AddOpenApi(IServiceCollection services)
         {
             services.AddSwaggerGen(options =>
             {
@@ -113,7 +116,7 @@ namespace DruidsCornerAPI
             });
         }
 
-        public static void SetAuthentication(WebApplicationBuilder builder)
+        private static void SetAuthentication(WebApplicationBuilder builder)
         {
             builder.Services.AddAuthentication(options =>
             {
@@ -149,6 +152,10 @@ namespace DruidsCornerAPI
         }
 
 
+        /// <summary>
+        /// Main entry poiint for app startup
+        /// </summary>
+        /// <param name="args"></param> 
         public static void Main(string[] args)
         {
             var webAppOptions = new WebApplicationOptions
@@ -156,6 +163,9 @@ namespace DruidsCornerAPI
                 Args = args
             };
             var builder = WebApplication.CreateBuilder(webAppOptions);
+            
+            // That's where we can add a new JsonConfig file if need be
+            //builder.Configuration.AddJsonFile("appsettings.local.json");
             
             // We need custom converters because some types within the Recipe object are polymorphic (DataRecord, FileRecord, CloudRecord)
             // So we need custom converters in order to represent them nicely
