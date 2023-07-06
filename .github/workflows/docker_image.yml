@@ -8,17 +8,49 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  
+  workflow_dispatch :
+    inputs:
+      build_base:
+        description: 'Build the base image as well'
+        required: true
+        default: false
+        type: boolean
+
+env:
+  BUCKET_DBPATH: gs://druidscornercloud-bucket/DiyDogExracted/diydog-db.zip
+  CONTAINER_REG_ZONE : europe-docker.pkg.dev
+  CONTAINER_REGISTRY : druidscornercloud-registry
+  GCP_PROJECT_ID : druids-corner-cloud
+  IMAGE_TAG: latest
+  GCRTAG: $CONTAINER_REG_ZONE/$GCP_PROJECT_ID/CONTAINER_REGISTRY
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Build Docker image
+
+    - name: Login to GCR
+      uses: docker/login-action@v2
+      with:
+        registry: gcr.io
+        username: _json_key
+        password: ${{ secrets.DRUIDS_CORNER_CLOUD_CICD_SA_KEYFILE }}
+
+    - name: Build base image
+      uses: ".github/template/base_image" #Just need to pass the path from action
+      if: github.event.inputs.build_base == true
+      with:
+        dbpath: $BUCKET_DBPATH
+        gcrtag: $GCRTAG
+        imgtag : $IMAGE_TAG
+
+    - name: Build Docker image (with UnitTests)
       working-directory: DruidsCornerAPI 
       run : |
-        docker build . -t druidscornerapi-build --build-arg SA_KEYFILE='${{ secrets.DRUIDS_CORNER_CLOUD_CICD_SA_KEYFILE }}' --build-arg BUCKET_DBPATH=$BUCKET_DBPATH
+        echo $GITHUB_CONTEXT
+        docker build -f Dockerfile.deploy --target build . -t druidscornerapi-build
 
     - name: Test
       run: docker run --name testing_container druidscornerapi-build  "dotnet" "test" "DruidsCornerUnitTests" "-l:junit" "-c" "Release" 
@@ -31,5 +63,18 @@ jobs:
       with:
         name: test-results
         path: TestResults.xml
+    
+    - name: Build Docker image for deployment (stripped down version)
+      working-directory: DruidsCornerAPI 
+      run : |
+        echo $GITHUB_CONTEXT
+        docker build -f Dockerfile.deploy . -t druidscornerapi-deploy
+        docker tag druidscornerapi-deploy $CONTAINER_REG_ZONE/$GCP_PROJECT_ID/$CONTAINER_REGISTRY/druidscornerapi-deploy:$IMAGE_TAG
+    
+    - name: Publish image
+      run : |
+        docker push gcr.io/druids-corner-cloud/druidscornerapi-base
+        
+        
       
     
