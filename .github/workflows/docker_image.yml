@@ -23,7 +23,7 @@ env:
   CONTAINER_REGISTRY : druidscornercloud-registry
   GCP_PROJECT_ID : druids-corner-cloud
   IMAGE_TAG: latest
-  GCRTAG: $CONTAINER_REG_ZONE/$GCP_PROJECT_ID/CONTAINER_REGISTRY
+  GCRTAG: $CONTAINER_REG_ZONE/$GCP_PROJECT_ID/$CONTAINER_REGISTRY
 
 jobs:
   build:
@@ -39,7 +39,7 @@ jobs:
         password: ${{ secrets.DRUIDS_CORNER_CLOUD_CICD_SA_KEYFILE }}
 
     - name: Build base image
-      uses: ".github/template/base_image" #Just need to pass the path from action
+      uses: "./.github/template/base_image" #Just need to pass the path from action
       if: github.event.inputs.build_base == true
       with:
         dbpath: $BUCKET_DBPATH
@@ -49,7 +49,6 @@ jobs:
     - name: Build Docker image (with UnitTests)
       working-directory: DruidsCornerAPI 
       run : |
-        echo $GITHUB_CONTEXT
         docker build -f Dockerfile.deploy --target build . -t druidscornerapi-build
 
     - name: Test

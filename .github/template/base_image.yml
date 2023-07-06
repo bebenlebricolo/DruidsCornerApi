@@ -27,6 +27,7 @@ runs:
   - name: Build base image
     working-directory: DruidsCornerAPI 
     run : |
+      echo ${{inputs.GCRTAG}}
       docker build -f Dockerfile.base . -t druidscornerapi-base --build-arg SA_KEYFILE='${{ secrets.DRUIDS_CORNER_CLOUD_CICD_SA_KEYFILE }}' --build-arg BUCKET_DBPATH='${{ inputs.db-path }}'
       docker tag druidscornerapi-base ${{ inputs.gcrtag }}/druidscornerapi-base:${{ inputs.imgtag }}
 
