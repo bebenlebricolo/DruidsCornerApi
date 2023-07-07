@@ -10,6 +10,9 @@ RUN dotnet publish /${ROOT_DIR}/DruidsCornerAPI/DruidsCornerAPI.csproj -c Releas
 
 # Stipped down version
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS druidscornerapi-deploy
+EXPOSE 80
+EXPOSE 443
+
 WORKDIR /app
 COPY --from=build /app/deployed .
 ENTRYPOINT ["dotnet", "DruidsCornerAPI.dll"]
