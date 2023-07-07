@@ -8,7 +8,14 @@
 - [Run the api locally (against localhost:)](#run-the-api-locally-against-localhost)
 - [Run the tests](#run-the-tests)
 - [Environment variables setup](#environment-variables-setup)
-- [Local secrets store](#local-secrets-store)
+- [Local Database downloading](#local-database-downloading)
+- [General project architecture](#general-project-architecture)
+  - [DiyDog database generation](#diydog-database-generation)
+  - [WebApi deployment](#webapi-deployment)
+  - [Client device/service](#client-deviceservice)
+- [Manual test and run workflow](#manual-test-and-run-workflow)
+  - [Use the gcloudauth python tool](#use-the-gcloudauth-python-tool)
+  - [Use the generated token (valid for 1 hour) to connect to the WebApi](#use-the-generated-token-valid-for-1-hour-to-connect-to-the-webapi)
 - [Build and publishing the API remotely](#build-and-publishing-the-api-remotely)
   - [Requirements](#requirements)
   - [Docker build](#docker-build)
@@ -52,19 +59,66 @@ Here is a list of the env vars and what they do :
 
 |   env var name        |  example/values       |   description         |
 |-----------------------|-----------------------|-----------------------|
-| `DRUIDSCORNERAPI_DIR` |`"C:\\YourName\\DruidsCornerApi\TestDatabase"` | Tells the runtime where to find repo's base location. Used for testing purposes (with local database especially) |
+| `DRUIDSCORNERAPI_DIR` |`"C:\\YourName\\DruidsCornerApi\diydog-db"` | Tells the runtime where to find repo's base location. Used for testing purposes (with local database especially) |
 | `DRUIDSCORNERAPI_DBMODE` | `Local` or `Cloud` | Tells the runtime where to look for a database. This overrides the Database default selection mode |
 
-# Local secrets store
-For now (dev) this Api relies on dotnet user secrets stores.
-When cloning the project, the secret store is enabled for the **DruidsCornerAPI project** but no entries are saved.
-So first, we need to set the secrets :
+# Local Database downloading
+In order to be able to use the **Local** database mode, you first need to download the database locally.
+This can be achieved using **gsutil** :
 ```bash
-dotnet user-secrets set "Authentication:Google:ClientId" "<ClientID>" -p DruidsCornerAPI/DruidsCornerAPI
+  gsutil cp gs://<path to db> <Temp folder>
+  unzip <Temp folder>/diydog-db.zip -d ${worskpaceFolder}/diydog-db
+  mv ${worskpaceFolder}/diydog-db/deployed/* ${worskpaceFolder}/diydog-db/*
+  rm -r ${worskpaceFolder}/diydog-db/deployed
 ```
 
-# Build and publishing the API remotely
+# General project architecture
+This project (Druids Corner Cloud) has many moving parts and requires security at various levels for everything to work properly.
 
+## DiyDog database generation
+For instance, the database is extracted by the repository [DiyDogExtractor](https://github.com/bebenlebricolo/DiyDogExtractor) and published with CI/CD pipelines to **Google Storage Buckets** (requires authentication).
+
+## WebApi deployment
+This .Net api (DruidsCornerApi) is also configured to be built and pushed automatically with CI/CD pipelines.
+Base docker image automatically downloads the latest **diydog-db** from Google Storage Buckets and is published in Google Artifact Registry.
+The Deployment image is also automatically built and deployed.
+Then the Cloud Run service is based on top of the deployed image; and the WebApi runs in Cloud Run infrastructure (requires authentication)
+
+## Client device/service
+Yet to be developped : End user application (mobile app), and Websites
+
+# Manual test and run workflow
+First, generate a token using the OAuth2 Client.
+## Use the gcloudauth python tool
+A python tool is provided under [Tools/GoogleCloudTokenGen](Tools/GoogleCloudTokenGen/gcloudauth.py).
+This tool requires you to provide valid configuration files under [Tools/GoogleCloudTokenGen/Config](Tools/GoogleCloudTokenGen/Config) where files such as `client_secrets.json` needs to be provided.
+Their content must reflect an OAuth2 client, registered in the Google Cloud Project (download credentials from there, files are ignored by git and are not embedded in the repository.)
+
+Then run the tool like this : 
+```bash
+  # Optional : Virtual environment and dependencies installation (to be done only once)
+  python -m venv .venv
+  source .venv/bin/activate
+  cd Tools/GoogleCloudTokenGen
+  pip install -r requirements.txt
+
+  # Run the script
+  python gcloudauth.py
+  # -> Will open the browser and ask you to allow the client to connect to your google account
+  # Prints a jwt token to stdout
+```
+
+## Use the generated token (valid for 1 hour) to connect to the WebApi
+The token can now be used for every call that goes to the hosted WebApi (Google's Servers) and locally as well.
+There are 2 security layers which consist of a first authentication/authorization check from Google infrastructure, then the WebApi performs another one on top of it.
+
+Simply add the token to any `HTTPS` request headers :
+```bash
+  curl -H "Authorization: Bearer <token>" https://<hostname>/<controller>/<endpoint>
+```
+
+
+# Build and publishing the API remotely
 ## Requirements 
 * Having Docker installed
 * Gcloud cli tools for api publishing
