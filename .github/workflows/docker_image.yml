@@ -23,7 +23,7 @@ on:
         type: boolean
 
 env:
-  BUCKET_DBPATH: gs://druidscornercloud-bucket/DiyDogExracted/diydog-db.zip
+  BUCKET_DBPATH: ${{ secrets.DRUIDS_CORNER_CLOUD_BUCKET_DBPATH }}
   CONTAINER_REG_ZONE : europe-docker.pkg.dev
   CONTAINER_REGISTRY : druidscornercloud-registry
   GCP_PROJECT_ID : druids-corner-cloud
