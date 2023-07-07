@@ -1,6 +1,7 @@
 import json
 import os
 import jwt
+import re
 
 from typing import cast
 
@@ -78,19 +79,33 @@ def check_client_can_request_token(target_audience : str) -> tuple[bool, str] :
         print("Client secrets file does not exist")
         return (False, "")
 
+    redirect_uris : list[str] = []
+    with open(client_secrets_file, 'r') as file :
+        content = json.load(file)
+        for uri in content["web"]["redirect_uris"] :
+            redirect_uris.append(uri)
+    
     flow = InstalledAppFlow.from_client_secrets_file(client_secrets_file,
                                                      scopes=SCOPES)
-    creds = flow.run_local_server(host="localhost", port=4200) # type: ignore
+    
+    https_candidates = [x for x in redirect_uris if "https" in x]
+    pattern = re.compile('https?:\/\/(\w*):([0-9]*)')
+    
+    candidate_uri = https_candidates[0] if len(https_candidates) != 0 else [x for x in redirect_uris if "http" in x][0]
+    matches = re.findall(pattern, candidate_uri)
+    (hostname, port_number) = matches[0]
+    creds = flow.run_local_server(host="localhost", port=int(port_number)) # type: ignore
 
     #print("Proprietary google OAUTH2 token : {}".format(flow.credentials.token))
     creds = cast(Credentials, flow.credentials)
     creds.audience = target_audience #type:ignore
+    
 
-    headers = generate_header(creds.id_token) #type:ignore
-    response = requests.get(target_audience, headers=headers)
-    if response.status_code != 200 :
-        print("Failed to authenticate service account")
-        return (False, "")
+    #headers = generate_header(creds.id_token) #type:ignore
+    #response = requests.get(target_audience, headers=headers)
+    #if response.status_code != 200 :
+    #    print("Failed to authenticate service account")
+    #    return (False, "")
 
     decoded_token = jwt.decode(creds.id_token, options={"verify_signature": False}) #type:ignore
     print("Successfully retrieved token for user {}\n\n".format(decoded_token["name"]))

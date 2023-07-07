@@ -1,10 +1,20 @@
+# Visual studio and VSCode outputs and config
 .vs
-.venv
 .vscode
+
+# Development binaries
 [Bb]uild
 bin
 obj
+
+# Testing databases folders
 diydog-db
 TestResults
-DiyDogExtractedDb
+
+
+# Locally published app
 published
+
+# Python local cache and Virtual environments
+.venv
+__pycache__
