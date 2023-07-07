@@ -139,7 +139,7 @@ namespace DruidsCornerAPI
               //})
               .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
-                options.Audience = builder.Configuration["Authentication:Google:ClientId"];
+                options.Audience = System.Environment.GetEnvironmentVariable("CLIENT_ID");
                 options.Authority = "https://accounts.google.com";
                 options.ClaimsIssuer = "https://accounts.google.com";
                 //options.TokenValidationParameters = new TokenValidationParameters

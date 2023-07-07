@@ -7,48 +7,52 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DruidsCornerAPI.DatabaseHandlers
 {
+    /// <summary>
+    /// Local database handler class handles File based local database (DiyDog database)
+    /// </summary>
     public class LocalDatabaseHandler : IDatabaseHandler
     {
-        private DirectoryInfo _deployedDBDir;
-        private DirectoryInfo _imagesDir;
-        private DirectoryInfo _pdfPagesDir;
-        private DirectoryInfo _recipesDir;
+        private DeployedDatabaseConfig _dbConfig;
 
         private List<Recipe> _cachedRecipes;
         private JsonSerializerOptions _jsonOptions;
 
+        /// <summary>
+        /// Constructs a LocalDatabaseHandler using a given DeployedDatabaseConfig as an input (points to folders)
+        /// </summary>
+        /// <param name="config"></param>
         public LocalDatabaseHandler(DeployedDatabaseConfig config)
         {
-            InitDirectories(config);
-        }
-
-        private void InitDirectories(DeployedDatabaseConfig config)
-        {
-            _deployedDBDir = new DirectoryInfo(config.RootFolderPath);
-            _imagesDir = new DirectoryInfo(config.ImagesFolderName);
-            _pdfPagesDir = new DirectoryInfo(config.PdfPagesFolderName);
-            _recipesDir = new DirectoryInfo(config.RecipesFolderName);
+            _dbConfig = config;
             _cachedRecipes = new List<Recipe>();
             _jsonOptions = JsonOptionsProvider.GetModelsJsonOptions();
         }
 
-
+        /// <summary>
+        /// Lists all available recipes on disk using a wildcard pattern 
+        /// </summary>
+        /// <returns></returns>
         protected List<string> ListAvailableRecipes()
         {
-            if(_recipesDir.Exists == false)
+            if(_dbConfig.GetRecipesFolder().Exists == false)
             {
                 return new List<string>();
             }
 
             var outList = new List<string>();
-            foreach (var element in _recipesDir.GetFiles("*.json"))
+            foreach (var element in _dbConfig.GetRecipesFolder().GetFiles("*.json"))
             {
                 outList.Add(element.FullName);
             }
             return outList;
         }
 
-        protected async Task<List<Recipe>> ParseFromIndividualRecipe(FileInfo[] files)
+        /// <summary>
+        /// Uses a list of filesources as an input to extract all recipes data from permanent storage.
+        /// </summary>
+        /// <param name="files">List of filesources to be read</param>
+        /// <returns></returns>
+        protected async Task<List<Recipe>> ParseFromIndividualRecipesFilesAsync(FileInfo[] files)
         {
             var allRecipesList = new List<Recipe>();
             foreach (var recipeFile in files)
@@ -65,6 +69,11 @@ namespace DruidsCornerAPI.DatabaseHandlers
             return allRecipesList;
         }
 
+        /// <summary>
+        /// Asynchronously fetches all recipes from disk.
+        /// </summary>
+        /// <param name="noCaching">Disables automatic caching to save memory, but slows down data accesses</param>
+        /// <returns></returns>
         public async Task<List<Recipe>> GetAllRecipesAsync(bool noCaching = false)
         {
             // Speeding up subsequent calls
@@ -75,7 +84,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
 
             var allRecipesList = new List<Recipe>();
 
-            var availableRecipes = _recipesDir.GetFiles("*.json");
+            var availableRecipes = _dbConfig.GetRecipesFolder().GetFiles("*.json");
             var allRecipesMonoFile = availableRecipes.First<FileInfo>(f => f.Name == "all_recipes.json");
             if (allRecipesMonoFile != null)
             {
@@ -96,7 +105,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
             // from disk
             if(allRecipesList.Count == 0)
             {
-                allRecipesList = await ParseFromIndividualRecipe(availableRecipes);
+                allRecipesList = await ParseFromIndividualRecipesFilesAsync(availableRecipes);
             }
 
             // Don't use cache, this will force subsequent calls to perform Disk Access
@@ -111,6 +120,11 @@ namespace DruidsCornerAPI.DatabaseHandlers
             return allRecipesList;
         }
 
+        /// <summary>
+        /// Asynchronously parses a single recipe from a file source.
+        /// </summary>
+        /// <param name="fileSource"></param>
+        /// <returns></returns>
         protected async Task<Recipe?> ReadSingleRecipeAsync(FileInfo fileSource)
         {
             var file = fileSource.OpenRead();
@@ -119,6 +133,12 @@ namespace DruidsCornerAPI.DatabaseHandlers
             return recipe;
         }
 
+        /// <summary>
+        /// Asynchronously retrieves a recipe using its base number / id in the database.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <param name="noCaching"></param>
+        /// <returns></returns>
         public async Task<Recipe?> GetRecipeByNumberAsync(uint number, bool noCaching = false)
         {
             if(_cachedRecipes != null && _cachedRecipes.Count != 0 && noCaching == false)
@@ -130,7 +150,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
                 }
             }
 
-            var matchingFile = _recipesDir.GetFiles("*.json").First(f =>
+            var matchingFile = _dbConfig.GetRecipesFolder().GetFiles("*.json").First(f =>
             {
                 var right = f.Name.Split('_')[1];
                 var numberString = right.Replace(".json", "");
@@ -150,11 +170,23 @@ namespace DruidsCornerAPI.DatabaseHandlers
             return recipe;
         }
 
+        /// <summary>
+        /// Finds a recipe using its name in a given collection (name is lowercased)
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="recipeList"></param>
+        /// <returns></returns>
         protected Recipe? FindByName(string name, List<Recipe> recipeList)
         {
             return recipeList.First(r => r.Name.ToLower() == name.ToLower());
         }
 
+        /// <summary>
+        /// Asynchronously retrieves a recipe using its name as a key (lowercased)
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="noCaching"></param>
+        /// <returns></returns>
         public async Task<Recipe?> GetRecipeByNameAsync(string name, bool noCaching = false)
         {
             if (_cachedRecipes != null && _cachedRecipes.Count != 0)
@@ -171,6 +203,12 @@ namespace DruidsCornerAPI.DatabaseHandlers
             return matchingRecipe;
         }
 
+        /// <summary>
+        /// Asynchronously retrieves an Image for a single recipe
+        /// </summary>
+        /// <param name="number"></param>
+        /// <param name="noCaching"></param>
+        /// <returns></returns>
         public async Task<Stream?> GetRecipeImageAsync(uint number, bool noCaching = false)
         {
             var recipe = await GetRecipeByNumberAsync(number, noCaching);
@@ -178,7 +216,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
             {
                 // This path is a local path relative to Root Folder
                 var filePath = new FileInfo((recipe.Image as FileRecord).Path);
-                var candidate = _imagesDir.GetFiles(filePath.Name).First();
+                var candidate = _dbConfig.GetImagesFolder().GetFiles(filePath.Name).First();
                 if (candidate != null)
                 {
                    return new BufferedStream(candidate.OpenRead());
@@ -187,6 +225,12 @@ namespace DruidsCornerAPI.DatabaseHandlers
             return null;
         }
 
+        /// <summary>
+        /// Asynchronously retrieves a PDF page for a single recipe
+        /// </summary>
+        /// <param name="number"></param>
+        /// <param name="noCaching"></param>
+        /// <returns></returns>
         public async Task<Stream?> GetRecipePdfPageAsync(uint number, bool noCaching = false)
         {
             var recipe = await GetRecipeByNumberAsync(number, noCaching);
@@ -195,7 +239,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
                 // This path is a local path relative to Root Folder
                 //var filePath = new FileInfo((recipe.PdfPage as FileRecord).Path);
                 var baseName = $"page_{number}.pdf";
-                var candidate = _pdfPagesDir.GetFiles(baseName).First();
+                var candidate = _dbConfig.GetPdfPagesFolder().GetFiles(baseName).First();
                 if (candidate != null)
                 {
                     return new BufferedStream(candidate.OpenRead());

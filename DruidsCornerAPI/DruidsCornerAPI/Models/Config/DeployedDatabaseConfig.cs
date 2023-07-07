@@ -23,28 +23,30 @@ namespace DruidsCornerAPI.Models.Config
         /// <summary>
         /// Encodes the location of RootFolderPath in the locally deployed file-based database
         /// </summary>
-        public string RootFolderPath { get; set; } = Path.GetTempPath();
+        protected string RootFolderPath { get; private set;} = Path.GetTempPath();
 
         /// <summary>
         /// Encodes the location of the Images folder, in the deployed context environment
         /// </summary>
-        public string ImagesFolderName { get; set; } = "images";
-
+        protected string ImagesFolderName { get; set; } = "images";
+        
         /// <summary>
         /// Encodes the location of the Pdf pages folder, in the deployed context environment
         /// </summary>
-        public string PdfPagesFolderName { get; set; } = "pdf_pages";
+        protected string PdfPagesFolderName { get; set; } = "pdf_pages";
+
 
         /// <summary>
         /// Encodes the location of the Recipes folder, in the deployed context environment
         /// </summary>
-        public string RecipesFolderName { get; set; } = "recipes";
+        protected string RecipesFolderName { get; set; } = "recipes";
 
 
         /// <summary>
         /// Encodes the name of reversed indexed databases
         /// </summary>
-        public string IndexedDbFolderName { get; set; } = "dbanalysis";
+        protected string IndexedDbFolderName { get; set; } = "dbanalysis";
+
 
         /// <summary>
         /// Tries to read members from the "DeployedDatabaseConfig" section
@@ -69,18 +71,23 @@ namespace DruidsCornerAPI.Models.Config
             // String substitution with env variable value
             string? deployedEnvVarValue = Environment.GetEnvironmentVariable(DeployedDBEnvVarName);
             var envVarPattern = $"${{{DeployedDBEnvVarName}}}";
-            if (Path.Exists(deployedEnvVarValue))
+            if(deployedEnvVarValue is not null)
             {
                 RootFolderPath = RootFolderPath.Replace(envVarPattern, deployedEnvVarValue);
+            }
+            else 
+            {
+                throw new Exception($"Could not find {DeployedDBEnvVarName} environment variable in current context.");
             }
 
             // Path.Exists() already takes care about potentially null-values as well.
             success &= Path.Exists(RootFolderPath);
             
-            success &= Path.Exists(Path.Combine(RootFolderPath, PdfPagesFolderName));
-            success &= Path.Exists(Path.Combine(RootFolderPath, ImagesFolderName));
-            success &= Path.Exists(Path.Combine(RootFolderPath, RecipesFolderName));
-            success &= Path.Exists(Path.Combine(RootFolderPath, IndexedDbFolderName));
+            success &= GetRootFolder().Exists;
+            success &= GetImagesFolder().Exists;
+            success &= GetRecipesFolder().Exists;
+            success &= GetPdfPagesFolder().Exists;
+            success &= GetIndexedDbFolder().Exists;
 
             return success;
         }
@@ -98,6 +105,32 @@ namespace DruidsCornerAPI.Models.Config
                 return false;
             }
             return FromConfigSection(section);
+        }
+
+        public DirectoryInfo GetRootFolder()
+        {
+            return new DirectoryInfo(RootFolderPath);
+        }
+        
+        
+        public DirectoryInfo GetRecipesFolder()
+        {
+            return new DirectoryInfo(Path.Combine(RootFolderPath, RecipesFolderName));
+        }
+
+        public DirectoryInfo GetImagesFolder()
+        {
+            return new DirectoryInfo(Path.Combine(RootFolderPath, ImagesFolderName));
+        }
+
+        public DirectoryInfo GetPdfPagesFolder()
+        {
+            return new DirectoryInfo(Path.Combine(RootFolderPath, PdfPagesFolderName));
+        }
+
+        public DirectoryInfo GetIndexedDbFolder()
+        {
+            return new DirectoryInfo(Path.Combine(RootFolderPath, IndexedDbFolderName));
         }
     }
 }

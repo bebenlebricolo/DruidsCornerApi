@@ -101,10 +101,11 @@ docker tag druidscornerapi-base europe-docker.pkg.dev/druids-corner-cloud/druids
 # Optional (if docker is configured and authenticated)
 docker push europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-base
 
+export CLIENT_ID="<The web client id used>"
 # Then build the deployment image
-docker build -f Dockerfile.deploy . -t druidscornerapi-deploy
+docker build -f Dockerfile.deploy . -t druidscornerapi-deploy --build-arg CLIENT_ID=$CLIENT_ID
 # Or build and stop before image stripping down so that the dev environment is still there
-docker build -f Dockerfile.deploy --target build . -t druidscornerapi-deploy
+docker build -f Dockerfile.deploy --target build . -t druidscornerapi-deploy --build-arg CLIENT_ID=$CLIENT_ID
 
 # Optional (same as above) : push to Google Artifact Registry
 docker tag druidscornerapi-deploy europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-deploy
