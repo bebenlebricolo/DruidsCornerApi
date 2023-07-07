@@ -23,29 +23,29 @@ namespace DruidsCornerAPI.Models.Config
         /// <summary>
         /// Encodes the location of RootFolderPath in the locally deployed file-based database
         /// </summary>
-        protected string RootFolderPath { get; private set;} = Path.GetTempPath();
+        public string RootFolderPath { get; private set;} = Path.GetTempPath();
 
         /// <summary>
         /// Encodes the location of the Images folder, in the deployed context environment
         /// </summary>
-        protected string ImagesFolderName { get; set; } = "images";
+        public string ImagesFolderName { get; set; } = "images";
         
         /// <summary>
         /// Encodes the location of the Pdf pages folder, in the deployed context environment
         /// </summary>
-        protected string PdfPagesFolderName { get; set; } = "pdf_pages";
+        public string PdfPagesFolderName { get; set; } = "pdf_pages";
 
 
         /// <summary>
         /// Encodes the location of the Recipes folder, in the deployed context environment
         /// </summary>
-        protected string RecipesFolderName { get; set; } = "recipes";
+        public string RecipesFolderName { get; set; } = "recipes";
 
 
         /// <summary>
         /// Encodes the name of reversed indexed databases
         /// </summary>
-        protected string IndexedDbFolderName { get; set; } = "dbanalysis";
+        public string IndexedDbFolderName { get; set; } = "dbanalysis";
 
 
         /// <summary>
@@ -74,10 +74,6 @@ namespace DruidsCornerAPI.Models.Config
             if(deployedEnvVarValue is not null)
             {
                 RootFolderPath = RootFolderPath.Replace(envVarPattern, deployedEnvVarValue);
-            }
-            else 
-            {
-                throw new Exception($"Could not find {DeployedDBEnvVarName} environment variable in current context.");
             }
 
             // Path.Exists() already takes care about potentially null-values as well.
