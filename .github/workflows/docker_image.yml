@@ -21,7 +21,12 @@ on:
         required: true
         default: false
         type: boolean
-
+      
+      force_publish:
+        description: 'Bypasses main branch check and forces deploy image publication to GCS.'
+        required: true
+        default: false
+        type: boolean
 env:
   BUCKET_DBPATH: ${{ secrets.DRUIDS_CORNER_CLOUD_BUCKET_DBPATH }}
   CONTAINER_REG_ZONE : europe-docker.pkg.dev
@@ -74,6 +79,7 @@ jobs:
         docker tag druidscornerapi-deploy $CONTAINER_REG_ZONE/$GCP_PROJECT_ID/$CONTAINER_REGISTRY/druidscornerapi-deploy:$IMAGE_TAG
     
     - name: Publish image
+      if: ( github.event.inputs.force_publish == 'true' ) || ( github.ref == 'refs/heads/main' )
       run : |
         docker push $CONTAINER_REG_ZONE/$GCP_PROJECT_ID/$CONTAINER_REGISTRY/druidscornerapi-deploy:$IMAGE_TAG
         
