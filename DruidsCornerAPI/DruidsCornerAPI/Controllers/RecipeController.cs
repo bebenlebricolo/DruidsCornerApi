@@ -2,6 +2,7 @@ using DruidsCornerAPI.Models.DiyDog;
 using DruidsCornerAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using FuzzySharp;
 
 namespace DruidsCornerAPI.Controllers
 {

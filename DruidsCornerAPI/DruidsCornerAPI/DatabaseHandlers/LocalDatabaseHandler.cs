@@ -1,9 +1,10 @@
 ﻿using DruidsCornerAPI.Models.Config;
 using DruidsCornerAPI.Models.DiyDog;
 using DruidsCornerAPI.Tools;
-using Microsoft.Extensions.Azure;
 using System.Text.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
+using DruidsCornerAPI.Tools;
+using System.Linq.Expressions;
 
 namespace DruidsCornerAPI.DatabaseHandlers
 {
@@ -176,9 +177,18 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// <param name="name"></param>
         /// <param name="recipeList"></param>
         /// <returns></returns>
-        protected Recipe? FindByName(string name, List<Recipe> recipeList)
+        protected Tuple<int, Recipe>? FindByName(string name, List<Recipe> recipeList)
         {
-            return recipeList.First(r => r.Name.ToLower() == name.ToLower());
+            Tuple<int, Recipe>? output = null;
+            var fuzzyResult = FuzzySearch.SearchPartialRatio(name, recipeList, elem => elem.Name);
+
+            // Use a ratio threshold under which nothing is returned
+            if (fuzzyResult.Item1 >= 50)
+            {
+                output = fuzzyResult;
+            }
+
+            return output;
         }
 
         /// <summary>
@@ -191,7 +201,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
         {
             if (_cachedRecipes != null && _cachedRecipes.Count != 0)
             {
-                var cachedRecipe = FindByName(name, _cachedRecipes);
+                var cachedRecipe = FindByName(name, _cachedRecipes).Item2;
                 if (cachedRecipe != null)
                 {
                     return cachedRecipe;
@@ -199,7 +209,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
             }
 
             var allRecipes = await GetAllRecipesAsync(noCaching);
-            var matchingRecipe = FindByName(name, allRecipes);
+            var matchingRecipe = FindByName(name, allRecipes).Item2;
             return matchingRecipe;
         }
 
