@@ -1,5 +1,6 @@
 ﻿using DruidsCornerAPI.DatabaseHandlers;
 using DruidsCornerAPI.Models.Config;
+using DruidsCornerAPI.Models.SearchResults;
 using DruidsCornerAPI.Models.DiyDog;
 using DruidsCornerAPI.Models.Exceptions;
 
@@ -10,34 +11,41 @@ namespace DruidsCornerAPI.Services
     /// </summary>
     public enum DatabaseSourceMode
     {
-        Local, // Database will be retrieved locally (using the appsettings.json configuration)
-        Cloud, // Database will be retrieved from Cloud Storage
-        Unknown    // Default, used to encode the "Failure" mode, when input data parsing is unsuccessful.
+        /// <summary> Database will be retrieved locally (using the appsettings.json configuration)  </summary>
+        Local,
+        
+        /// <summary> Database will be retrieved from Cloud Storage </summary>
+        Cloud,
+
+        /// <summary> Default, used to encode the "Failure" mode, when input data parsing is unsuccessful. </summary>
+        Unknown  
     }
 
+    /// <summary>
+    /// Recipe service class ; provides database services abstractions to Controller (and various environment-based behaviours)
+    /// </summary>
     public class RecipeService
     {
         private readonly IConfiguration _configuration;
         private ILogger<RecipeService> _logger;
         private static string DBModeEnvVarName = "DRUIDSCORNERAPI_DBMODE";
 
+        /// <summary>
+        /// Standard constructor
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="logger"></param>
         public RecipeService(IConfiguration configuration, ILogger<RecipeService> logger)
         {
             _configuration = configuration;
             _logger = logger;
         }
 
-        private DeployedDatabaseConfig GetDeployedDataPathFromConfig()
-        {
-            var deployedDb = new DeployedDatabaseConfig();
-            var success = deployedDb.FromConfig(_configuration);
-            if (!success)
-            {
-                _logger.LogError("Could not retrieve local file database from configuration !");
-            }
-            return deployedDb;
-        }
-
+    
+        /// <summary>
+        /// Retrieves Database mode from local environment
+        /// </summary>
+        /// <returns></returns>
         protected DatabaseSourceMode GetMode()
         {
             DatabaseSourceMode dbModeEnum;
@@ -51,6 +59,11 @@ namespace DruidsCornerAPI.Services
             return dbModeEnum;
         }
 
+        /// <summary>
+        /// Builds / retrieves a database handler that suits the local DB environment (either Local or Cloud Based)
+        /// </summary>
+        /// <param name="dbMode"></param>
+        /// <returns></returns>
         protected IDatabaseHandler GetDatabaseHandler(DatabaseSourceMode dbMode) 
         {
             // Local deployment needs proper path handling
@@ -70,6 +83,10 @@ namespace DruidsCornerAPI.Services
             throw new NotImplementedException("Whoops ! Not there yet!");
         }
 
+        /// <summary>
+        /// Fetches all recipes from database provider
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<Recipe>> GetAllRecipesAsync()
         {
             var dbMode = GetMode();
@@ -84,7 +101,7 @@ namespace DruidsCornerAPI.Services
         /// <param name="name"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<Recipe?> GetRecipeByNameAsync(string name)
+        public async Task<RecipeResult> GetRecipeByNameAsync(string name)
         {
             var dbMode = GetMode();
             var dbHandler = GetDatabaseHandler(dbMode);
@@ -106,6 +123,11 @@ namespace DruidsCornerAPI.Services
             return await dbHandler.GetRecipeByNumberAsync(number);
         }
 
+        /// <summary>
+        /// Fetches a single recipe image using its number/id as a query parameter
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns></returns>
         public async Task<Stream?> GetRecipeImageAsync(uint number)
         {
             var dbMode = GetMode();
@@ -114,6 +136,11 @@ namespace DruidsCornerAPI.Services
             return await dbHandler.GetRecipeImageAsync(number);
         }
 
+        /// <summary>
+        /// Fetches a single recipe PDF page using its number/id as a query parameter
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns></returns>
         public async Task<Stream?> GetRecipePdfPageAsync(uint number)
         {
             var dbMode = GetMode();

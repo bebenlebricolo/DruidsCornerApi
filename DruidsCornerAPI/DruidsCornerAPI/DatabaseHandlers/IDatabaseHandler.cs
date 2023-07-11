@@ -1,4 +1,5 @@
 ﻿using DruidsCornerAPI.Models.DiyDog;
+using DruidsCornerAPI.Models.SearchResults;
 
 namespace DruidsCornerAPI.DatabaseHandlers
 {
@@ -6,7 +7,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
     {
         public Task<Recipe?> GetRecipeByNumberAsync(uint number, bool noCaching = false);
         
-        public Task<Recipe?> GetRecipeByNameAsync(string name, bool noCaching = false);
+        public Task<RecipeResult> GetRecipeByNameAsync(string name, bool noCaching = false);
 
         public Task<List<Recipe>> GetAllRecipesAsync(bool noCaching = false);
 

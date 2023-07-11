@@ -1,5 +1,6 @@
 ﻿using DruidsCornerAPI.Models.Config;
 using DruidsCornerAPI.Models.DiyDog;
+using DruidsCornerAPI.Models.SearchResults;
 using DruidsCornerAPI.Tools;
 using System.Text.Json;
 
@@ -177,18 +178,10 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// <param name="name"></param>
         /// <param name="recipeList"></param>
         /// <returns></returns>
-        protected Tuple<int, Recipe>? FindByName(string name, List<Recipe> recipeList)
+        protected RecipeResult FindByName(string name, List<Recipe> recipeList)
         {
-            Tuple<int, Recipe>? output = null;
             var fuzzyResult = FuzzySearch.SearchPartialRatio(name, recipeList, elem => elem.Name);
-
-            // Use a ratio threshold under which nothing is returned
-            if (fuzzyResult.Item1 >= 50)
-            {
-                output = fuzzyResult;
-            }
-
-            return output;
+            return new RecipeResult(fuzzyResult.Item1, fuzzyResult.Item2);
         }
 
         /// <summary>
@@ -197,11 +190,11 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// <param name="name"></param>
         /// <param name="noCaching"></param>
         /// <returns></returns>
-        public async Task<Recipe?> GetRecipeByNameAsync(string name, bool noCaching = false)
+        public async Task<RecipeResult> GetRecipeByNameAsync(string name, bool noCaching = false)
         {
             if (_cachedRecipes != null && _cachedRecipes.Count != 0)
             {
-                var cachedRecipe = FindByName(name, _cachedRecipes).Item2;
+                var cachedRecipe = FindByName(name, _cachedRecipes);
                 if (cachedRecipe != null)
                 {
                     return cachedRecipe;
@@ -209,7 +202,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
             }
 
             var allRecipes = await GetAllRecipesAsync(noCaching);
-            var matchingRecipe = FindByName(name, allRecipes).Item2;
+            var matchingRecipe = FindByName(name, allRecipes);
             return matchingRecipe;
         }
 
