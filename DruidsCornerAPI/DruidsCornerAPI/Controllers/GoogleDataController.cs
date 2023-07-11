@@ -8,6 +8,9 @@ using System.Text.Json;
 
 namespace DruidsCornerAPI.Controllers
 {
+    /// <summary>
+    /// Google data controller : allows to interact with Google apis 
+    /// </summary>
     [ApiController]
     [Authorize("OAuth2")]
     [Route("gdata")]
@@ -15,11 +18,20 @@ namespace DruidsCornerAPI.Controllers
     {
         private readonly ILogger<RecipeController> _logger;
 
+        /// <summary>
+        /// Standard constructor
+        /// </summary>
+        /// <param name="logger"></param>
         public GoogleDataController(ILogger<RecipeController> logger)
         {
             _logger = logger;
         }
 
+        /// <summary>
+        /// Retrieves an access token using an httprequest as input
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         private string GetAccessToken(HttpRequest request)
         {
             StringValues authHeaderContent;
@@ -33,6 +45,10 @@ namespace DruidsCornerAPI.Controllers
             return accessToken;
         }
 
+        /// <summary>
+        /// Retrieves user profile using the token as an input parameter
+        /// </summary>
+        /// <returns></returns>
         [HttpGet(Name = "Check user profile")]
         [ProducesResponseType(500)]
         [ProducesResponseType(typeof(UserInfo), 200)]

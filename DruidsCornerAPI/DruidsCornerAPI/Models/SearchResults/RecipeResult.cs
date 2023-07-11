@@ -5,7 +5,7 @@ namespace DruidsCornerAPI.Models.SearchResults
 {
     /// <summary>
     /// Encapsulates a Recipe search result 
-    /// </summary> <summary>
+    /// </summary>
     public record RecipeResult
     {
         /// <summary>
@@ -15,7 +15,7 @@ namespace DruidsCornerAPI.Models.SearchResults
 
         /// <summary>
         /// Found recipe
-        /// </summary> <summary>
+        /// </summary> 
         public Recipe Recipe { get; set; }
 
         /// <summary>

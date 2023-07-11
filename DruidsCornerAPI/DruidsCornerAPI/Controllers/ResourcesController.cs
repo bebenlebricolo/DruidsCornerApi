@@ -19,6 +19,11 @@ namespace DruidsCornerAPI.Controllers
         private readonly ILogger<ResourcesController> _logger;
         private readonly RecipeService _recipeService;
 
+        /// <summary>
+        /// Standard constructor
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="recipeService"></param>
         public ResourcesController(ILogger<ResourcesController> logger, RecipeService recipeService)
         {
             _logger = logger;

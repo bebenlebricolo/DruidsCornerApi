@@ -4,7 +4,6 @@ using DruidsCornerAPI.Models.SearchResults;
 using DruidsCornerAPI.Tools;
 using System.Text.Json;
 
-using DruidsCornerAPI.Tools;
 using System.Linq.Expressions;
 
 namespace DruidsCornerAPI.DatabaseHandlers
@@ -218,7 +217,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
             if (recipe != null)
             {
                 // This path is a local path relative to Root Folder
-                var filePath = new FileInfo((recipe.Image as FileRecord).Path);
+                var filePath = new FileInfo((recipe!.Image as FileRecord)!.Path);
                 var candidate = _dbConfig.GetImagesFolder().GetFiles(filePath.Name).First();
                 if (candidate != null)
                 {

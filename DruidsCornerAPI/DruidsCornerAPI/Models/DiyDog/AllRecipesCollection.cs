@@ -7,6 +7,9 @@
     /// <value></value>
     public record AllRecipesCollection
     {
+        /// <summary>
+        /// List of recipes
+        /// </summary>
         public List<Recipe> Recipes { get; set; } = new List<Recipe>();
     }
 }

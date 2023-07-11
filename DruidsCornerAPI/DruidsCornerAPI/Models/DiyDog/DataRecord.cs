@@ -12,9 +12,12 @@ namespace DruidsCornerAPI.Models.DiyDog
     /// </summary>
     public enum RecordKind
     {
-        FileSource,     // File record (local database, json based)
-        CloudRecord,    // Cloud record (remote distributed database)
-        Unknown         // Default value
+        /// <summary> File record (local database, json based) </summary>
+        FileSource,    
+        /// <summary> Cloud record (remote distributed database) </summary>
+        CloudRecord,     
+        /// <summary> Default value </summary>
+        Unknown         
     }
 
     /// <summary>
@@ -135,10 +138,26 @@ namespace DruidsCornerAPI.Models.DiyDog
     /// </summary>
     public abstract class DataRecord
     {
+        /// <summary>
+        /// Data record underlying kind (typed structure)
+        /// </summary>
+        /// <value></value>
         public RecordKind Kind { get; set; } = RecordKind.Unknown;
 
+        /// <summary>
+        /// Reads from an UTF8 Json stream
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="reader"></param>
+        /// <param name="namingPolicy"></param>
         public abstract void HandleJsonRead(string propertyName, Utf8JsonReader reader, JsonNamingPolicy? namingPolicy = null);
 
+        
+        /// <summary>
+        /// Writes Object's data structure to an UTF8 Json Stream
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="namingPolicy"></param>
         public virtual void WriteToJson(Utf8JsonWriter writer, JsonNamingPolicy? namingPolicy = null)
         {
             if(namingPolicy == null)
@@ -151,15 +170,32 @@ namespace DruidsCornerAPI.Models.DiyDog
 
     }
 
+    /// <summary>
+    /// File source record (Local database mode).
+    /// Points to a file datastructure which is usually stored on disk
+    /// </summary>
     public class FileRecord : DataRecord
     {
+        /// <summary>
+        /// Standard constructor
+        /// </summary>
         public FileRecord()
         {
             Kind = RecordKind.FileSource;
         }
 
+        /// <summary>
+        /// Where to find the FileRecord on disk
+        /// </summary>
+        /// <value></value>
         public string Path { get; set; } = "";
 
+        /// <summary>
+        /// Parses an UTF8 Json stream and extracts data from it.
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="reader"></param>
+        /// <param name="namingPolicy"></param>
         public override void HandleJsonRead(string propertyName, Utf8JsonReader reader, JsonNamingPolicy? namingPolicy = null ) 
         {
             if(namingPolicy == null)
@@ -174,6 +210,11 @@ namespace DruidsCornerAPI.Models.DiyDog
             Path = reader.GetString() ?? "";
         }
 
+        /// <summary>
+        /// Writes the object data structure to a Json UTF8 stream (using the provided writer)
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="namingPolicy"></param>
         public override void WriteToJson(Utf8JsonWriter writer, JsonNamingPolicy? namingPolicy = null)
         {
             if (namingPolicy == null)
@@ -185,6 +226,11 @@ namespace DruidsCornerAPI.Models.DiyDog
             writer.WriteString(encodedPathProp, Path);
         }
 
+        /// <summary>
+        /// Custom comparison operators
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public override bool Equals(object? obj)
         {
             if(obj is not FileRecord || obj is null)
@@ -194,19 +240,48 @@ namespace DruidsCornerAPI.Models.DiyDog
             var other = obj as FileRecord;
             return other!.Path == Path; ;
         }
+
+        /// <summary>
+        /// Custom hasher
+        /// </summary>
+        public override int GetHashCode()
+        {
+            return Kind.GetHashCode() * 32 + Path.GetHashCode();
+        }
     }
 
+    /// <summary>
+    /// Represents a Cloud-based data record.
+    /// This usually will point to a database document (like Firestore database)
+    /// </summary>
     public class CloudRecord : DataRecord
     {
+        /// <summary>
+        /// Standard constructor
+        /// </summary>
         public CloudRecord()
         {
             Kind = RecordKind.CloudRecord;
         }
 
+        /// <summary>
+        /// Record unique identifier 
+        /// </summary>
+        /// <value></value>
         public string Id { get; set; } = "";
 
+        /// <summary>
+        /// Record version (unique version)
+        /// </summary>
+        /// <value></value>
         public string Version { get; set; } = "";
 
+        /// <summary>
+        /// Reads from an UTF8 Json Stream
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="reader"></param>
+        /// <param name="namingPolicy"></param>
         public override void HandleJsonRead(string propertyName, Utf8JsonReader reader, JsonNamingPolicy? namingPolicy = null)
         {
             if (namingPolicy == null)
@@ -238,6 +313,11 @@ namespace DruidsCornerAPI.Models.DiyDog
             }
         }
 
+        /// <summary>
+        /// Writes to an UTF8 Json Stream
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="namingPolicy"></param>
         public override void WriteToJson(Utf8JsonWriter writer, JsonNamingPolicy? namingPolicy = null)
         {
             if (namingPolicy == null)
@@ -251,6 +331,11 @@ namespace DruidsCornerAPI.Models.DiyDog
             writer.WriteString(encodedVersionProp, Version);
         }
 
+        /// <summary>
+        /// Custom comparison operator
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public override bool Equals(object? obj)
         {
             if (obj is not CloudRecord || obj is null)
@@ -261,6 +346,14 @@ namespace DruidsCornerAPI.Models.DiyDog
             var same = other!.Id == Id;
             same &= other!.Version == Version;
             return same ;
+        }
+
+        /// <summary>
+        /// Custom hasher
+        /// </summary>
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode() * 17 + Kind.GetHashCode();
         }
     }
 }

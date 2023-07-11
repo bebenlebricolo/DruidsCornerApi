@@ -8,17 +8,23 @@ namespace DruidsCornerAPI.Models.DiyDog
     /// </summary>
     public enum PackagingType
     {
+        /// <summary> Beer packaged in a Normal Bottle (0.33 L bottles) </summary>
         Bottle,
+        /// <summary> Beer packaged in a Big bottle (0.75 L bottles) </summary>
         BigBottle,
+        /// <summary> Beer packaged in a Bottle ... in a Squirrel ... (0.33 L) </summary>
         Squirrel,
+        /// <summary> Beer packaged in a Keg </summary>
         Keg,
+        /// <summary> Beer packaged in a Barrel / Cask </summary>
         Barrel,
+        /// <summary> Beer packaged in a Can </summary>
         Can
     }
 
     /// <summary>
     /// Depicts a Beer Recipe
-    /// </summary> <summary>
+    /// </summary> 
     public record Recipe
     {
         /// <summary>

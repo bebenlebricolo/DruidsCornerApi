@@ -103,27 +103,46 @@ namespace DruidsCornerAPI.Models.Config
             return FromConfigSection(section);
         }
 
+        /// <summary>
+        /// Fetches the root folder of the local file database
+        /// </summary>
         public DirectoryInfo GetRootFolder()
         {
             return new DirectoryInfo(RootFolderPath);
         }
         
         
+        /// <summary>
+        /// Retrieves the Recipes folder for the locally deployed database
+        /// </summary>
+        /// <returns>DirectoryInfo for the requested path</returns>
         public DirectoryInfo GetRecipesFolder()
         {
             return new DirectoryInfo(Path.Combine(RootFolderPath, RecipesFolderName));
         }
 
+        /// <summary>
+        /// Fetches the image folder for the locally deployed database
+        /// </summary>
+        /// <returns>DirectoryInfo for the requested path</returns>
         public DirectoryInfo GetImagesFolder()
         {
             return new DirectoryInfo(Path.Combine(RootFolderPath, ImagesFolderName));
         }
 
+        /// <summary>
+        /// Retrieves the PDF pages folder for the local deployed database.
+        /// </summary>
+        /// <returns>DirectoryInfo for the requested path</returns>
         public DirectoryInfo GetPdfPagesFolder()
         {
             return new DirectoryInfo(Path.Combine(RootFolderPath, PdfPagesFolderName));
         }
 
+        /// <summary>
+        /// Retrieves the indexed database folder for the locally deployed database
+        /// </summary>
+        /// <returns></returns>
         public DirectoryInfo GetIndexedDbFolder()
         {
             return new DirectoryInfo(Path.Combine(RootFolderPath, IndexedDbFolderName));

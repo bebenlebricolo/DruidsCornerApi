@@ -37,8 +37,11 @@ namespace DruidsCornerAPI
     /// </summary>
     public class Program
     {
+        /// <summary>
+        /// Custom OAuth2 authentication Scheme name
+        /// Used when authenticating user through the passed token
+        /// </summary>
         protected static readonly string OAuth2Scheme = "OAuth2";
-
 
         private static void AddOpenApi(IServiceCollection services)
         {

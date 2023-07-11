@@ -1,5 +1,8 @@
 ﻿namespace DruidsCornerAPI.Models.DiyDog
 {
+    /// <summary>
+    /// Ingredients datastructure 
+    /// </summary>
     public record Ingredients 
     {
         /// <summary>
@@ -26,7 +29,7 @@
 
         /// <summary>
         /// List of yeast used for a single recipe
-        /// </summary> <summary>
+        /// </summary> 
         public List<Yeast> Yeasts { get; set; } = new List<Yeast>();
 
         /// <summary>
