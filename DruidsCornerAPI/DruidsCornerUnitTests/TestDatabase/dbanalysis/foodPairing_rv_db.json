@@ -1,0 +1,112 @@
+{
+    "foodPairing": [
+        {
+            "name": "+80% Dark chocolate",
+            "foundInBeers": [
+                296
+            ]
+        },
+        {
+            "name": "12hr smoked brisket",
+            "foundInBeers": [
+                167
+            ]
+        },
+        {
+            "name": "20hr smoked brisket",
+            "foundInBeers": [
+                172
+            ]
+        },
+        {
+            "name": "5-Spice Duck Noodles",
+            "foundInBeers": [
+                415
+            ]
+        },
+        {
+            "name": "7",
+            "foundInBeers": [
+                354
+            ]
+        },
+        {
+            "name": "A Massive Ribeye Steak",
+            "foundInBeers": [
+                363
+            ]
+        },
+        {
+            "name": "A Shakin' jesse",
+            "foundInBeers": [
+                215
+            ]
+        },
+        {
+            "name": "Affogato with ice cream",
+            "foundInBeers": [
+                313
+            ]
+        },
+        {
+            "name": "Affogato with vanilla ice cream",
+            "foundInBeers": [
+                101
+            ]
+        },
+        {
+            "name": "Aged Gouda",
+            "foundInBeers": [
+                402
+            ]
+        },
+        {
+            "name": "Aged Stilton",
+            "foundInBeers": [
+                142
+            ]
+        },
+        {
+            "name": "Aged cheddar with honey and raspberry chutney",
+            "foundInBeers": [
+                50
+            ]
+        },
+        {
+            "name": "Aged cheddar, chickpea & roasted vegetable tagine",
+            "foundInBeers": [
+                235
+            ]
+        },
+        {
+            "name": "Aged gouda",
+            "foundInBeers": [
+                198
+            ]
+        },
+        {
+            "name": "Alex James' Blue Monday #",
+            "foundInBeers": [
+                354
+            ]
+        },
+        {
+            "name": "Allondigas Meatballs",
+            "foundInBeers": [
+                361
+            ]
+        },
+        {
+            "name": "Almond Milk Pudding",
+            "foundInBeers": [
+                399
+            ]
+        },
+        {
+            "name": "Almond and Chocolate Tart",
+            "foundInBeers": [
+                414
+            ]
+        }
+    ]
+}

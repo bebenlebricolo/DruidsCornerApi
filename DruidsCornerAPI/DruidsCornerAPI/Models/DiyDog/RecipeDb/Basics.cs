@@ -1,4 +1,4 @@
-﻿namespace DruidsCornerAPI.Models.DiyDog
+﻿namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
 {
     /// <summary>
     /// Encodes basic information about BrewDog's beer recipe.

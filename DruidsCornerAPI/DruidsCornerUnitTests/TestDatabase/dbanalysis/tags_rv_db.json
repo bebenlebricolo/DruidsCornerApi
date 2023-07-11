@@ -1,0 +1,40 @@
+{
+    "tags": [
+        {
+            "name": "11th Anniversary Imperial Stout",
+            "foundInBeers": [
+                312
+            ]
+        },
+        {
+            "name": "2013 Prototype Red Rye Ipa",
+            "foundInBeers": [
+                138
+            ]
+        },
+        {
+            "name": "2013 Prototype Rye Pale Ale",
+            "foundInBeers": [
+                137
+            ]
+        },
+        {
+            "name": "21st Century Lager",
+            "foundInBeers": [
+                225
+            ]
+        },
+        {
+            "name": "21st Century Pilsner",
+            "foundInBeers": [
+                165
+            ]
+        },
+        {
+            "name": "5% Abv Raspberry Berlinerweisse",
+            "foundInBeers": [
+                299
+            ]
+        }
+    ]
+}

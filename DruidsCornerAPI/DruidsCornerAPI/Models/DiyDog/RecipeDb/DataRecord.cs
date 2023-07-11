@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace DruidsCornerAPI.Models.DiyDog
+namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
 {
 
     /// <summary>

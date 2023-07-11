@@ -1,0 +1,692 @@
+{
+    "recipes": [
+        {
+            "name": "Punk Ipa 2007 - 2010",
+            "subtitle": "",
+            "style": "Unknown",
+            "number": 1,
+            "tags": [
+                "Hoppy",
+                "Post Modern Classic",
+                "Tropical",
+                "Spiky"
+            ],
+            "firstBrewed": "APRIL 2007",
+            "image": {
+                "kind": "FileSource",
+                "path": "../images/beer_1.png"
+            },
+            "pdfPage": {
+                "kind": "FileSource",
+                "path": "../pdf_pages/page_1.pdf"
+            },
+            "description": "Our flagship beer that kick started the craft beer revolution. This is James and Martin's original take on an American IPA, subverted with punchy New Zealand hops. Layered with new world hops to create an all-out riot of grapefruit, pineapple and lychee before a spiky, mouth-puckering bitter finish.",
+            "brewersTip": "While it may surprise you, this version of Punk IPA isn't dry hopped but still packs a punch! To make the best of the aroma hops make sure they are fully submerged and add them just before knock out for an intense hop hit.",
+            "basics": {
+                "volume": {
+                    "litres": 20.0,
+                    "galons": 5.0
+                },
+                "boilVolume": {
+                    "litres": 25.0,
+                    "galons": 6.6
+                },
+                "abv": 6.0,
+                "targetOg": 1056.0,
+                "targetFg": 1010.0,
+                "ebc": 17.0,
+                "ibu": 60.0,
+                "srm": 8.5,
+                "ph": 4.4,
+                "attenuationLevel": 82.14
+            },
+            "foodPairings": [
+                "Spicy carne asada with a pico de gallo sauce",
+                "Shredded chicken tacos with a mango chilli lime salsa",
+                "Cheesecake with a passion fruit swirl sauce"
+            ],
+            "ingredients": {
+                "malts": [
+                    {
+                        "name": "Extra Pale",
+                        "kgs": 5.3,
+                        "lbs": 11.7
+                    }
+                ],
+                "hops": [
+                    {
+                        "name": "Ahtanum",
+                        "amount": 17.5,
+                        "when": "Start",
+                        "attribute": "Bitter"
+                    },
+                    {
+                        "name": "Chinook",
+                        "amount": 15.0,
+                        "when": "Start",
+                        "attribute": "Bitter"
+                    },
+                    {
+                        "name": "Crystal",
+                        "amount": 17.5,
+                        "when": "Middle",
+                        "attribute": "Flavour"
+                    },
+                    {
+                        "name": "Chinook",
+                        "amount": 17.5,
+                        "when": "Middle",
+                        "attribute": "Flavour"
+                    },
+                    {
+                        "name": "Ahtanum",
+                        "amount": 17.5,
+                        "when": "End",
+                        "attribute": "Flavour"
+                    },
+                    {
+                        "name": "Chinook",
+                        "amount": 27.5,
+                        "when": "End",
+                        "attribute": "Flavour"
+                    },
+                    {
+                        "name": "Crystal",
+                        "amount": 17.5,
+                        "when": "End",
+                        "attribute": "Flavour"
+                    },
+                    {
+                        "name": "Motueka",
+                        "amount": 17.5,
+                        "when": "End",
+                        "attribute": "Flavour"
+                    }
+                ],
+                "yeasts": [
+                    {
+                        "name": "Wyeast 1056 - American Ale\u0099"
+                    }
+                ],
+                "extraMash": null,
+                "extraBoil": null,
+                "alternativeDescription": null
+            },
+            "methodTimings": {
+                "mashTemps": [
+                    {
+                        "celsius": 65.0,
+                        "fahrenheit": 150.0,
+                        "time": 75.0
+                    }
+                ],
+                "mashTips": [],
+                "fermentation": {
+                    "celsius": 19.0,
+                    "fahrenheit": 19.0,
+                    "tips": []
+                },
+                "twists": null
+            },
+            "packaging": "Keg",
+            "parsingErrors": null
+        },
+        {
+            "name": "Punk Ipa 2010 - Current",
+            "subtitle": "",
+            "style": "Unknown",
+            "number": 2,
+            "tags": [
+                "Hoppy",
+                "Post Modern Classic",
+                "Tropical",
+                "Spiky"
+            ],
+            "firstBrewed": "OCTOBER 2010",
+            "image": {
+                "kind": "FileSource",
+                "path": "../images/beer_2.png"
+            },
+            "pdfPage": {
+                "kind": "FileSource",
+                "path": "../pdf_pages/page_2.pdf"
+            },
+            "description": "Punk IPA. Amplified. In 2010 we finally got our paws on the equipment we needed to dry hop our beers. We focused all our energy on dry hopping, amping up the aroma and flavour of our flagship beer to create a relentless explosion of tropical fruits, and adding a hint of Caramalt to balance out the insane amount of hops.",
+            "brewersTip": "To get the best possible profile from the dry hops we recommend dry hopping post fermentation for 5 days. Dry hops should be added at cellar temperature. We find 14\u00b0C results in the most aromatic dry hop profile.",
+            "basics": {
+                "volume": {
+                    "litres": 20.0,
+                    "galons": 5.0
+                },
+                "boilVolume": {
+                    "litres": 25.0,
+                    "galons": 6.6
+                },
+                "abv": 5.6,
+                "targetOg": 1053.0,
+                "targetFg": 1011.0,
+                "ebc": 15.0,
+                "ibu": 40.0,
+                "srm": 7.6,
+                "ph": 4.4,
+                "attenuationLevel": 78.0
+            },
+            "foodPairings": [
+                "Spicy carne asada with a pico de gallo sauce",
+                "Shredded chicken tacos with a mango chilli lime salsa",
+                "Cheesecake with a passion fruit swirl sauce"
+            ],
+            "ingredients": {
+                "malts": [
+                    {
+                        "name": "Extra Pale",
+                        "kgs": 4.38,
+                        "lbs": 9.6
+                    },
+                    {
+                        "name": "CaraMalt",
+                        "kgs": 0.25,
+                        "lbs": 0.55
+                    }
+                ],
+                "hops": [
+                    {
+                        "name": "Chinook",
+                        "amount": 20.0,
+                        "when": "Start",
+                        "attribute": "Bitter"
+                    },
+                    {
+                        "name": "Ahtanum",
+                        "amount": 12.5,
+                        "when": "Start",
+                        "attribute": "Bitter"
+                    },
+                    {
+                        "name": "Chinook",
+                        "amount": 20.0,
+                        "when": "Middle",
+                        "attribute": "Flavour"
+                    },
+                    {
+                        "name": "Ahtanum",
+                        "amount": 12.5,
+                        "when": "Middle",
+                        "attribute": "Flavour"
+                    },
+                    {
+                        "name": "Chinook",
+                        "amount": 27.5,
+                        "when": "End",
+                        "attribute": "Flavour"
+                    },
+                    {
+                        "name": "Ahtanum",
+                        "amount": 12.5,
+                        "when": "End",
+                        "attribute": "Flavour"
+                    },
+                    {
+                        "name": "Simcoe",
+                        "amount": 12.5,
+                        "when": "End",
+                        "attribute": "Flavour"
+                    },
+                    {
+                        "name": "Nelson Sauvin",
+                        "amount": 12.5,
+                        "when": "End",
+                        "attribute": "Flavour"
+                    },
+                    {
+                        "name": "Chinook",
+                        "amount": 47.5,
+                        "when": "Dry Hop",
+                        "attribute": "Aroma"
+                    },
+                    {
+                        "name": "Ahtanum",
+                        "amount": 37.5,
+                        "when": "Dry Hop",
+                        "attribute": "Aroma"
+                    },
+                    {
+                        "name": "Simcoe",
+                        "amount": 37.5,
+                        "when": "Dry Hop",
+                        "attribute": "Aroma"
+                    },
+                    {
+                        "name": "Nelson Sauvin",
+                        "amount": 20.0,
+                        "when": "Dry Hop",
+                        "attribute": "Aroma"
+                    },
+                    {
+                        "name": "Cascade",
+                        "amount": 37.5,
+                        "when": "Dry Hop",
+                        "attribute": "Aroma"
+                    },
+                    {
+                        "name": "Amarillo",
+                        "amount": 10.0,
+                        "when": "Dry Hop",
+                        "attribute": "Aroma"
+                    }
+                ],
+                "yeasts": [
+                    {
+                        "name": "Wyeast 1056 - American Ale\u0099"
+                    }
+                ],
+                "extraMash": null,
+                "extraBoil": null,
+                "alternativeDescription": null
+            },
+            "methodTimings": {
+                "mashTemps": [
+                    {
+                        "celsius": 66.0,
+                        "fahrenheit": 152.0,
+                        "time": 75.0
+                    }
+                ],
+                "mashTips": [],
+                "fermentation": {
+                    "celsius": 19.0,
+                    "fahrenheit": 19.0,
+                    "tips": []
+                },
+                "twists": null
+            },
+            "packaging": "Keg",
+            "parsingErrors": null
+        },
+        {
+            "name": "The Physics",
+            "subtitle": "",
+            "style": "Laid Back Amber Beer",
+            "number": 3,
+            "tags": [
+                "Laid Back Amber Beer"
+            ],
+            "firstBrewed": "APRIL 2007",
+            "image": {
+                "kind": "FileSource",
+                "path": "../images/beer_3.png"
+            },
+            "pdfPage": {
+                "kind": "FileSource",
+                "path": "../pdf_pages/page_3.pdf"
+            },
+            "description": "A hoppy Amber Ale that won World's Best Amber Beer in the World Beer Awards 2007. Malt and hops are in perfect harmony in this incredibly balanced beer. Biscuity, bitter and packing a surprisingly hoppy punch, this beer ultimately morphed into 5AM Saint.",
+            "brewersTip": "Keep the fermentation temperature as close to 19\u00b0C as possible. This will ensure the yeast creates a more neutral flavour profile, allowing the hops to really shine through.",
+            "basics": {
+                "volume": {
+                    "litres": 20.0,
+                    "galons": 5.0
+                },
+                "boilVolume": {
+                    "litres": 25.0,
+                    "galons": 6.6
+                },
+                "abv": 5.0,
+                "targetOg": 1048.5,
+                "targetFg": 1010.0,
+                "ebc": 65.0,
+                "ibu": 47.0,
+                "srm": 32.5,
+                "ph": 4.4,
+                "attenuationLevel": 79.4
+            },
+            "foodPairings": [
+                "Barbecue pulled pork on sourdough bread",
+                "Roast turkey with a honey and herb marinade and roasted vegetables",
+                "Banana walnut loaf with chocolate chips"
+            ],
+            "ingredients": {
+                "malts": [
+                    {
+                        "name": "Extra Pale",
+                        "kgs": 4.06,
+                        "lbs": 8.95
+                    },
+                    {
+                        "name": "CaraMalt",
+                        "kgs": 0.31,
+                        "lbs": 0.69
+                    },
+                    {
+                        "name": "Crystal 120",
+                        "kgs": 0.23,
+                        "lbs": 0.5
+                    },
+                    {
+                        "name": "Crystal 150",
+                        "kgs": 0.94,
+                        "lbs": 0.21
+                    }
+                ],
+                "hops": [
+                    {
+                        "name": "Amarillo",
+                        "amount": 25.0,
+                        "when": "Start",
+                        "attribute": "Bitter"
+                    },
+                    {
+                        "name": "Amarillo",
+                        "amount": 12.5,
+                        "when": "Middle",
+                        "attribute": "Flavour"
+                    },
+                    {
+                        "name": "Bramling Cross",
+                        "amount": 12.5,
+                        "when": "End",
+                        "attribute": "Flavour"
+                    },
+                    {
+                        "name": "Amarillo",
+                        "amount": 50.0,
+                        "when": "End",
+                        "attribute": "Flavour"
+                    }
+                ],
+                "yeasts": [
+                    {
+                        "name": "Wyeast 1056 - American Ale\u0099"
+                    }
+                ],
+                "extraMash": null,
+                "extraBoil": null,
+                "alternativeDescription": null
+            },
+            "methodTimings": {
+                "mashTemps": [
+                    {
+                        "celsius": 65.0,
+                        "fahrenheit": 149.0,
+                        "time": 75.0
+                    }
+                ],
+                "mashTips": [],
+                "fermentation": {
+                    "celsius": 19.0,
+                    "fahrenheit": 19.0,
+                    "tips": []
+                },
+                "twists": null
+            },
+            "packaging": "Keg",
+            "parsingErrors": null
+        },
+        {
+            "name": "Riptide",
+            "subtitle": "",
+            "style": "Twisted Merciless Stout",
+            "number": 4,
+            "tags": [
+                "Twisted Merciless Stout"
+            ],
+            "firstBrewed": "APRIL 2007",
+            "image": {
+                "kind": "FileSource",
+                "path": "../images/beer_4.png"
+            },
+            "pdfPage": {
+                "kind": "FileSource",
+                "path": "../pdf_pages/page_4.pdf"
+            },
+            "description": "The original BrewDog, Bracken, decided to make a beer that best reflected himself; this is the beer equivalent of the big, cute chocolate monster. Soft, smooth, dark, chocolatey and a force to be reckoned with. This gentle giant will never bite, but you'll still want to be on your best behaviour!",
+            "brewersTip": "We recommend adding the chocolate malt at the start of the run off to ensure you extract the flavour and colour without imparting too much of the astringency of the malt into your wort. This will give the beer a really smooth mouthfeel, making this dangerously drinkable at 8% ABV.",
+            "basics": {
+                "volume": {
+                    "litres": 20.0,
+                    "galons": 5.0
+                },
+                "boilVolume": {
+                    "litres": 25.0,
+                    "galons": 6.6
+                },
+                "abv": 8.0,
+                "targetOg": 1075.0,
+                "targetFg": 1014.0,
+                "ebc": 240.0,
+                "ibu": 45.0,
+                "srm": 120.0,
+                "ph": 4.4,
+                "attenuationLevel": 81.3
+            },
+            "foodPairings": [
+                "Seared scallops",
+                "Pan seared venison with fruit salad side",
+                "Caramelised apple pie with vanilla ice cream"
+            ],
+            "ingredients": {
+                "malts": [
+                    {
+                        "name": "Extra Pale - Maris Otter",
+                        "kgs": 5.36,
+                        "lbs": 11.8
+                    },
+                    {
+                        "name": "Crystal Dark 350 - 400",
+                        "kgs": 0.71,
+                        "lbs": 1.6
+                    },
+                    {
+                        "name": "Carafa Special III",
+                        "kgs": 0.18,
+                        "lbs": 0.4
+                    },
+                    {
+                        "name": "CaraMalt",
+                        "kgs": 0.54,
+                        "lbs": 1.2
+                    },
+                    {
+                        "name": "Chocolate Malt",
+                        "kgs": 0.25,
+                        "lbs": 0.6
+                    },
+                    {
+                        "name": "Wheat",
+                        "kgs": 0.36,
+                        "lbs": 0.8
+                    },
+                    {
+                        "name": "Flaked Oat",
+                        "kgs": 0.54,
+                        "lbs": 1.2
+                    }
+                ],
+                "hops": [
+                    {
+                        "name": "Columbus",
+                        "amount": 14.3,
+                        "when": "Start",
+                        "attribute": "Bitter"
+                    },
+                    {
+                        "name": "Galena",
+                        "amount": 14.3,
+                        "when": "Start",
+                        "attribute": "Bitter"
+                    },
+                    {
+                        "name": "Galena",
+                        "amount": 21.4,
+                        "when": "Start",
+                        "attribute": "Bitter"
+                    },
+                    {
+                        "name": "Cascade",
+                        "amount": 21.4,
+                        "when": "End",
+                        "attribute": "Flavour"
+                    },
+                    {
+                        "name": "Columbus",
+                        "amount": 21.4,
+                        "when": "End",
+                        "attribute": "Flavour"
+                    }
+                ],
+                "yeasts": [
+                    {
+                        "name": "Wyeast 1272 - American Ale II\u0099"
+                    }
+                ],
+                "extraMash": null,
+                "extraBoil": null,
+                "alternativeDescription": null
+            },
+            "methodTimings": {
+                "mashTemps": [
+                    {
+                        "celsius": 65.0,
+                        "fahrenheit": 149.0,
+                        "time": 75.0
+                    }
+                ],
+                "mashTips": [],
+                "fermentation": {
+                    "celsius": 20.0,
+                    "fahrenheit": 20.0,
+                    "tips": []
+                },
+                "twists": [
+                    {
+                        "name": "Dark muscavado sugar",
+                        "amount": 285.0,
+                        "when": null
+                    }
+                ]
+            },
+            "packaging": "Keg",
+            "parsingErrors": null
+        },
+        {
+            "name": "Hop Rocker",
+            "subtitle": "",
+            "style": "Hoppy Aggressive Lager",
+            "number": 5,
+            "tags": [
+                "Hoppy Aggressive Lager"
+            ],
+            "firstBrewed": "APRIL 2007",
+            "image": {
+                "kind": "FileSource",
+                "path": "../images/beer_5.png"
+            },
+            "pdfPage": {
+                "kind": "FileSource",
+                "path": "../pdf_pages/page_5.pdf"
+            },
+            "description": "The first of our foray into lager beer, Hop Rocker is a high impact, hoppy behemoth made with 100% malt. Since 2007 we have been obsessive about quality, using only the best ingredients to ensure the flavour and craftsmanship of the beer in your glass. Hop Rocker is testament to that. The malt base gives this beer a sweet, balanced complexity while the combination of New Zealand and German hops merges new world tropical juiciness with old world peppery spice.",
+            "brewersTip": "After the fermentation has finished, chill the beer to below 5\u00b0C (if you can), wait 10 days and then rack the beer off the yeast into another bucket.  The yeast left in suspension will carry on working its magic to create really clean, crisp lager flavours.",
+            "basics": {
+                "volume": {
+                    "litres": 20.0,
+                    "galons": 5.0
+                },
+                "boilVolume": {
+                    "litres": 25.0,
+                    "galons": 6.6
+                },
+                "abv": 5.5,
+                "targetOg": 1052.0,
+                "targetFg": 1010.0,
+                "ebc": 25.0,
+                "ibu": 40.0,
+                "srm": 12.0,
+                "ph": 4.2,
+                "attenuationLevel": 80.7
+            },
+            "foodPairings": [
+                "Cajun spiced chicken wings",
+                "Mild cheddar",
+                "Lemon tart"
+            ],
+            "ingredients": {
+                "malts": [
+                    {
+                        "name": "Extra Pale - Maris Otter",
+                        "kgs": 3.78,
+                        "lbs": 8.3
+                    },
+                    {
+                        "name": "CaraMalt",
+                        "kgs": 0.31,
+                        "lbs": 0.7
+                    },
+                    {
+                        "name": "Munich Malt",
+                        "kgs": 0.31,
+                        "lbs": 0.7
+                    }
+                ],
+                "hops": [
+                    {
+                        "name": "Cascade",
+                        "amount": 12.5,
+                        "when": "Start",
+                        "attribute": "Bitter"
+                    },
+                    {
+                        "name": "Saaz",
+                        "amount": 12.5,
+                        "when": "Start",
+                        "attribute": "Bitter"
+                    },
+                    {
+                        "name": "Cascade",
+                        "amount": 25.0,
+                        "when": "End",
+                        "attribute": "Flavour"
+                    },
+                    {
+                        "name": "Motueka",
+                        "amount": 12.5,
+                        "when": "End",
+                        "attribute": "Flavour"
+                    },
+                    {
+                        "name": "Chinook",
+                        "amount": 25.0,
+                        "when": "End",
+                        "attribute": "Flavour"
+                    }
+                ],
+                "yeasts": [
+                    {
+                        "name": "Saflager - S-189"
+                    }
+                ],
+                "extraMash": null,
+                "extraBoil": null,
+                "alternativeDescription": null
+            },
+            "methodTimings": {
+                "mashTemps": [
+                    {
+                        "celsius": 65.0,
+                        "fahrenheit": 149.0,
+                        "time": 75.0
+                    }
+                ],
+                "mashTips": [],
+                "fermentation": {
+                    "celsius": 10.0,
+                    "fahrenheit": 10.0,
+                    "tips": []
+                },
+                "twists": null
+            },
+            "packaging": "Keg",
+            "parsingErrors": null
+        }
+    ]
+}

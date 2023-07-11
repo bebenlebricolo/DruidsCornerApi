@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using DruidsCornerAPI.Models.DiyDog;
+using DruidsCornerAPI.Models.DiyDog.RecipeDb;
 
 namespace DruidsCornerAPI.Models.Search
 {

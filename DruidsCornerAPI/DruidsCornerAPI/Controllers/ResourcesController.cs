@@ -1,4 +1,4 @@
-using DruidsCornerAPI.Models.DiyDog;
+using DruidsCornerAPI.Models.DiyDog.RecipeDb;
 using DruidsCornerAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -59,6 +59,16 @@ namespace DruidsCornerAPI.Models.Search
         // #########################################################
 
         /// <summary>
+        /// Queried list of names that may match (fuzzy search on names)
+        /// </summary>
+        public List<string>? NameList { get; set; }
+
+        /// <summary>
+        /// Queried list of styles that may match (fuzzy search on names
+        /// </summary>
+        public List<string>? StyleList { get; set; }
+
+        /// <summary>
         /// Queried boil / fermentation elements list (fuzzy search on names)
         /// </summary>
         public List<string>? ExtraBoilList { get; set; }

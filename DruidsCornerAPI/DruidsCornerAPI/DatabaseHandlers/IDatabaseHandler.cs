@@ -1,4 +1,6 @@
-﻿using DruidsCornerAPI.Models.DiyDog;
+﻿using DruidsCornerAPI.Models.DiyDog.RecipeDb;
+using DruidsCornerAPI.Models.DiyDog.IndexedDb;
+using DruidsCornerAPI.Models.DiyDog.References;
 using DruidsCornerAPI.Models.Search;
 
 namespace DruidsCornerAPI.DatabaseHandlers
@@ -53,5 +55,44 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// <returns>Found recipe's pdf page stream, or null in case none was found with the requested number</returns>
         public Task<Stream?> GetRecipePdfPageAsync(uint number, bool noCaching = false);
 
+
+        /// #################################################################################################
+        /// ############################# Known good databases accessors ####################################
+        /// #################################################################################################
+
+        /// <summary>
+        /// Retrieves a known good hops list from current dbs
+        /// </summary>
+        /// <returns>Hops reference object or null</returns>
+        public Task<ReferenceHops?> GetReferenceHopsAsync();
+        
+        /// <summary>
+        /// Retrieves a known good malts list from current dbs
+        /// </summary>
+        /// <returns>Malts reference object or null</returns>
+        public Task<ReferenceMalts?> GetReferenceMaltsAsync();
+         
+        /// <summary>
+        /// Retrieves a known good yeasts list from current dbs
+        /// </summary>
+        /// <returns>Yeasts reference object or null</returns>
+        public Task<ReferenceYeasts?> GetReferenceYeastsAsync();
+         
+        /// <summary>
+        /// Retrieves a known good styles list from current dbs
+        /// </summary>
+        /// <returns>Styles reference object or null</returns>
+        public Task<ReferenceStyles?> GetReferenceStylesAsync();
+
+        
+        /// #################################################################################################
+        /// ############################### Indexed databases accessors #####################################
+        /// #################################################################################################
+
+        /// <summary>
+        /// Retrieves an indexed Database (reversed indexing) using the kind parameter as the query parameter.
+        /// </summary>
+        /// <returns>IndexedDb or null</returns>
+        public Task<IndexedDb?> GetIndexedDbAsync(IndexedDbPropKind kind);
     }
 }

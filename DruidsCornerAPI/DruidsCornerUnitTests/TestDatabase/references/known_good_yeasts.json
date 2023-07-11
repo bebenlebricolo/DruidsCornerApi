@@ -1,0 +1,29 @@
+{
+    "yeasts": [
+        {
+            "name" : "Safale - BE-134",
+            "manufacturer" : "Fermentis",
+            "aliases" : [
+                "BE-134"
+            ],
+            "url" : "https://beermaverick.com/yeast/be-134-safale-be-134-fermentis/"
+        },
+        {
+            "name" : "Lalvin - EC-1118",
+            "manufacturer" : "Lallemand",
+            "aliases" : [
+                "Champagne",
+                "EC-1118"
+            ],
+            "url" : "https://www.lallemandbrewing.com/en/continental-europe/product-details/lalvin-ec-1118/"
+        },
+        {
+            "name" : "Saflager - S-189",
+            "manufacturer" : "Fermentis",
+            "aliases":[
+                "S189"
+            ],
+            "url" : "https://beermaverick.com/yeast/s-189-saflager-s-189-fermentis/"
+        }
+    ]
+}

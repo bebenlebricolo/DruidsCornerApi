@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Design;
 using System.Text.Json.Serialization;
 
-namespace DruidsCornerAPI.Models.DiyDog
+namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
 {
     /// <summary>
     /// Available packaging types for the beers

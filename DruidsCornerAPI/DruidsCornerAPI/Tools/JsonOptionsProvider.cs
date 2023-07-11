@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using System.Text.Json;
 using System;
-using DruidsCornerAPI.Models.DiyDog;
+using DruidsCornerAPI.Models.DiyDog.RecipeDb;
 
 namespace DruidsCornerAPI.Tools
 {

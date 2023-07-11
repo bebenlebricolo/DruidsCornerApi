@@ -1,5 +1,5 @@
 using DruidsCornerAPI.Models;
-using DruidsCornerAPI.Models.DiyDog;
+using DruidsCornerAPI.Models.DiyDog.RecipeDb;
 using DruidsCornerAPI.Tools;
 using System.Text.Json;
 

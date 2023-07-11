@@ -1,8 +1,10 @@
 ﻿using DruidsCornerAPI.DatabaseHandlers;
 using DruidsCornerAPI.Models.Config;
 using DruidsCornerAPI.Models.Search;
-using DruidsCornerAPI.Models.DiyDog;
+using DruidsCornerAPI.Models.DiyDog.RecipeDb;
 using DruidsCornerAPI.Models.Exceptions;
+using Microsoft.Extensions.Logging.Configuration;
+using DruidsCornerAPI.Tools.Logging;
 
 namespace DruidsCornerAPI.Services
 {
@@ -76,7 +78,8 @@ namespace DruidsCornerAPI.Services
                     throw new ConfigException("Could not read configuration (appsettings), failing short.");
                 }
 
-                var dbHandler = new LocalDatabaseHandler(deployedConfig);
+                var dbLogger = ApplicationLogging.LoggerFactory.CreateLogger<LocalDatabaseHandler>();
+                var dbHandler = new LocalDatabaseHandler(deployedConfig, dbLogger);
                 return dbHandler;
             }
         

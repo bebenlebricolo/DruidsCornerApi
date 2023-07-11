@@ -1,0 +1,16 @@
+{
+    "hops": [
+        {
+            "name" : "Ahtanum",
+            "url" : "https://beermaverick.com/hop/ahtanum/"
+        },
+        {
+            "name" : "Amarillo",
+            "url" : "https://beermaverick.com/hop/amarillo/"
+        },
+        {
+            "name" : "Apollo",
+            "url" : "https://beermaverick.com/hop/apollo/"
+        }
+    ]
+}

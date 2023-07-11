@@ -1,10 +1,12 @@
-﻿using DruidsCornerAPI.Models.Config;
-using DruidsCornerAPI.Models.DiyDog;
-using DruidsCornerAPI.Models.Search;
-using DruidsCornerAPI.Tools;
-using System.Text.Json;
+﻿using System.Text.Json;
 
-using System.Linq.Expressions;
+using DruidsCornerAPI.Tools;
+using DruidsCornerAPI.Models.Config;
+using DruidsCornerAPI.Models.Search;
+using DruidsCornerAPI.Models.DiyDog.RecipeDb;
+using DruidsCornerAPI.Models.DiyDog.References;
+using DruidsCornerAPI.Models.DiyDog.IndexedDb;
+
 
 namespace DruidsCornerAPI.DatabaseHandlers
 {
@@ -14,6 +16,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
     public class LocalDatabaseHandler : IDatabaseHandler
     {
         private DeployedDatabaseConfig _dbConfig;
+        private ILogger<LocalDatabaseHandler> _logger;
 
         private List<Recipe> _cachedRecipes;
         private JsonSerializerOptions _jsonOptions;
@@ -21,10 +24,11 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// <summary>
         /// Constructs a LocalDatabaseHandler using a given DeployedDatabaseConfig as an input (points to folders)
         /// </summary>
-        /// <param name="config"></param>
-        public LocalDatabaseHandler(DeployedDatabaseConfig config)
+        /// <param name="config">Deployed database configuration (used to read from disk)</param>
+        public LocalDatabaseHandler(DeployedDatabaseConfig config, ILogger<LocalDatabaseHandler> logger)
         {
             _dbConfig = config;
+            _logger = logger;
             _cachedRecipes = new List<Recipe>();
             _jsonOptions = JsonOptionsProvider.GetModelsJsonOptions();
         }
@@ -60,6 +64,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
             {
                 var file = recipeFile.OpenRead();
                 var parsedRecipe = await JsonSerializer.DeserializeAsync<Recipe>(file, _jsonOptions);
+                file.Close();
 
                 if (parsedRecipe != null)
                 {
@@ -246,6 +251,118 @@ namespace DruidsCornerAPI.DatabaseHandlers
                 {
                     return new BufferedStream(candidate.OpenRead());
                 }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Read reference properties Json file from disk and return the deserialized objects
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        protected async Task<T?> ReadRefFromDiskAsync<T>(string filename) where T : class?
+        {
+            var filepath = _dbConfig.GetReferencesFolder().GetFiles(filename).First();
+            if(filepath == null)
+            {
+                return null;
+            }
+
+            try 
+            {
+                var file = filepath.Open(FileMode.Open);
+                var referenceHops = await JsonSerializer.DeserializeAsync<T>(file);
+                file.Close();
+                return referenceHops;
+            }
+            catch (Exception ex) 
+            {
+                _logger.LogError($"Could not read reference {filename} from disk : {ex.Message}");
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ReferenceHops?> GetReferenceHopsAsync()
+        {   
+            return await ReadRefFromDiskAsync<ReferenceHops>("known_good_hops.json");
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ReferenceMalts?> GetReferenceMaltsAsync()
+        {
+            return await ReadRefFromDiskAsync<ReferenceMalts>("known_good_malts.json");
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ReferenceYeasts?> GetReferenceYeastsAsync()
+        {
+            return await ReadRefFromDiskAsync<ReferenceYeasts>("known_good_yeasts.json");
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ReferenceStyles?> GetReferenceStylesAsync()
+        {
+            return await ReadRefFromDiskAsync<ReferenceStyles>("known_good_styles.json");
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<IndexedDb?> GetIndexedDbAsync(IndexedDbPropKind kind)
+        {
+            string filename;
+            switch(kind)
+            {
+                case IndexedDbPropKind.Hops :
+                    filename = "hops_rv_db.json";
+                    break;
+                case IndexedDbPropKind.Malts :
+                    filename = "hops_rv_db.json";
+                    break;
+                case IndexedDbPropKind.Styles :
+                    filename = "hops_rv_db.json";
+                    break;
+                case IndexedDbPropKind.FoodPairing :
+                    filename = "hops_rv_db.json";
+                    break;
+                default:
+                    _logger.LogError($"Unsupported property name : {kind}");
+                    return null;
+            }
+        
+            var filepath = _dbConfig.GetIndexedDbFolder().GetFiles(filename).First();
+            if(filepath == null)
+            {
+                _logger.LogError($"Could not find Indexed DB file on disk");
+                return null;
+            }
+
+            try
+            {
+                var file = filepath.OpenRead();
+                var indexedDb = await JsonSerializer.DeserializeAsync<IndexedDb>(file);
+                file.Close();
+                return indexedDb;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError("Caught exception while reading IndexedDB file. Exception : ");
+                _logger.LogError(ex.Message);
             }
             return null;
         }

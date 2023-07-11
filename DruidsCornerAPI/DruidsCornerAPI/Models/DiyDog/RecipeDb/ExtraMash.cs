@@ -1,22 +1,23 @@
-﻿namespace DruidsCornerAPI.Models.DiyDog
+﻿namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
 {
     /// <summary>
-    /// Malt ingredient
+    /// Extra Mash ingredient.
+    /// Might be anything, from sugar to milk, lactose, dextrose, etc.
     /// </summary>
-    public record Malt 
+    public record ExtraMash 
     {
         /// <summary>
-        /// Malt's name
+        /// Ingredient name
         /// </summary>
         public string Name { get; set; } = "";
 
         /// <summary>
-        /// Amount of Malt in kilograms
+        /// Amount of this ingredient in Kilograms 
         /// </summary>
         public float Kgs { get; set; } = 0.0f;
 
         /// <summary>
-        /// Amount of Malt in pounds
+        /// Amount of this ingredient in Lbs
         /// </summary>
         public float Lbs { get; set; } = 0.0f;
 

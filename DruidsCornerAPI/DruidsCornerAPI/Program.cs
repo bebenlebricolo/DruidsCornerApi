@@ -1,8 +1,9 @@
 using DruidsCornerAPI.AuthenticationHandlers;
-using DruidsCornerAPI.Models.DiyDog;
+using DruidsCornerAPI.Models.DiyDog.RecipeDb;
 using DruidsCornerAPI.Services;
 using DruidsCornerAPI.Models.Config;
 using DruidsCornerAPI.Tools;
+using DruidsCornerAPI.Tools.Logging;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -29,6 +30,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.Reflection;
+using DruidsCornerAPI.DatabaseHandlers;
 
 namespace DruidsCornerAPI
 {
@@ -154,7 +156,6 @@ namespace DruidsCornerAPI
               //.AddScheme<BasicAuthenticationOptions, GoogleOauth2AuthenticationHandler>("Custom", null);
         }
 
-
         /// <summary>
         /// Main entry poiint for app startup
         /// </summary>
@@ -225,6 +226,8 @@ namespace DruidsCornerAPI
 
             // Registering available services
             builder.Services.AddSingleton<RecipeService>();
+            builder.Services.AddSingleton<SearchService>();
+            //builder.Services.AddTransient<LocalDatabaseHandler>();
 
             var slidingPolicy = "sliding";
             var rateLimitingOptions = new WebRateLimits();
@@ -256,7 +259,9 @@ namespace DruidsCornerAPI
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers().RequireRateLimiting(slidingPolicy);
-
+            
+            // Set the logger factory config to ApplicationLogging util
+            ApplicationLogging.LoggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
             app.Run();
         }
     }
