@@ -1,5 +1,5 @@
 ﻿using DruidsCornerAPI.Models.DiyDog;
-using DruidsCornerAPI.Models.SearchResults;
+using DruidsCornerAPI.Models.Search;
 
 namespace DruidsCornerAPI.DatabaseHandlers
 {

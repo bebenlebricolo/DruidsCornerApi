@@ -1,6 +1,6 @@
 ﻿using DruidsCornerAPI.Models.Config;
 using DruidsCornerAPI.Models.DiyDog;
-using DruidsCornerAPI.Models.SearchResults;
+using DruidsCornerAPI.Models.Search;
 using DruidsCornerAPI.Tools;
 using System.Text.Json;
 

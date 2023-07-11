@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using DruidsCornerAPI.Models.DiyDog;
 
-namespace DruidsCornerAPI.Models.SearchResults
+namespace DruidsCornerAPI.Models.Search
 {
     /// <summary>
     /// Encapsulates a Recipe search result 

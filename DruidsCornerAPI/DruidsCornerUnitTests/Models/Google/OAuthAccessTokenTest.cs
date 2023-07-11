@@ -29,7 +29,7 @@ namespace DruidsCornerUnitTests.Models.Google
             var serialized = JsonSerializer.Serialize(accessToken);
             var deserialized = JsonSerializer.Deserialize<OAuthAccessToken>(serialized);   
 
-            Assert.AreEqual(accessToken, deserialized);
+            Assert.That(accessToken, Is.EqualTo(deserialized));
         }
     }
 }

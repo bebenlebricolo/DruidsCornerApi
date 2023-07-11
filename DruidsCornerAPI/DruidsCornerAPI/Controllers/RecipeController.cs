@@ -1,6 +1,6 @@
 using DruidsCornerAPI.Models.DiyDog;
 using DruidsCornerAPI.Services;
-using DruidsCornerAPI.Models.SearchResults;
+using DruidsCornerAPI.Models.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
