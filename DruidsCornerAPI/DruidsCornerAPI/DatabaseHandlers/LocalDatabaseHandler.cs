@@ -319,6 +319,55 @@ namespace DruidsCornerAPI.DatabaseHandlers
             return await ReadRefFromDiskAsync<ReferenceStyles>("known_good_styles.json");
         }
 
+
+        /// <summary>
+        /// Reads from local file
+        /// </summary>
+        /// <param name="kind"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        protected async Task<IndexedDb?> ReadFromFile(IndexedDbPropKind kind, FileInfo path)
+        {
+            var file = path.OpenRead();
+            IndexedDb? indexedDb = null;
+            try
+            {
+                switch(kind)
+                {
+                    case IndexedDbPropKind.Hops :
+                        indexedDb = await JsonSerializer.DeserializeAsync<IndexedHopDb>(file, _jsonOptions);
+                        break;
+
+                    case IndexedDbPropKind.Malts :
+                        indexedDb = await JsonSerializer.DeserializeAsync<IndexedMaltDb>(file, _jsonOptions);
+                        break;
+
+                    case IndexedDbPropKind.Styles :
+                        indexedDb = await JsonSerializer.DeserializeAsync<IndexedStyleDb>(file, _jsonOptions);
+                        break;
+
+                    case IndexedDbPropKind.Tags :
+                        indexedDb = await JsonSerializer.DeserializeAsync<IndexedTagDb>(file, _jsonOptions);
+                        break;
+
+                    case IndexedDbPropKind.FoodPairing :
+                        indexedDb = await JsonSerializer.DeserializeAsync<IndexedFoodPairingDb>(file, _jsonOptions);
+                        break;
+
+                    default:
+                        _logger.LogError($"Unsupported property name : {kind}");
+                        return null;
+                }
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"Could not read IndexedDb from file : {ex.Message}");
+            }
+            file.Close();
+            return indexedDb;
+        }
+
+
         /// <summary>
         /// </summary>
         /// <returns></returns>
@@ -332,13 +381,16 @@ namespace DruidsCornerAPI.DatabaseHandlers
                     filename = "hops_rv_db.json";
                     break;
                 case IndexedDbPropKind.Malts :
-                    filename = "hops_rv_db.json";
+                    filename = "malts_rv_db.json";
                     break;
                 case IndexedDbPropKind.Styles :
-                    filename = "hops_rv_db.json";
+                    filename = "styles_rv_db.json";
+                    break;
+                case IndexedDbPropKind.Tags :
+                    filename = "tags_rv_db.json";
                     break;
                 case IndexedDbPropKind.FoodPairing :
-                    filename = "hops_rv_db.json";
+                    filename = "foodPairing_rv_db.json";
                     break;
                 default:
                     _logger.LogError($"Unsupported property name : {kind}");
@@ -352,19 +404,8 @@ namespace DruidsCornerAPI.DatabaseHandlers
                 return null;
             }
 
-            try
-            {
-                var file = filepath.OpenRead();
-                var indexedDb = await JsonSerializer.DeserializeAsync<IndexedDb>(file);
-                file.Close();
-                return indexedDb;
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError("Caught exception while reading IndexedDB file. Exception : ");
-                _logger.LogError(ex.Message);
-            }
-            return null;
+            var indexedDb = await ReadFromFile(kind, filepath);
+            return indexedDb;
         }
     }
 }

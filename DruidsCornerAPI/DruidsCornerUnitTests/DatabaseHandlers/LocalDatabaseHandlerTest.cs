@@ -1,15 +1,10 @@
 using Moq;
-using System.Collections.Generic;
 using NUnit.Framework.Internal;
 
-using DruidsCornerAPI.Models;
-using DruidsCornerAPI.Tools;
 using DruidsCornerAPI.DatabaseHandlers;
 using DruidsCornerAPI.Models.Config;
 using Microsoft.Extensions.Logging;
 using DruidsCornerAPI.Models.DiyDog.IndexedDb;
-using Microsoft.VisualBasic;
-using DruidsCornerAPI.Tools.Logging;
 
 namespace DruidsCornerUnitTests.DatabaseHandlers
 {
@@ -44,8 +39,39 @@ namespace DruidsCornerUnitTests.DatabaseHandlers
             Assert.That(config.FromRootFolder(_localTestDbFolder.FullName), Is.True);
             
             var handler = new LocalDatabaseHandler(config, mockLogger.Object);
-            var indexedDb = await handler.GetIndexedDbAsync(IndexedDbPropKind.Malts);
-            Assert.That(indexedDb, Is.Not.Null);
+            var indexedMaltDb = await handler.GetIndexedDbAsync(IndexedDbPropKind.Malts) as IndexedMaltDb;
+            Assert.That(indexedMaltDb, Is.Not.Null);
+            Assert.That(indexedMaltDb.Malts.Count, Is.EqualTo(4));
+            Assert.That(indexedMaltDb.Malts[3].Name, Is.EqualTo("Black Malt"));
+            Assert.That(indexedMaltDb.Malts[3].FoundInBeers.Contains(136), Is.True);
+        
+            var indexedHopDb = await handler.GetIndexedDbAsync(IndexedDbPropKind.Hops) as IndexedHopDb;
+            Assert.That(indexedHopDb, Is.Not.Null);
+            Assert.That(indexedHopDb.Hops.Count, Is.EqualTo(4));
+            Assert.That(indexedHopDb.Hops[3].Name, Is.EqualTo("Ariana"));
+            Assert.That(indexedHopDb.Hops[3].FoundInBeers.Contains(353), Is.True);
+
+            var indexedStyleDb = await handler.GetIndexedDbAsync(IndexedDbPropKind.Styles) as IndexedStyleDb;
+            Assert.That(indexedStyleDb, Is.Not.Null);
+            Assert.That(indexedStyleDb.Styles.Count, Is.EqualTo(6));
+            Assert.That(indexedStyleDb.Styles[5].Name, Is.EqualTo("A Blend Of Two Barrel-aged Imperial Saisons"));
+            Assert.That(indexedStyleDb.Styles[5].FoundInBeers.Contains(89), Is.True);
+
+            var indexedTagDb = await handler.GetIndexedDbAsync(IndexedDbPropKind.Tags) as IndexedTagDb;
+            Assert.That(indexedTagDb, Is.Not.Null);
+            Assert.That(indexedTagDb.Tags.Count, Is.EqualTo(6));
+            Assert.That(indexedTagDb.Tags[5].Name, Is.EqualTo("5% Abv Raspberry Berlinerweisse"));
+            Assert.That(indexedTagDb.Tags[5].FoundInBeers.Contains(299), Is.True);
+
+            var indexedFoodPairingDb = await handler.GetIndexedDbAsync(IndexedDbPropKind.FoodPairing) as IndexedFoodPairingDb;
+            Assert.That(indexedFoodPairingDb, Is.Not.Null);
+            Assert.That(indexedFoodPairingDb.FoodPairing.Count, Is.EqualTo(18));
+            Assert.That(indexedFoodPairingDb.FoodPairing[17].Name, Is.EqualTo("Almond and Chocolate Tart"));
+            Assert.That(indexedFoodPairingDb.FoodPairing[17].FoundInBeers.Contains(414), Is.True);
+        
+            var wrongIndexedDbKey = await handler.GetIndexedDbAsync(IndexedDbPropKind.Unknown);
+            Assert.That(wrongIndexedDbKey, Is.Null);
+
         }
     }
 }

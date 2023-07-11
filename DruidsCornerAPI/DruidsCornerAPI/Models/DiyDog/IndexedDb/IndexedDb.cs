@@ -10,6 +10,8 @@
         Yeasts,
         /// <summary>Indexed for styles</summary>
         Styles,
+        /// <summary>Indexed for tags</summary>
+        Tags,
         /// <summary>Indexed for malts</summary>
         Malts,
         /// <summary>Indexed for hops</summary>
@@ -26,15 +28,15 @@
     /// </summary>
     public record IndexedDb
     {
-        /// <summary>
-        /// Underlying type of indexed database (only available for properties listed in <see cref="IndexedDbPropKind"/> )
-        /// </summary>
-        public IndexedDbPropKind Kind {get; set;} = IndexedDbPropKind.Unknown;
+        // /// <summary>
+        // /// Underlying type of indexed database (only available for properties listed in <see cref="IndexedDbPropKind"/> )
+        // /// </summary>
+        // public IndexedDbPropKind Kind {get; set;} = IndexedDbPropKind.Unknown;
 
-        /// <summary>
-        /// List of properties in a reversed DB construct
-        /// </summary>
-        public List<ReversedPropMapping> properties = new List<ReversedPropMapping>();  
+        // /// <summary>
+        // /// List of properties in a reversed DB construct
+        // /// </summary>
+        // public List<ReversedPropMapping> properties = new List<ReversedPropMapping>();  
 
         /// <summary>
         /// Checks if an IndexDb can be constructed for the given object
