@@ -272,7 +272,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
             try 
             {
                 var file = filepath.Open(FileMode.Open);
-                var referenceHops = await JsonSerializer.DeserializeAsync<T>(file);
+                var referenceHops = await JsonSerializer.DeserializeAsync<T>(file, _jsonOptions);
                 file.Close();
                 return referenceHops;
             }
@@ -369,7 +369,9 @@ namespace DruidsCornerAPI.DatabaseHandlers
 
 
         /// <summary>
+        /// Gets an Indexed database from disk
         /// </summary>
+        /// TODO : remove this mess and implement polymorphic Json deserialization (...)
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         public async Task<IndexedDb?> GetIndexedDbAsync(IndexedDbPropKind kind)

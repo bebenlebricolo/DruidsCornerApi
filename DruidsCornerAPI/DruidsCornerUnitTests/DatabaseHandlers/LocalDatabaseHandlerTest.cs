@@ -73,5 +73,43 @@ namespace DruidsCornerUnitTests.DatabaseHandlers
             Assert.That(wrongIndexedDbKey, Is.Null);
 
         }
+
+        public async Task CanReadReferenceDbsFromDisk()
+        {
+            var mockLogger = new Mock<ILogger<LocalDatabaseHandler>>();
+
+            // Lookup the local directory structure for this test database
+            var config = new DeployedDatabaseConfig();
+            Assert.That(config.FromRootFolder(_localTestDbFolder.FullName), Is.True);
+            
+            var handler = new LocalDatabaseHandler(config, mockLogger.Object);
+            var refHops = await handler.GetReferenceHopsAsync();
+            Assert.That(refHops, Is.Not.Null);
+            Assert.That(refHops.Hops.Count, Is.EqualTo(3));
+            Assert.That(refHops.Hops[2].Name, Is.EqualTo("Apollo"));
+            Assert.That(refHops.Hops[2].Url, Is.EqualTo("https://beermaverick.com/hop/apollo/"));
+            Assert.That(refHops.Hops[2].Aliases, Is.Null);
+
+            var refMalts = await handler.GetReferenceMaltsAsync();
+            Assert.That(refMalts, Is.Not.Null);
+            Assert.That(refMalts.Malts.Count, Is.EqualTo(3));
+            Assert.That(refMalts.Malts[2].Name, Is.EqualTo("Black Malt"));
+            Assert.That(refMalts.Malts[2].Manufacturer, Is.EqualTo("Simpsons"));
+            Assert.That(refMalts.Malts[2].Url, Is.EqualTo("https://www.simpsonsmalt.co.uk/our-malts/black-malt/"));
+         
+            var refStyles = await handler.GetReferenceStylesAsync();
+            Assert.That(refStyles, Is.Not.Null);
+            Assert.That(refStyles.Styles.Count, Is.EqualTo(3));
+            Assert.That(refStyles.Styles[2].Name, Is.EqualTo("Eisbock"));
+            Assert.That(refStyles.Styles[2].Category, Is.EqualTo("Bocks"));
+            Assert.That(refStyles.Styles[2].Url, Is.EqualTo("https://www.beeradvocate.com/beer/styles/36/"));
+         
+            var refYeasts = await handler.GetReferenceYeastsAsync();
+            Assert.That(refYeasts, Is.Not.Null);
+            Assert.That(refYeasts.Yeasts.Count, Is.EqualTo(3));
+            Assert.That(refYeasts.Yeasts[2].Name, Is.EqualTo("Saflager - S-189"));
+            Assert.That(refYeasts.Yeasts[2].Manufacturer, Is.EqualTo("Fermentis"));
+            Assert.That(refYeasts.Yeasts[2].Aliases!.Contains("S189"), Is.True);
+        }
     }
 }
