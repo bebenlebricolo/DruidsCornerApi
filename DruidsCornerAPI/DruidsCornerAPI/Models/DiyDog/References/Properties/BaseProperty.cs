@@ -3,7 +3,7 @@ namespace DruidsCornerAPI.Models.DiyDog.References
 
     /// <summary>
     /// Encodes availanle known good properties
-    /// From DiyDogExtractor known_good_<prop>.json dbs
+    /// From DiyDogExtractor known_good_{prop}.json dbs
     /// </summary>
     public enum ReferencePropKind
     {

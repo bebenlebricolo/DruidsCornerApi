@@ -25,6 +25,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// Constructs a LocalDatabaseHandler using a given DeployedDatabaseConfig as an input (points to folders)
         /// </summary>
         /// <param name="config">Deployed database configuration (used to read from disk)</param>
+        /// <param name="logger">System's logger</param>
         public LocalDatabaseHandler(DeployedDatabaseConfig config, ILogger<LocalDatabaseHandler> logger)
         {
             _dbConfig = config;

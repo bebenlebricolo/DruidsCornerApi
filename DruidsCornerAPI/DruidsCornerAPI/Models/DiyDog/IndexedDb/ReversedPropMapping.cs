@@ -2,7 +2,7 @@ namespace DruidsCornerAPI.Models.DiyDog.IndexedDb
 {
 
     /// <summary>
-    /// Encodes a simple reversed property mapping as found in <prop>_rv_db.json provided by 
+    /// Encodes a simple reversed property mapping as found in {prop}_rv_db.json provided by 
     /// DiyDogExtract databases
     /// </summary>
     public record ReversedPropMapping
