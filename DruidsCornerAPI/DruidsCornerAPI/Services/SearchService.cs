@@ -1,7 +1,7 @@
-﻿using DruidsCornerAPI.DatabaseHandlers;
+﻿using DruidsCornerAPI.Tools;
 using DruidsCornerAPI.Models.Search;
+using DruidsCornerAPI.DatabaseHandlers;
 using DruidsCornerAPI.Models.DiyDog.RecipeDb;
-using DruidsCornerAPI.Tools;
 using DruidsCornerAPI.Models.DiyDog.IndexedDb;
 
 namespace DruidsCornerAPI.Services
@@ -28,7 +28,7 @@ namespace DruidsCornerAPI.Services
         }
 
 
-#region Filters
+#region RangeFilters
         /// <summary>
         /// Filters out TargetOg value on a single recipe
         /// </summary>
@@ -160,9 +160,11 @@ namespace DruidsCornerAPI.Services
             return FilterOutRangeValueDiscrete(subject, subject.MethodTimings.Fermentation.Celsius, queries.FermentationTemps);
         }
 
-#endregion Filters
+#endregion RangeFilters
 
 #region FuzzySearchFilters
+
+#region GenericFilters
         /// <summary>
         /// Performs a fuzzy search on property mapping in the given propMapping list (coming from an indexed DB)
         /// </summary>
@@ -212,16 +214,189 @@ namespace DruidsCornerAPI.Services
 
             return candidatesResults;
         }
+#endregion GenericFilters
+
+        /// <summary>
+        /// Small wrapper to get matching recipe using a Name only query
+        /// </summary>
+        /// <param name="candidates"></param>
+        /// <param name="names"></param>
+        /// <returns></returns>
+        public List<FuzzySearchResult<Recipe>> GetMatchingRecipeByNames( List<Recipe> candidates, List<string> names)
+        {
+            return FuzzySearchInRecipesMultipleQueries(candidates, names, c => new List<string>{c.Name});
+        }
+
+        /// <summary>
+        /// Small wrapper around <see cref="FuzzySearchInIndexedDbMultipleQueries"/> for the specified type (used for abstraction and testing)
+        /// </summary>
+        /// <param name="candidates"></param>
+        /// <param name="names"></param>
+        /// <returns></returns>
+        public List<FuzzySearchResult<Recipe>> GetMatchingRecipeByExtraMashIngredients( List<Recipe> candidates, List<string> names)
+        {
+            var extraMashCandidatesResults = FuzzySearchInRecipesMultipleQueries(candidates, names, c => {
+                    // Null values are handled locally in the algorithm
+                    return c.Ingredients.extraMashes!.Select(x => x.Name).ToList();
+                });
+            return  extraMashCandidatesResults;
+        }
+
+        /// <summary>
+        /// Small wrapper around <see cref="FuzzySearchInIndexedDbMultipleQueries"/> for the specified type (used for abstraction and testing)
+        /// </summary>
+        /// <param name="candidates"></param>
+        /// <param name="names"></param>
+        /// <returns></returns>
+        public List<FuzzySearchResult<Recipe>> GetMatchingRecipeByExtraBoilIngredients( List<Recipe> candidates, List<string> names)
+        {
+            var extraBoilCandidatesResults = FuzzySearchInRecipesMultipleQueries(candidates, names, c => {
+                    // Null values are handled locally in the algorithm
+                    return c.Ingredients.extraBoils!.Select(x => x.Name).ToList();
+                });
+            return  extraBoilCandidatesResults;
+        }
+
+        /// <summary>
+        /// Find matching recipes in candidates list and returns a new list containing only recipes that uses the queried items
+        /// </summary>
+        /// <param name="candidates">List of candidate recipes</param>
+        /// <param name="indexedMalts">Indexed Malts database</param>
+        /// <param name="names">List of malt names</param>
+        public List<Recipe> GetMatchingRecipeByMalts(List<Recipe> candidates, IndexedMaltDb? indexedMalts, List<string>? names)
+        {
+            if(names != null && indexedMalts != null)
+            {
+                var maltsCandidates = FuzzySearchInIndexedDbMultipleQueries(indexedMalts.Malts, names);
+                candidates = KeepSimilarIndices(candidates, maltsCandidates);
+            }
+            return candidates;
+        }
+
+        /// <summary>
+        /// Small wrapper around <see cref="FuzzySearchInIndexedDbMultipleQueries"/> for the specified type (used for abstraction and testing)
+        /// </summary>
+        /// <param name="refList"></param>
+        /// <param name="names"></param>
+        /// <returns></returns>
+        public List<FuzzySearchResult<ReversedPropMapping>> GetMatchingRecipeByStyles( List<ReversedPropMapping> refList, List<string> names)
+        {
+            return FuzzySearchInIndexedDbMultipleQueries(refList, names);
+        }
+
+
+        /// <summary>
+        /// Small wrapper around <see cref="FuzzySearchInIndexedDbMultipleQueries"/> for the specified type (used for abstraction and testing)
+        /// </summary>
+        /// <param name="refList"></param>
+        /// <param name="names"></param>
+        /// <returns></returns>
+        public List<FuzzySearchResult<ReversedPropMapping>> GetMatchingRecipeByHops( List<ReversedPropMapping> refList, List<string> names)
+        {
+            return FuzzySearchInIndexedDbMultipleQueries(refList, names);
+        }
+
+        /// <summary>
+        /// Small wrapper around <see cref="FuzzySearchInIndexedDbMultipleQueries"/> for the specified type (used for abstraction and testing)
+        /// </summary>
+        /// <param name="refList"></param>
+        /// <param name="names"></param>
+        /// <returns></returns>
+        public List<FuzzySearchResult<ReversedPropMapping>> GetMatchingRecipeByYeasts( List<ReversedPropMapping> refList, List<string> names)
+        {
+            return FuzzySearchInIndexedDbMultipleQueries(refList, names);
+        }
+
+        
+        /// <summary>
+        /// Small wrapper around <see cref="FuzzySearchInIndexedDbMultipleQueries"/> for the specified type (used for abstraction and testing)
+        /// </summary>
+        /// <param name="refList"></param>
+        /// <param name="names"></param>
+        /// <returns></returns>
+        public List<FuzzySearchResult<ReversedPropMapping>> GetMatchingRecipeByTags( List<ReversedPropMapping> refList, List<string> names)
+        {
+            return FuzzySearchInIndexedDbMultipleQueries(refList, names);
+        }
+
+
+
+
 
 #endregion FuzzySearchFilters        
         
+        /// <summary>
+        /// Removes duplicated recipes in input list
+        /// </summary>
+        /// <param name="recipes"></param>
+        /// <returns></returns>
+        public List<Recipe> RemoveDoubles(List<Recipe> recipes)
+        {
+            var output = new List<Recipe>();
+            foreach(var recipe in recipes) 
+            {
+                if(!output.Any(r => r.Number == recipe.Number))
+                {
+                    output.Add(recipe);
+                }
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// Only keep objects that are both in candidates list and filterOutputList
+        /// (performs a logical AND on both lists)
+        /// </summary>
+        /// <param name="candidates">Recipe candidates list </param>
+        /// <param name="filterOutputList">Previous filtering stage output result list</param>
+        /// <returns>New list containing only elements that are common to both input lists</returns>
+        public List<Recipe> KeepSimilar(List<Recipe> candidates, List<FuzzySearchResult<Recipe>> filterOutputList)
+        {
+            var outputList = new List<Recipe>();
+            foreach(var filterOutput in filterOutputList)
+            {
+                if(candidates.Any(elem => elem.Number == filterOutput.Prop!.Number))
+                {
+                    outputList.Add(filterOutput.Prop!);
+                }
+            }
+            outputList = RemoveDoubles(outputList);
+            return outputList;
+        }
+
+       /// <summary>
+        /// Variant of the <see cref="KeepSimilar"/> method above, but works with indices provided by reverse property mappings 
+        /// (performs a logical AND on both lists)
+        /// </summary>
+        /// <param name="candidates">Recipe candidates list </param>
+        /// <param name="filterOutputList">Previous filtering stage output result list</param>
+        /// <returns>New list containing only elements that are common to both input lists</returns>
+        public List<Recipe> KeepSimilarIndices(List<Recipe> candidates, List<FuzzySearchResult<ReversedPropMapping>> filterOutputList)
+        {
+            var outputList = new List<Recipe>();
+            foreach(var filterOutput in filterOutputList)
+            {
+                foreach(var index in filterOutput.Prop!.FoundInBeers)
+                {
+                    var candidate = candidates.FirstOrDefault(c => c.Number == index);
+                    if(candidate != null)
+                    {
+                        outputList.Add(candidate);
+                    }
+                }
+            }
+
+            outputList = RemoveDoubles(outputList);
+            return outputList;
+        }
+
         /// <summary>
         /// Searches for a single recipe using the given queries and database handler.
         /// </summary>
         /// <param name="queries">Input queries used for searching</param>
         /// <param name="dbHandler">Database handler used in current context</param>
         /// <returns></returns>
-        public async Task<List<RecipeResult>> SearchRecipe(Queries queries, IDatabaseHandler dbHandler)
+        public async Task<MultipleRecipeResult> SearchRecipeAsync(Queries queries, IDatabaseHandler dbHandler)
         {
             var allRecipes = await dbHandler.GetAllRecipesAsync();
             
@@ -270,75 +445,59 @@ namespace DruidsCornerAPI.Services
             // Fuzzy Search for names
             if(queries.NameList != null)
             {
-                var nameCandidatesResults = FuzzySearchInRecipesMultipleQueries(candidates, queries.NameList, c => new List<string>{c.Name});
+                var nameCandidatesResults = GetMatchingRecipeByNames(candidates, queries.NameList);
+                candidates = KeepSimilar(candidates, nameCandidatesResults);
             }
 
             // Fuzzy Search for names
             if(queries.ExtraMashList != null)
             {
-                var extraMashCandidatesResults = FuzzySearchInRecipesMultipleQueries(candidates, queries.ExtraMashList, c => {
-                    // Null values are handled locally in the algorithm
-                    return c.Ingredients.extraMashes!.Select(x => x.Name).ToList();
-                });
+                var extraMashCandidatesResults = GetMatchingRecipeByExtraMashIngredients(candidates, queries.ExtraMashList);
+                candidates = KeepSimilar(candidates, extraMashCandidatesResults);
             }
 
             // Fuzzy Search for names
             if(queries.ExtraBoilList != null)
             {
-                var extraMashCandidatesResults = FuzzySearchInRecipesMultipleQueries(candidates, queries.ExtraBoilList, c => {
-                    // Null values are handled locally in the algorithm
-                    return c.Ingredients.extraBoils!.Select(x => x.Name).ToList();
-                });
+                var extraBoilCandidatesResults = GetMatchingRecipeByExtraBoilIngredients(candidates, queries.ExtraBoilList);
+                candidates = KeepSimilar(candidates, extraBoilCandidatesResults);
             }
 
 
-            List<uint> candidatesIndicesList = new List<uint>();
-            if(queries.MaltList != null && indexedMalts != null)
-            {
-                var maltsCandidates = FuzzySearchInIndexedDbMultipleQueries(indexedMalts.Malts, queries.MaltList);
-            }
+            // Perform the same kind of analysis with Reversed properties (and indices)
+            candidates = GetMatchingRecipeByMalts(candidates, indexedMalts, queries.MaltList);
 
             if(queries.StyleList != null && indexedStyles != null)
             {
-                var stylesCandidates = FuzzySearchInIndexedDbMultipleQueries(indexedStyles.Styles, queries.StyleList);
+                var stylesCandidates = GetMatchingRecipeByStyles(indexedStyles.Styles, queries.StyleList);
+                candidates = KeepSimilarIndices(candidates, stylesCandidates);
             }
 
             if(queries.HopList != null && indexedHops != null)
             {
-                var hopsCandidates = FuzzySearchInIndexedDbMultipleQueries(indexedHops.Hops, queries.HopList);
+                var hopsCandidates = GetMatchingRecipeByHops(indexedHops.Hops, queries.HopList);
+                candidates = KeepSimilarIndices(candidates, hopsCandidates);
             }
 
             if(queries.YeastList != null && indexedYeasts != null)
             {
-                var yeastsCandidates = FuzzySearchInIndexedDbMultipleQueries(indexedYeasts.Yeasts, queries.YeastList);
+                var yeastsCandidates = GetMatchingRecipeByYeasts(indexedYeasts.Yeasts, queries.YeastList);
+                candidates = KeepSimilarIndices(candidates, yeastsCandidates);
             }
 
             if(queries.TagList != null && indexedTags != null)
             {
-                var tagsCandidates = FuzzySearchInIndexedDbMultipleQueries(indexedTags.Tags, queries.TagList);
+                var tagsCandidates = GetMatchingRecipeByTags(indexedTags.Tags, queries.TagList);
+                candidates = KeepSimilarIndices(candidates, tagsCandidates);
             }
 
             if(queries.FoodPairingList != null && indexedFoodPairings != null)
             {
                 var foodPairingsCandidates = FuzzySearchInIndexedDbMultipleQueries(indexedFoodPairings.FoodPairing, queries.FoodPairingList);
+                candidates = KeepSimilarIndices(candidates, foodPairingsCandidates);
             }
 
-
-            List<Recipe> filteredCandidates = new List<Recipe>();
-            // Iterate over remaining candidates and filter out the list even more
-            // Using the indices found earlier
-            foreach(var recipe in candidates)
-            {
-                if(candidatesIndicesList.Contains(recipe.Number))
-                {
-                    filteredCandidates.Add(recipe);
-                }
-            }
-
-
-            List<RecipeResult> filteredResults = new List<RecipeResult>();
-
-            return filteredResults;
+            return new MultipleRecipeResult(candidates);
         }
     }
 }

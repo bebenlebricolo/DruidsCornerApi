@@ -5,6 +5,7 @@ using DruidsCornerAPI.DatabaseHandlers;
 using DruidsCornerAPI.Models.Config;
 using Microsoft.Extensions.Logging;
 using DruidsCornerAPI.Models.DiyDog.IndexedDb;
+using System.Runtime.CompilerServices;
 
 namespace DruidsCornerUnitTests.DatabaseHandlers
 {
@@ -12,21 +13,13 @@ namespace DruidsCornerUnitTests.DatabaseHandlers
     [TestFixture]
     public class LocalDatabaseHandlersTest
     {
-        private DirectoryInfo _localTestDbFolder;
+        private DirectoryInfo? _localTestDbFolder;
 
 
         [SetUp]
         public void Setup()
         {
-            var testDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-            // Recurse until base project folder (...)
-            while(testDir != null && testDir.Name != nameof(DruidsCornerAPI))
-            {
-                testDir = testDir.Parent;
-            }
-
-            var unitTestFolder = testDir!.GetDirectories("DruidsCornerUnitTests").First()!;
-            _localTestDbFolder = unitTestFolder.GetDirectories("TestDatabase").First();
+            _localTestDbFolder = TestHelpers.TestDatabaseFinder.FindTestDatabase();
         }
 
         [Test]
@@ -36,7 +29,7 @@ namespace DruidsCornerUnitTests.DatabaseHandlers
 
             // Lookup the local directory structure for this test database
             var config = new DeployedDatabaseConfig();
-            Assert.That(config.FromRootFolder(_localTestDbFolder.FullName), Is.True);
+            Assert.That(config.FromRootFolder(_localTestDbFolder!.FullName), Is.True);
             
             var handler = new LocalDatabaseHandler(config, mockLogger.Object);
             var indexedMaltDb = await handler.GetIndexedDbAsync(IndexedDbPropKind.Malts) as IndexedMaltDb;
@@ -74,13 +67,14 @@ namespace DruidsCornerUnitTests.DatabaseHandlers
 
         }
 
+
+        [Test]
         public async Task CanReadReferenceDbsFromDisk()
         {
             var mockLogger = new Mock<ILogger<LocalDatabaseHandler>>();
-
             // Lookup the local directory structure for this test database
             var config = new DeployedDatabaseConfig();
-            Assert.That(config.FromRootFolder(_localTestDbFolder.FullName), Is.True);
+            Assert.That(config.FromRootFolder(_localTestDbFolder!.FullName), Is.True);
             
             var handler = new LocalDatabaseHandler(config, mockLogger.Object);
             var refHops = await handler.GetReferenceHopsAsync();

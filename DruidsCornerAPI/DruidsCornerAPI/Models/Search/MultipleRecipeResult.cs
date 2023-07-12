@@ -14,5 +14,14 @@ namespace DruidsCornerAPI.Models.Search
         /// <see cref="Recipe"/> 
         /// </summary>
         public List<Recipe> Recipes { get; set; } = new List<Recipe>();
+
+        /// <summary>
+        /// Standard constructor
+        /// </summary>
+        /// <param name="recipes"></param>
+        public MultipleRecipeResult(List<Recipe> recipes)
+        {
+            this.Recipes = recipes; 
+        }
     }
 }
