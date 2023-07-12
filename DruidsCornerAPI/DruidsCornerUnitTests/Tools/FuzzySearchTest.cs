@@ -48,27 +48,27 @@ namespace DruidsCornerUnitTests.Tools
            
             var data = GenerateFakeData();
 
-            var test1Result = FuzzySearch.SearchPartialRatio("test 1", data, elem => elem.Name);
-            Assert.That(test1Result.Item1, Is.EqualTo(100));
-            Assert.That(test1Result.Item2, Is.EqualTo(data[0]));
+            var test1Result = FuzzySearch.SearchInList("test 1", data, elem => new List<string> {elem.Name});
+            Assert.That(test1Result.Ratio, Is.EqualTo(100));
+            Assert.That(test1Result.Prop, Is.EqualTo(data[0]));
 
-            var test2Result = FuzzySearch.SearchPartialRatio("test 2", data, elem => elem.Name);
-            Assert.That(test2Result.Item2, Is.EqualTo(data[1]));
+            var test2Result = FuzzySearch.SearchInList("test 2", data, elem => new List<string> {elem.Name});
+            Assert.That(test2Result.Prop, Is.EqualTo(data[1]));
 
-            var test3Result = FuzzySearch.SearchPartialRatio("test 3", data, elem => elem.Name);
-            Assert.That(test3Result.Item2, Is.EqualTo(data[2]));
+            var test3Result = FuzzySearch.SearchInList("test 3", data, elem => new List<string> {elem.Name});
+            Assert.That(test3Result.Prop, Is.EqualTo(data[2]));
 
-            var test4Result = FuzzySearch.SearchPartialRatio("another 1", data, elem => elem.Name);
-            Assert.That(test4Result.Item2, Is.EqualTo(data[3]));
+            var test4Result = FuzzySearch.SearchInList("another 1", data, elem => new List<string> {elem.Name});
+            Assert.That(test4Result.Prop, Is.EqualTo(data[3]));
 
-            var test5Result = FuzzySearch.SearchPartialRatio("yet another", data, elem => elem.Name);
-            Assert.That(test5Result.Item2, Is.EqualTo(data[4]));
+            var test5Result = FuzzySearch.SearchInList("yet another", data, elem => new List<string> {elem.Name});
+            Assert.That(test5Result.Prop, Is.EqualTo(data[4]));
 
-            var test6Result = FuzzySearch.SearchPartialRatio("1 te", data, elem => elem.Name);
-            Assert.That(test6Result.Item2, Is.EqualTo(data[5]));
+            var test6Result = FuzzySearch.SearchInList("1 te", data, elem => new List<string> {elem.Name});
+            Assert.That(test6Result.Prop, Is.EqualTo(data[5]));
 
-            var test7Result = FuzzySearch.SearchPartialRatio("1 te mis", data, elem => elem.Name);
-            Assert.That(test7Result.Item2, Is.EqualTo(data[6]));
+            var test7Result = FuzzySearch.SearchInList("1 te mis", data, elem => new List<string> {elem.Name});
+            Assert.That(test7Result.Prop, Is.EqualTo(data[6]));
         }
 
 
@@ -81,19 +81,25 @@ namespace DruidsCornerUnitTests.Tools
         {
             var data = GenerateFakeData();
 
-            var orderedList = FuzzySearch.SearchPartialRatioCompleteList("test 1", data, elem => elem.Name);
+            var orderedList = FuzzySearch.SearchInListFullResults("test 1", data, elem => new List<string> {elem.Name}, FuzzMode.Ratio);
             
             // Lock descending order
-            Assert.That(orderedList[0].Item1, Is.GreaterThan(orderedList[1].Item1));
-            var expectedOrder = new List<Tuple<int, TestDataContainer>> {
-                new Tuple<int, TestDataContainer>(100, data[0]),
-                new Tuple<int, TestDataContainer>(67, data[5]),
-                new Tuple<int, TestDataContainer>(60, data[3]),
-                new Tuple<int, TestDataContainer>(50, data[4]),
-                new Tuple<int, TestDataContainer>(43, data[6]),
-                new Tuple<int, TestDataContainer>(37, data[1]),
-                new Tuple<int, TestDataContainer>(37, data[2]),
+            Assert.That(orderedList[0].Ratio, Is.GreaterThan(orderedList[1].Ratio));
+            var expectedOrder = new List<FuzzySearchResult<TestDataContainer>> {
+                new FuzzySearchResult<TestDataContainer>(100, data[0]),
+                new FuzzySearchResult<TestDataContainer>(67, data[5]),
+                new FuzzySearchResult<TestDataContainer>(60, data[3]),
+                new FuzzySearchResult<TestDataContainer>(50, data[4]),
+                new FuzzySearchResult<TestDataContainer>(43, data[6]),
+                new FuzzySearchResult<TestDataContainer>(37, data[1]),
+                new FuzzySearchResult<TestDataContainer>(37, data[2]),
             };
+
+            // Assert order and values are correct
+            for(int i = 0; i < orderedList.Count ; i++) 
+            {
+                Assert.That(orderedList[i], Is.EqualTo(expectedOrder[i]));
+            }
         }
     }
 }

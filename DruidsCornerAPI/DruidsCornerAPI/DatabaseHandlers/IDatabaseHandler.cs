@@ -94,5 +94,42 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// </summary>
         /// <returns>IndexedDb or null</returns>
         public Task<IndexedDb?> GetIndexedDbAsync(IndexedDbPropKind kind);
+
+        /// <summary>
+        /// Retrieves an Indexed Malt Database
+        /// </summary>
+        /// <returns>Indexed database or null</returns>
+        public Task<IndexedMaltDb?> GetIndexedMaltDbAsync();
+
+        /// <summary>
+        /// Retrieves an Indexed Hop Database
+        /// </summary>
+        /// <returns>Indexed database or null</returns>
+        public Task<IndexedHopDb?> GetIndexedHopDbAsync();
+
+        /// <summary>
+        /// Retrieves an Indexed Style Database
+        /// </summary>
+        /// <returns>Indexed database or null</returns>
+        public Task<IndexedStyleDb?> GetIndexedStyleDbAsync();
+
+        /// <summary>
+        /// Retrieves an Indexed Yeast Database
+        /// </summary>
+        /// <returns>Indexed database or null</returns>
+        public Task<IndexedYeastDb?> GetIndexedYeastDbAsync();
+
+        /// <summary>
+        /// Retrieves an Indexed Tag Database
+        /// </summary>
+        /// <returns>Indexed database or null</returns>
+        public Task<IndexedTagDb?> GetIndexedTagDbAsync();
+        
+        /// <summary>
+        /// Retrieves an Indexed FoodPairing Database
+        /// </summary>
+        /// <returns>Indexed database or null</returns>
+        public Task<IndexedFoodPairingDb?> GetIndexedFoodPairingDbAsync();
+
     }
 }

@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-
 namespace DruidsCornerAPI.Tools.Logging
 {
 

@@ -99,6 +99,16 @@ namespace DruidsCornerAPI.Models.Search
         public List<string>? TwistList {get; set; }
 
         /// <summary>
+        /// Queried tag list (fuzzy search on names)
+        /// </summary>
+        public List<string>? TagList {get; set; }
+
+        /// <summary>
+        /// Queried food pairing list (fuzzy search on names)
+        /// </summary>
+        public List<string>? FoodPairingList {get; set; }
+
+        /// <summary>
         /// Removes doubles from an optional list of string
         /// </summary>
         /// <param name="list"></param>
@@ -135,6 +145,9 @@ namespace DruidsCornerAPI.Models.Search
             RemoveDoubles(HopList);
             RemoveDoubles(TwistList);
             RemoveDoubles(YeastList);
+            RemoveDoubles(TagList);
+            RemoveDoubles(FoodPairingList);
+            RemoveDoubles(NameList);
         }
 
 

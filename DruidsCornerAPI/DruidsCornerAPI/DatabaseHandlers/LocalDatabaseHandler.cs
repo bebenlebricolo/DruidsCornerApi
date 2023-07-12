@@ -185,8 +185,8 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// <returns></returns>
         protected RecipeResult FindByName(string name, List<Recipe> recipeList)
         {
-            var fuzzyResult = FuzzySearch.SearchPartialRatio(name, recipeList, elem => elem.Name);
-            return new RecipeResult(fuzzyResult.Item1, fuzzyResult.Item2);
+            var fuzzyResult = FuzzySearch.SearchInList(name, recipeList, elem => new List<string>{elem.Name});
+            return new RecipeResult(fuzzyResult.Ratio, fuzzyResult.Prop!);
         }
 
         /// <summary>
@@ -409,6 +409,60 @@ namespace DruidsCornerAPI.DatabaseHandlers
 
             var indexedDb = await ReadFromFile(kind, filepath);
             return indexedDb;
+        }
+
+        /// <summary>
+        /// Retrieves an Indexed Malt Database
+        /// </summary>
+        /// <returns>Indexed database or null</returns>
+        public async Task<IndexedMaltDb?> GetIndexedMaltDbAsync()
+        {
+            return await GetIndexedDbAsync(IndexedDbPropKind.Malts) as IndexedMaltDb;
+        }
+
+        /// <summary>
+        /// Retrieves an Indexed Hop Database
+        /// </summary>
+        /// <returns>Indexed database or null</returns>
+        public async Task<IndexedHopDb?> GetIndexedHopDbAsync()
+        {
+            return await GetIndexedDbAsync(IndexedDbPropKind.Hops) as IndexedHopDb;
+        }
+
+        /// <summary>
+        /// Retrieves an Indexed Style Database
+        /// </summary>
+        /// <returns>Indexed database or null</returns>
+        public async Task<IndexedStyleDb?> GetIndexedStyleDbAsync()
+        {
+            return await GetIndexedDbAsync(IndexedDbPropKind.Styles) as IndexedStyleDb;
+        }
+
+        /// <summary>
+        /// Retrieves an Indexed Style Database
+        /// </summary>
+        /// <returns>Indexed database or null</returns>
+        public async Task<IndexedYeastDb?> GetIndexedYeastDbAsync()
+        {
+            return await GetIndexedDbAsync(IndexedDbPropKind.Yeasts) as IndexedYeastDb;
+        }
+
+        /// <summary>
+        /// Retrieves an Indexed Tag Database
+        /// </summary>
+        /// <returns>Indexed database or null</returns>
+        public async Task<IndexedTagDb?> GetIndexedTagDbAsync()
+        {
+            return await GetIndexedDbAsync(IndexedDbPropKind.Tags) as IndexedTagDb;
+        }
+
+        /// <summary>
+        /// Retrieves an Indexed FoodPairing Database
+        /// </summary>
+        /// <returns>Indexed database or null</returns>
+        public async Task<IndexedFoodPairingDb?> GetIndexedFoodPairingDbAsync()
+        {
+            return await GetIndexedDbAsync(IndexedDbPropKind.FoodPairing) as IndexedFoodPairingDb;
         }
     }
 }

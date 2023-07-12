@@ -29,9 +29,26 @@ namespace DruidsCornerAPI.Models.Search
         }
 
         /// <summary>
+        /// Checks if the Range is reversed (Start and End are sorted in a reversed order)
+        /// Reverse ordering might be useful for linear interpolation of negative coefficient curves (like NTC thermistors for instance)
+        /// </summary>
+        public bool IsReversed()
+        {
+            return Start.CompareTo(End) > 0;
+        }
+
+        /// <summary>
+        /// Checks if interval span is actually zero (twice the same value for Start and End)
+        /// </summary>
+        public bool IsNullInterval()
+        {
+            return Start.CompareTo(End) == 0;
+        }
+        
+        /// <summary>
         /// Swaps Start for End
         /// </summary>
-        public void Reverse()
+        public void SwapBoundaries()
         {
             var tmp = Start;
             Start = End;
@@ -64,12 +81,26 @@ namespace DruidsCornerAPI.Models.Search
                 max = tmp;
             }
 
-            if(!allowReversed && Start.CompareTo(End) > 0)
+            if(!allowReversed && IsReversed())
             {
-                Reverse();
+                SwapBoundaries();
             }
             Numerics.Clamp(Start, max, min);
             Numerics.Clamp(End, max, min);   
+        }
+
+        /// <summary>
+        /// Checks that the input value is included in the Range interval 
+        /// </summary>
+        /// <param name="input">Subject comparison value</param>
+        /// <param name="strict">If set to true : Rejects input value that exactly match one of the two boundaries (Strict comparison). Otherwise, lt/gt comparison is performed</param>
+        public bool InRange(T input, bool strict = false)
+        {
+            if(strict)
+            {
+                return Start.CompareTo(input) < 0 && End.CompareTo(input) > 0;
+            }
+            return Start.CompareTo(input) <= 0 && End.CompareTo(input) >= 0;
         }
     }
 }
