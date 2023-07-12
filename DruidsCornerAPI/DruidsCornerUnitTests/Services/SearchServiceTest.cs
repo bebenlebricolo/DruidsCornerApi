@@ -45,9 +45,9 @@ namespace DruidsCornerUnitTests.Services
             var mockLogger = new Mock<ILogger<SearchService>>();
             var searchService = new SearchService(_fakeConfig, mockLogger.Object);
             
-            var results = await searchService.SearchRecipeAsync(query, _localDbHandler);
-            Assert.That(results.Recipes.Count, Is.EqualTo(3));
-            Assert.That(results.Recipes[0].Name, Is.EqualTo("Punk Ipa 2007 - 2010"));
+            var recipes = await searchService.SearchRecipeAsync(query, _localDbHandler);
+            Assert.That(recipes.Count, Is.EqualTo(3));
+            Assert.That(recipes[0].Name, Is.EqualTo("Punk Ipa 2007 - 2010"));
         }
 
         [Test]
@@ -62,9 +62,9 @@ namespace DruidsCornerUnitTests.Services
             };
 
             var reversedHopMapping = await _localDbHandler.GetIndexedHopDbAsync();
-            var results = searchService.GetMatchingRecipeByHops(reversedHopMapping!.Hops, hopsQueryList);
-            Assert.That(results.Count, Is.EqualTo(reversedHopMapping.Hops.Count));
-            Assert.That(results[0].Ratio, Is.EqualTo(100));
+            var candidates = await _localDbHandler.GetAllRecipesAsync();
+            var recipes = searchService.GetMatchingRecipeByHops(candidates, reversedHopMapping, hopsQueryList);
+            Assert.That(recipes.Count, Is.EqualTo(3));
         }
     }
 }
