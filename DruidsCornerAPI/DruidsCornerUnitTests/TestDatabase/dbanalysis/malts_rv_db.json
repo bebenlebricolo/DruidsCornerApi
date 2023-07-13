@@ -5,18 +5,7 @@
             "foundInBeers": [
                 111,
                 114,
-                121,
-                138,
-                187,
-                188,
-                189,
-                209,
-                251,
-                275,
-                282,
-                316,
-                318,
-                415
+                121
             ]
         },
         {
@@ -25,35 +14,7 @@
                 15,
                 22,
                 24,
-                25,
-                32,
-                42,
-                49,
-                69,
-                77,
-                96,
-                100,
-                117,
-                118,
-                126,
-                130,
-                136,
-                141,
-                144,
-                156,
-                167,
-                172,
-                173,
-                199,
-                200,
-                217,
-                239,
-                253,
-                254,
-                278,
-                293,
-                298,
-                402
+                25
             ]
         },
         {
@@ -61,13 +22,7 @@
             "foundInBeers": [
                 49,
                 51,
-                101,
-                126,
-                130,
-                144,
-                270,
-                383,
-                391
+                101
             ]
         },
         {
@@ -75,16 +30,128 @@
             "foundInBeers": [
                 47,
                 65,
-                101,
-                113,
-                129,
-                136,
-                215,
-                235,
-                313,
-                350,
-                387,
-                389
+                101
+            ]
+        },
+        {
+            "name": "Extra Pale",
+            "foundInBeers": [
+                1,
+                2,
+                3,
+                6,
+                7,
+                11,
+                12,
+                15,
+                16
+            ]
+        },
+        {
+            "name": "Extra Pale - Maris Otter",
+            "foundInBeers": [
+                4,
+                5,
+                9
+            ]
+        },
+        {
+            "name": "CaraMalt",
+            "foundInBeers": [
+                2,
+                3,
+                4,
+                5,
+                6
+            ]
+        },
+        {
+            "name": "CaraMunich I",
+            "foundInBeers": [
+                17,
+                177
+            ]
+        },
+        {
+            "name": "CaraPils",
+            "foundInBeers": [
+                277,
+                299
+            ]
+        },
+        {
+            "name": "CaraRed",
+            "foundInBeers": [
+                169
+            ]
+        },
+        {
+            "name": "Carafa Special I",
+            "foundInBeers": [
+                6,
+                7,
+                35
+            ]
+        },
+        {
+            "name": "Carafa Special II",
+            "foundInBeers": [
+                75,
+                103
+            ]
+        },
+        {
+            "name": "Carafa Special III",
+            "foundInBeers": [
+                4,
+                6,
+                7
+            ]
+        },
+        {
+            "name": "Chocolate Malt",
+            "foundInBeers": [
+                4,
+                21,
+                25,
+                27,
+                28
+            ]
+        },
+        {
+            "name": "Crystal",
+            "foundInBeers": [
+                11,
+                24,
+                42
+            ]
+        },
+        {
+            "name": "Crystal 120",
+            "foundInBeers": [
+                3,
+                25,
+                40
+            ]
+        },
+        {
+            "name": "Crystal 150",
+            "foundInBeers": [
+                3,
+                19,
+                20,
+                25,
+                26,
+                32,
+                35
+            ]
+        },
+        {
+            "name": "Crystal 60",
+            "foundInBeers": [
+                25,
+                413,
+                414
             ]
         }
     ]

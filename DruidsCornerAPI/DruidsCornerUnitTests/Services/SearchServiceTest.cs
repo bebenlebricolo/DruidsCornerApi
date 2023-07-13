@@ -51,20 +51,54 @@ namespace DruidsCornerUnitTests.Services
         }
 
         [Test]
-        public async Task TestSearchGetSingleProp()
+        public async Task TestSearchGetSingleProp_Hops()
         {
             var mockLogger = new Mock<ILogger<SearchService>>();
             var searchService = new SearchService(_fakeConfig, mockLogger.Object);
 
-            var hopsQueryList = new List<string>{
+            var queryList = new List<string>{
                 "Ahtanum",
                 "Amarillo"
             };
 
-            var reversedHopMapping = await _localDbHandler.GetIndexedHopDbAsync();
+            var reversedMappingDb = await _localDbHandler.GetIndexedHopDbAsync();
             var candidates = await _localDbHandler.GetAllRecipesAsync();
-            var recipes = searchService.GetMatchingRecipeByHops(candidates, reversedHopMapping, hopsQueryList);
+            var recipes = searchService.GetMatchingRecipeByHops(candidates, reversedMappingDb, queryList);
             Assert.That(recipes.Count, Is.EqualTo(3));
+        }
+
+        [Test]
+        public async Task TestSearchGetSingleProp_Malts()
+        {
+            var mockLogger = new Mock<ILogger<SearchService>>();
+            var searchService = new SearchService(_fakeConfig, mockLogger.Object);
+
+            var queryList = new List<string>{
+                "extra pale maris",
+                "cara"
+            };
+
+            var reversedMappingDb = await _localDbHandler.GetIndexedMaltDbAsync();
+            var candidates = await _localDbHandler.GetAllRecipesAsync();
+            var recipes = searchService.GetMatchingRecipeByMalts(candidates, reversedMappingDb, queryList);
+            Assert.That(recipes.Count, Is.EqualTo(5));
+        }
+
+
+        [Test]
+        public async Task TestSearchGetSingleProp_Yeasts()
+        {
+            var mockLogger = new Mock<ILogger<SearchService>>();
+            var searchService = new SearchService(_fakeConfig, mockLogger.Object);
+
+            var queryList = new List<string>{
+                "S 189"
+            };
+
+            var reversedMappingDb = await _localDbHandler.GetIndexedYeastDbAsync();
+            var candidates = await _localDbHandler.GetAllRecipesAsync();
+            var recipes = searchService.GetMatchingRecipeByYeasts(candidates, reversedMappingDb, queryList);
+            Assert.That(recipes.Count, Is.EqualTo(1));
         }
     }
 }

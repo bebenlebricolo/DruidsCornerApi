@@ -342,6 +342,10 @@ namespace DruidsCornerAPI.DatabaseHandlers
                     case IndexedDbPropKind.Malts :
                         indexedDb = await JsonSerializer.DeserializeAsync<IndexedMaltDb>(file, _jsonOptions);
                         break;
+                    
+                    case IndexedDbPropKind.Yeasts :
+                        indexedDb = await JsonSerializer.DeserializeAsync<IndexedYeastDb>(file, _jsonOptions);
+                        break;
 
                     case IndexedDbPropKind.Styles :
                         indexedDb = await JsonSerializer.DeserializeAsync<IndexedStyleDb>(file, _jsonOptions);
@@ -385,6 +389,9 @@ namespace DruidsCornerAPI.DatabaseHandlers
                     break;
                 case IndexedDbPropKind.Malts :
                     filename = "malts_rv_db.json";
+                    break;
+                case IndexedDbPropKind.Yeasts :
+                    filename = "yeasts_rv_db.json";
                     break;
                 case IndexedDbPropKind.Styles :
                     filename = "styles_rv_db.json";

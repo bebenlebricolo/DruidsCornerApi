@@ -96,6 +96,9 @@ namespace DruidsCornerAPI.Tools
                 return false;
             }
 
+            // I know some stuff might be null from the typing system's point of view
+            // But here there's nothing null at this point anymore
+            #pragma warning disable CS8602
             bool identical = true;
             int index = 0;
             if(orderSensitive)

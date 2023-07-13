@@ -14,6 +14,8 @@ namespace DruidsCornerUnitTests.TestHelpers
                 {"Nested:Key2", "NestedValue2"}
             };
 
+            // Disabling because this just some test code, won't pose any real issue.
+            #pragma warning disable CS8620
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(myConfiguration)
                 .Build();
