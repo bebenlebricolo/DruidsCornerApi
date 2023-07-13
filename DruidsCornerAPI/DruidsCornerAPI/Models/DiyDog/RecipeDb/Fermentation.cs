@@ -3,19 +3,19 @@
 namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
 {
     /// <summary>
-    /// Temperature instruction for Mash
+    /// Fermentation temperatures instructions
     /// </summary>
-    public class Temperature
+    public class Fermentation : Temperature
     {
         /// <summary>
-        /// Temperature expressed in Celsius degrees
+        /// Optional time (used for extended fermentation steps, such as cask-aging)
         /// </summary>
-        public float Celsius { get; set; } = 0.0f;
+        public float? Time { get; set; } = null;
 
         /// <summary>
-        /// Temperature expressed using Fahrenheit degrees
+        /// Optional additional tips indicated by the brewer's team
         /// </summary>
-        public float Fahrenheit { get; set; } = 0.0f;
+        public List<string> Tips { get; set; } = new List<string>();
 
         /// <summary>
         /// Custom comparison operators
@@ -24,11 +24,11 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
         /// <returns></returns>
         public override bool Equals(object? obj)
         {
-            if(obj is not Temperature)  
+            if(obj is not Fermentation)  
             {
                 return false;
             }
-            return Equals(obj as Temperature);
+            return Equals(obj as Fermentation);
         }
 
         /// <summary>
@@ -36,13 +36,13 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public bool Equals(Temperature? other)
+        public bool Equals(Fermentation? other)
         {  
             bool identical = other is not null;
             
             // We don't care about the ordering here
-            identical &= Celsius == other!.Celsius;
-            identical &= Fahrenheit == other!.Fahrenheit;
+            identical &= Language.CompareEquivalentLists(Tips, other!.Tips);
+            identical &= Time == other!.Time;
             return identical;
         }
 
@@ -52,7 +52,7 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public static bool operator==(Temperature? left, Temperature? right)
+        public static bool operator==(Fermentation? left, Fermentation? right)
         {
             if(Language.SameNullity(new [] {left, right}))
             {
@@ -71,7 +71,7 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public static bool operator!=(Temperature? left, Temperature? right)
+        public static bool operator!=(Fermentation? left, Fermentation? right)
         {
             return !(left == right);
         }
@@ -81,19 +81,12 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
         /// </summary>
         public override int GetHashCode()
         {
-            var hash = Celsius.GetHashCode() * 2 + Fahrenheit.GetHashCode() * 3;
+            var hash = Tips.GetHashCode() * 2;
+            if(Time != null)
+            {
+                hash += Time.GetHashCode() * 2;
+            }
             return hash;
         }
-    }
-
-    /// <summary>
-    /// Mash temperature
-    /// </summary>
-    public class MashTemp : Temperature
-    {
-        /// <summary>
-        /// Time of the mash
-        /// </summary>
-        public float Time { get; set; } = 0.0f;
     }
 }

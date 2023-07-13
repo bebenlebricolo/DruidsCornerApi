@@ -1,5 +1,6 @@
 ﻿using DruidsCornerAPI.Tools;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Configuration.EnvironmentVariables;
 
 namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
 {
@@ -122,19 +123,29 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
         /// <param name="obj"></param>
         /// <returns></returns>
         public override bool Equals(object? obj)
+        {
+            if(obj is not Recipe)  
+            {
+                return false;
+            }
+            return Equals(obj as Recipe);
+        }
+
+        /// <summary>
+        /// Custom comparison operators
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(Recipe? other)
         {  
-            var other = obj as Recipe;
             bool identical = other is not null;
             identical &= Name == other!.Name;
             identical &= Subtitle == other!.Subtitle;
             identical &= Style == other!.Style;
             identical &= Description == other!.Description;
             identical &= Number == other!.Number;
-            identical &= Tags.Count == other!.Tags.Count;
             identical &= FirstBrewed == other!.FirstBrewed;
             identical &= BrewersTip == other!.BrewersTip;
-            identical &= Language.SameNullity(new[] {FoodPairing, other!.FoodPairing});
-            identical &= Language.SameNullity(new[] {ParsingErrors, other!.ParsingErrors});
             if(!identical) return false;
 
             // We don't care about the ordering here
@@ -166,7 +177,7 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
                 {
                     return true;
                 }
-                left!.Equals(right);
+                return left!.Equals(right);
             }
             return false;
         }
@@ -188,33 +199,33 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
         public override int GetHashCode()
         {
             var hash = Name.GetHashCode() * 2;
-            hash *= Subtitle.GetHashCode() * 2;
-            hash *= Style.GetHashCode() * 2;
-            hash *= Description.GetHashCode() * 2;
-            hash *= Number.GetHashCode() * 2;
-            hash *= Tags.GetHashCode() * 2;
-            hash *= FirstBrewed.GetHashCode() * 2;
+            hash += Subtitle.GetHashCode() * 2;
+            hash += Style.GetHashCode() * 2;
+            hash += Description.GetHashCode() * 2;
+            hash += Number.GetHashCode() * 2;
+            hash += Tags.GetHashCode() * 2;
+            hash += FirstBrewed.GetHashCode() * 2;
             
             if(BrewersTip is not null)
             {
-                hash *= BrewersTip.GetHashCode() * 2;
+                hash += BrewersTip.GetHashCode() * 2;
             }
 
-            hash *= Basics.GetHashCode() * 2;
-            hash *= Ingredients.GetHashCode() * 2;
-            hash *= MethodTimings.GetHashCode() * 2;
-            hash *= PackagingType.GetHashCode() * 2;
-            hash *= Image.GetHashCode() * 2;
-            hash *= PdfPage.GetHashCode() * 2;
+            hash += Basics.GetHashCode() * 2;
+            hash += Ingredients.GetHashCode() * 2;
+            hash += MethodTimings.GetHashCode() * 2;
+            hash += PackagingType.GetHashCode() * 2;
+            hash += Image.GetHashCode() * 2;
+            hash += PdfPage.GetHashCode() * 2;
             
             if(FoodPairing is not null)
             {
-                hash *= FoodPairing.GetHashCode() * 2;
+                hash += FoodPairing.GetHashCode() * 2;
             }
             
             if(ParsingErrors is not null)
             {
-                hash *= ParsingErrors.GetHashCode() * 2;
+                hash += ParsingErrors.GetHashCode() * 2;
             }
             return hash;
         }

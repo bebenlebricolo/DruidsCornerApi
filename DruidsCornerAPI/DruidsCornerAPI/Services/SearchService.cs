@@ -247,7 +247,7 @@ namespace DruidsCornerAPI.Services
             {
                 var extraMashCandidatesResults = FuzzySearchInRecipesMultipleQueries(candidates, names, c => {
                     // Null values are handled locally in the algorithm
-                    return c.Ingredients.extraMashes!.Select(x => x.Name).ToList();
+                    return c.Ingredients.ExtraMashes!.Select(x => x.Name).ToList();
                 });
                 candidates = KeepSimilar(candidates, extraMashCandidatesResults);
             }
@@ -268,7 +268,7 @@ namespace DruidsCornerAPI.Services
             {
                 var extraBoilCandidatesResults = FuzzySearchInRecipesMultipleQueries(candidates, names, c => {
                     // Null values are handled locally in the algorithm
-                    return c.Ingredients.extraBoils!.Select(x => x.Name).ToList();
+                    return c.Ingredients.ExtraBoils!.Select(x => x.Name).ToList();
                 });
                 candidates = KeepSimilar(candidates, extraBoilCandidatesResults);
             }

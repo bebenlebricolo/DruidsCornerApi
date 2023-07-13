@@ -1,9 +1,11 @@
-﻿namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
+﻿using DruidsCornerAPI.Tools;
+
+namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
 {
     /// <summary>
     /// Ingredients datastructure 
     /// </summary>
-    public record Ingredients 
+    public class Ingredients 
     {
         /// <summary>
         /// List of malts used for a single recipe
@@ -19,12 +21,12 @@
         /// <summary>
         /// Optional list of extra boil / fermentation ingredient
         /// </summary>
-        public List<ExtraBoil>? extraBoils{ get; set; } = null;
+        public List<ExtraBoil>? ExtraBoils{ get; set; } = null;
         
         /// <summary>
         /// Optional list of extra mash ingredients
         /// </summary>
-        public List<ExtraMash>? extraMashes{ get; set; } = null;
+        public List<ExtraMash>? ExtraMashes{ get; set; } = null;
 
 
         /// <summary>
@@ -36,6 +38,91 @@
         /// Alternative optional description, sometimes on some recipes an additional description was given instead of ingredients (...)
         /// </summary>
         public string? AlternativeDescription { get; set; } = null;
+
+        /// <summary>
+        /// Custom comparison operators
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object? obj)
+        {
+            if(obj is not Ingredients)  
+            {
+                return false;
+            }
+            return Equals(obj as Ingredients);
+        }
+
+        /// <summary>
+        /// Custom comparison operators
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(Ingredients? other)
+        {  
+            bool identical = other is not null;
+            identical &= Language.CompareEquivalentLists(Malts, other!.Malts);
+            identical &= Language.CompareEquivalentLists(Hops, other!.Hops);
+            identical &= Language.CompareEquivalentLists(ExtraBoils, other!.ExtraBoils);
+            identical &= Language.CompareEquivalentLists(ExtraMashes, other!.ExtraMashes);
+            identical &= Language.CompareEquivalentLists(Yeasts, other!.Yeasts);
+            identical &= AlternativeDescription == other!.AlternativeDescription;
+
+            return identical;
+        }
+
+        /// <summary>
+        /// Customc equality operator
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        public static bool operator==(Ingredients? left, Ingredients? right)
+        {
+            if(Language.SameNullity(new [] {left, right}))
+            {
+                if(left is null)
+                {
+                    return true;
+                }
+                return left!.Equals(right);
+            }
+            return false;
+        }
+        
+        /// <summary>
+        /// Customc inequality operator
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        public static bool operator!=(Ingredients? left, Ingredients? right)
+        {
+            return !(left == right);
+        }
+
+        /// <summary>
+        /// Custom hasher
+        /// </summary>
+        public override int GetHashCode()
+        {
+            var hash = Malts.GetHashCode() * 3;
+            hash += Hops.GetHashCode() * 3;
+            if(ExtraBoils != null)
+            {
+                hash += ExtraBoils.GetHashCode() * 3;
+            }
+            if(ExtraMashes != null)
+            {
+                hash += ExtraMashes.GetHashCode() * 3;
+            }
+            hash += Yeasts.GetHashCode() * 3;
+            if(AlternativeDescription != null)
+            {
+                hash += AlternativeDescription.GetHashCode() * 5;
+            }
+            return hash;
+        }
 
     }
 }

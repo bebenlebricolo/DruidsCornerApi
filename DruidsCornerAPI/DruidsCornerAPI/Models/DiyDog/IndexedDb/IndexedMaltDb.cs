@@ -50,7 +50,7 @@ namespace DruidsCornerAPI.Models.DiyDog.IndexedDb
                 {
                     return true;
                 }
-                left!.Equals(right);
+                return left!.Equals(right);
             }
             return false;
         }

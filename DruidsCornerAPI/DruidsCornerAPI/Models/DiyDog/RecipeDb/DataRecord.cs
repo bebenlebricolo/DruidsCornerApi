@@ -136,7 +136,7 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
     /// <summary>
     /// Base Data record class, used to provide an interface to the two underlying types
     /// </summary>
-    public abstract class DataRecord
+    public abstract record DataRecord
     {
         /// <summary>
         /// Data record underlying kind (typed structure)
@@ -174,7 +174,7 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
     /// File source record (Local database mode).
     /// Points to a file datastructure which is usually stored on disk
     /// </summary>
-    public class FileRecord : DataRecord
+    public record FileRecord : DataRecord
     {
         /// <summary>
         /// Standard constructor
@@ -225,36 +225,13 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
             var encodedPathProp = namingPolicy.ConvertName(nameof(Path));
             writer.WriteString(encodedPathProp, Path);
         }
-
-        /// <summary>
-        /// Custom comparison operators
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public override bool Equals(object? obj)
-        {
-            if(obj is not FileRecord || obj is null)
-            {
-                return false;
-            }
-            var other = obj as FileRecord;
-            return other!.Path == Path; ;
-        }
-
-        /// <summary>
-        /// Custom hasher
-        /// </summary>
-        public override int GetHashCode()
-        {
-            return Kind.GetHashCode() * 32 + Path.GetHashCode();
-        }
     }
 
     /// <summary>
     /// Represents a Cloud-based data record.
     /// This usually will point to a database document (like Firestore database)
     /// </summary>
-    public class CloudRecord : DataRecord
+    public record CloudRecord : DataRecord
     {
         /// <summary>
         /// Standard constructor
@@ -329,31 +306,6 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
             var encodedVersionProp = namingPolicy.ConvertName(nameof(Version));
             writer.WriteString(encodedIdProp, Id);
             writer.WriteString(encodedVersionProp, Version);
-        }
-
-        /// <summary>
-        /// Custom comparison operator
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public override bool Equals(object? obj)
-        {
-            if (obj is not CloudRecord || obj is null)
-            {
-                return false;
-            }
-            var other = obj as CloudRecord;
-            var same = other!.Id == Id;
-            same &= other!.Version == Version;
-            return same ;
-        }
-
-        /// <summary>
-        /// Custom hasher
-        /// </summary>
-        public override int GetHashCode()
-        {
-            return Id.GetHashCode() * 17 + Kind.GetHashCode();
         }
     }
 }
