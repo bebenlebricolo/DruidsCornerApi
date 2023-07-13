@@ -1,4 +1,5 @@
 using DruidsCornerAPI.Models.DiyDog.RecipeDb;
+using DruidsCornerAPI.Tools;
 
 namespace DruidsCornerAPI.Models.DiyDog.References
 {
@@ -13,41 +14,54 @@ namespace DruidsCornerAPI.Models.DiyDog.References
         public List<MaltProperty> Malts {get; set; } = new List<MaltProperty>();  
 
         /// <summary>
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public override bool Equals(object? other)
+        {
+            if(other is not ReferenceMalts)
+            {
+                return false;
+            }
+            return Equals(other as ReferenceMalts);
+        }
+
+        /// <summary>
         /// Custom comparison operators
         /// </summary>
-        /// <param name="obj"></param>
+        /// <param name="other"></param>
         /// <returns></returns>
-        public override bool Equals(object? obj)
+        public bool Equals(ReferenceMalts? other)
         {
-            var other = obj as ReferenceMalts;
-            bool identical = other != null;
-            identical &= Malts.Count == other!.Malts.Count;
+            bool identical = other is not null;
             if(!identical) return false;
             
-            // We don't care about the order here, we are looking for the same numbers and nothing more.
-            int index = 0;
-            while(index < Malts.Count && identical)
-            {
-                identical &= other.Malts!.Any(item => item == Malts[index]);
-                index++;
-            }
+            identical &= Language.CompareEquivalentLists(Malts, other!.Malts);
             return identical;
         }
 
         /// <summary>
         /// Custom equality operator
         /// </summary>
-        public static bool operator == (ReferenceMalts left, ReferenceMalts right)
+        public static bool operator == (ReferenceMalts? left, ReferenceMalts? right)
         {
-            return left.Equals(right);
+            if(Language.SameNullity(new [] {left, right}))
+            {
+                if(left is null)
+                {
+                    return true;
+                }
+                left!.Equals(right);
+            }
+            return false;
         }
 
         /// <summary>
         /// Custom inequality operator
         /// </summary>
-        public static bool operator != (ReferenceMalts left, ReferenceMalts right)
+        public static bool operator != (ReferenceMalts? left, ReferenceMalts? right)
         {
-            return !left.Equals(right);
+            return !(left == right);
         }
 
         /// <summary>

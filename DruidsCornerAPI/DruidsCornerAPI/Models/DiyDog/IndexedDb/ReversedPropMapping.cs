@@ -20,33 +20,57 @@ namespace DruidsCornerAPI.Models.DiyDog.IndexedDb
         public List<uint> FoundInBeers { get; set; } = new List<uint>();
 
         /// <summary>
-        /// Custom comparison operators
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
         public override bool Equals(object? obj)
         {
-            var other = obj as ReversedPropMapping;
+            if(obj is not ReversedPropMapping)
+            {
+                return false;
+            }
+            return Equals(obj as ReversedPropMapping);
+        }
+
+        /// <summary>
+        /// Custom comparison operators
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(ReversedPropMapping? other)
+        {
             bool identical = other != null;
-            if(!identical) return false;
                       
             identical &= Name == other!.Name;
-            if(!identical) return false;
-
-            identical &= FoundInBeers.Count == other.FoundInBeers.Count;
-            if(!identical) return false;
-
-            // We don't care about the order here, we are looking for the same numbers and nothing more.
-            int index = 0;
-            while(index < FoundInBeers.Count && identical)
-            {
-                identical &= other.FoundInBeers.Contains(FoundInBeers[index]);
-                index++;
-            }
-
+            identical &= Language.CompareEquivalentLists(FoundInBeers, other!.FoundInBeers);
             return identical;
         }
 
+        
+        /// <summary>
+        /// Custom equality operator
+        /// </summary>
+        public static bool operator == (ReversedPropMapping? left, ReversedPropMapping? right)
+        {
+            if(Language.SameNullity(new [] {left, right}))
+            {
+                if(left is null)
+                {
+                    return true;
+                }
+                left!.Equals(right);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Custom inequality operator
+        /// </summary>
+        public static bool operator != (ReversedPropMapping? left, ReversedPropMapping? right)
+        {
+            return !(left == right);
+        }
+        
         /// <summary>
         /// Custom hasher
         /// </summary>

@@ -51,6 +51,7 @@ namespace DruidsCornerUnitTests.Models.Databases
             var deserialized = JsonSerializer.Deserialize<ReferenceHops>(serialized, jsonOptions);
 
             Assert.That(refHops, Is.EqualTo(deserialized));
+            
         }
 
         [Test]

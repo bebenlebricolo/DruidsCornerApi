@@ -1,3 +1,5 @@
+using DruidsCornerAPI.Tools;
+
 namespace DruidsCornerAPI.Models.DiyDog.References
 {
 
@@ -37,6 +39,9 @@ namespace DruidsCornerAPI.Models.DiyDog.References
         /// </summary>
         public string? Url { get; set; } = null;
 
+
+        
+
         /// <summary>
         /// Custom comparison operators
         /// </summary>
@@ -50,7 +55,7 @@ namespace DruidsCornerAPI.Models.DiyDog.References
             }
 
             var other = obj as BaseProperty;
-            if(other == null) 
+            if(other is null) 
             {
                 return false;
             }
@@ -64,17 +69,25 @@ namespace DruidsCornerAPI.Models.DiyDog.References
         /// <summary>
         /// Custom equality operator
         /// </summary>
-        public static bool operator == (BaseProperty left, BaseProperty right)
+        public static bool operator == (BaseProperty? left, BaseProperty? right)
         {
-            return left.Equals(right);
+            if(Language.SameNullity(new [] {left, right}))
+            {
+                if(left is null)
+                {
+                    return true;
+                }
+                left!.Equals(right);
+            }
+            return false;
         }
 
         /// <summary>
         /// Custom inequality operator
         /// </summary>
-        public static bool operator != (BaseProperty left, BaseProperty right)
+        public static bool operator != (BaseProperty? left, BaseProperty? right)
         {
-            return !left.Equals(right);
+            return !(left == right);
         }
 
         /// <summary>

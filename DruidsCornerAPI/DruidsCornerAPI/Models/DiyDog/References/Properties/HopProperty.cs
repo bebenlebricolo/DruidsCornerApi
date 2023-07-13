@@ -20,53 +20,39 @@ namespace DruidsCornerAPI.Models.DiyDog.References
         /// <returns></returns>
         public override bool Equals(object? obj)
         {
-            if(obj is not HopProperty || obj is null)
-            {
-                return false;
-            }
-
-            var other = obj as HopProperty;
-            if(other == null) 
-            {
-                return false;
-            }
-            bool identical = true;
+             var other = obj as HopProperty;
+            bool identical = other is not null;
+            if(!identical) return false;
             
             identical &= base.Equals(other as BaseProperty);
             if(!identical) return false;
-
-            // Reject non-matching nullity
-            identical &= Language.SameNullity(new[] { Aliases, other.Aliases });
-            if(!identical) return false;
-
-            // We don't care about the order here, we are looking for the same numbers and nothing more.
-            if(Aliases != null)
-            {
-                int index = 0;
-                while(index < Aliases.Count && identical)
-                {
-                    identical &= other.Aliases!.Contains(Aliases[index]);
-                    index++;
-                }
-            }
-
+            
+            identical &= Language.CompareEquivalentLists(Aliases, other!.Aliases);
             return identical;
         }
 
         /// <summary>
         /// Custom equality operator
         /// </summary>
-        public static bool operator == (HopProperty left, HopProperty right)
+        public static bool operator == (HopProperty? left, HopProperty? right)
         {
-            return left.Equals(right);
+            if(Language.SameNullity(new [] {left, right}))
+            {
+                if(left is null)
+                {
+                    return true;
+                }
+                left!.Equals(right);
+            }
+            return false;
         }
 
         /// <summary>
         /// Custom inequality operator
         /// </summary>
-        public static bool operator != (HopProperty left, HopProperty right)
+        public static bool operator != (HopProperty? left, HopProperty? right)
         {
-            return !left.Equals(right);
+            return !(left == right);
         }
 
         /// <summary>

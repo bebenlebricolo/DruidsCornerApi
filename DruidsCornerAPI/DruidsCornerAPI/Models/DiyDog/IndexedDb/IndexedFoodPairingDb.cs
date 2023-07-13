@@ -1,4 +1,7 @@
-﻿namespace DruidsCornerAPI.Models.DiyDog.IndexedDb
+﻿using System.Reflection.Metadata.Ecma335;
+using DruidsCornerAPI.Tools;
+
+namespace DruidsCornerAPI.Models.DiyDog.IndexedDb
 {
     /// <summary>
     /// Encodes basic information about BrewDog's beer recipe.
@@ -8,40 +11,32 @@
         /// <summary>
         /// List of properties in a reversed DB construct
         /// </summary>
-        public List<ReversedPropMapping> FoodPairing  {get; set;} = new List<ReversedPropMapping>();  
+        public List<ReversedPropMapping> FoodPairing  {get; set;} = new List<ReversedPropMapping>();
 
         /// <summary>
-        /// Custom comparison operators
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
         public override bool Equals(object? obj)
         {
-            if(obj is not IndexedFoodPairingDb || obj is null)
+            if(obj is not IndexedFoodPairingDb)
             {
                 return false;
             }
+            return Equals(obj as IndexedFoodPairingDb);
+        }
 
-            var other = obj as IndexedFoodPairingDb;
-            if(other == null)
-            {
-                return false;
-            }
-
-            if(FoodPairing.Count != other.FoodPairing.Count)
-            {
-                return false;
-            }
-
-            bool identical = true;
+        /// <summary>
+        /// Custom comparison operators
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(IndexedFoodPairingDb? other)
+        {
+            bool identical = other  is not null;
+            if(!identical) return false;
             
-            // We don't care about the ordering here
-            int index = 0;
-            while(index < FoodPairing.Count && identical)
-            {
-                identical &= other.FoodPairing.Contains(FoodPairing[index]);
-                index++;
-            }
+            identical &= Language.CompareEquivalentLists(FoodPairing, other!.FoodPairing);
             return identical;
         }
 

@@ -1,4 +1,6 @@
-﻿namespace DruidsCornerAPI.Models.DiyDog.IndexedDb
+﻿using DruidsCornerAPI.Tools;
+
+namespace DruidsCornerAPI.Models.DiyDog.IndexedDb
 {
     /// <summary>
     /// Encodes basic information about BrewDog's beer recipe.
@@ -10,41 +12,56 @@
         /// </summary>
         public List<ReversedPropMapping> Yeasts {get; set;} = new List<ReversedPropMapping>();  
 
-         /// <summary>
-        /// Custom comparison operators
+        /// <summary>
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
         public override bool Equals(object? obj)
         {
-            if(obj is not IndexedYeastDb || obj is null)
+            if(obj is not IndexedYeastDb)
             {
                 return false;
             }
-
-            var other = obj as IndexedYeastDb;
-            if(other == null)
-            {
-                return false;
-            }
-
-            if(Yeasts.Count != other.Yeasts.Count)
-            {
-                return false;
-            }
-
-            bool identical = true;
-            
-            // We don't care about the ordering here
-            int index = 0;
-            while(index < Yeasts.Count && identical)
-            {
-                identical &= other.Yeasts.Contains(Yeasts[index]);
-                index++;
-            }
-            return identical;
+            return Equals(obj as IndexedYeastDb);
         }
 
+        /// <summary>
+        /// Custom comparison operators
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(IndexedYeastDb? other)
+        {
+            bool identical = other  is not null;
+            if(!identical) return false;
+
+            identical &= Language.CompareEquivalentLists(Yeasts, other!.Yeasts);
+            return identical;
+        }
+        
+        /// <summary>
+        /// Custom equality operator
+        /// </summary>
+        public static bool operator == (IndexedYeastDb? left, IndexedYeastDb? right)
+        {
+            if(Language.SameNullity(new [] {left, right}))
+            {
+                if(left is null)
+                {
+                    return true;
+                }
+                left!.Equals(right);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Custom inequality operator
+        /// </summary>
+        public static bool operator != (IndexedYeastDb? left, IndexedYeastDb? right)
+        {
+            return !(left == right);
+        }
         /// <summary>
         /// Custom hasher
         /// </summary>

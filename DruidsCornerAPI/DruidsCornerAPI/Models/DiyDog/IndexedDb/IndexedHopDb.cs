@@ -1,4 +1,6 @@
-﻿namespace DruidsCornerAPI.Models.DiyDog.IndexedDb
+﻿using DruidsCornerAPI.Tools;
+
+namespace DruidsCornerAPI.Models.DiyDog.IndexedDb
 {
     /// <summary>
     /// Encodes basic information about BrewDog's beer recipe.
@@ -11,38 +13,52 @@
         public List<ReversedPropMapping> Hops {get; set;} = new List<ReversedPropMapping>();  
 
         /// <summary>
-        /// Custom comparison operators
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
         public override bool Equals(object? obj)
         {
-            if(obj is not IndexedHopDb || obj is null)
+            if(obj is not IndexedHopDb)
             {
                 return false;
             }
+            return Equals(obj as IndexedHopDb);
+        }
 
-            var other = obj as IndexedHopDb;
-            if(other == null)
-            {
-                return false;
-            }
-
-            if(Hops.Count != other.Hops.Count)
-            {
-                return false;
-            }
-
-            bool identical = true;
-            
-            // We don't care about the ordering here
-            int index = 0;
-            while(index < Hops.Count && identical)
-            {
-                identical &= other.Hops.Contains(Hops[index]);
-                index++;
-            }
+        /// <summary>
+        /// Custom comparison operators
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(IndexedHopDb? other)
+        {
+            bool identical = other is not null;
+            identical &= Language.CompareEquivalentLists(Hops, other!.Hops);
             return identical;
+        }
+
+        /// <summary>
+        /// Custom equality operator
+        /// </summary>
+        public static bool operator == (IndexedHopDb? left, IndexedHopDb? right)
+        {
+            if(Language.SameNullity(new [] {left, right}))
+            {
+                if(left is null)
+                {
+                    return true;
+                }
+                left!.Equals(right);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Custom inequality operator
+        /// </summary>
+        public static bool operator != (IndexedHopDb? left, IndexedHopDb? right)
+        {
+            return !(left == right);
         }
 
         /// <summary>

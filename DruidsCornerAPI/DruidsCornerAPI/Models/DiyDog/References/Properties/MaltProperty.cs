@@ -27,7 +27,7 @@ namespace DruidsCornerAPI.Models.DiyDog.References
         public override bool Equals(object? obj)
         {
             var other = obj as MaltProperty;
-            bool identical = other != null;
+            bool identical = other is not null;
             if(!identical) return false;
             
             identical &= base.Equals(other as BaseProperty);
@@ -35,41 +35,37 @@ namespace DruidsCornerAPI.Models.DiyDog.References
 
             // Reject non-matching nullity
             identical &= Language.SameNullity(new[] { Manufacturer, other!.Manufacturer });
-            identical &= Language.SameNullity(new[] { Aliases, other!.Aliases });
-            if(!identical) return false;
-
             if(Manufacturer != null)
             {
                 identical &= Manufacturer == other!.Manufacturer;
             }
 
-            // We don't care about the order here, we are looking for the same numbers and nothing more.
-            if(Aliases != null)
-            {
-                int index = 0;
-                while(index < Aliases.Count && identical)
-                {
-                    identical &= other.Aliases!.Contains(Aliases[index]);
-                    index++;
-                }
-            }
+            identical &= Language.CompareEquivalentLists(Aliases, other!.Aliases);
             return identical;
         }
 
         /// <summary>
         /// Custom equality operator
         /// </summary>
-        public static bool operator == (MaltProperty left, MaltProperty right)
+        public static bool operator == (MaltProperty? left, MaltProperty? right)
         {
-            return left.Equals(right);
+            if(Language.SameNullity(new [] {left, right}))
+            {
+                if(left is null)
+                {
+                    return true;
+                }
+                left!.Equals(right);
+            }
+            return false;
         }
 
         /// <summary>
         /// Custom inequality operator
         /// </summary>
-        public static bool operator != (MaltProperty left, MaltProperty right)
+        public static bool operator != (MaltProperty? left, MaltProperty? right)
         {
-            return !left.Equals(right);
+            return !(left == right);
         }
 
 

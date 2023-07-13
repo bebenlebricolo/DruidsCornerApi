@@ -1,3 +1,5 @@
+using DruidsCornerAPI.Tools;
+
 namespace DruidsCornerAPI.Models.DiyDog.References
 {
     /// <summary>
@@ -11,41 +13,54 @@ namespace DruidsCornerAPI.Models.DiyDog.References
         public List<YeastProperty> Yeasts {get; set; } = new List<YeastProperty>();  
 
         /// <summary>
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public override bool Equals(object? other)
+        {
+            if(other is not ReferenceYeasts)
+            {
+                return false;
+            }
+            return Equals(other as ReferenceYeasts);
+        }
+        
+        /// <summary>
         /// Custom comparison operators
         /// </summary>
-        /// <param name="obj"></param>
+        /// <param name="other"></param>
         /// <returns></returns>
-        public override bool Equals(object? obj)
+        public bool Equals(ReferenceYeasts? other)
         {
-            var other = obj as ReferenceYeasts;
-            bool identical = other != null;
-            identical &= Yeasts.Count == other!.Yeasts.Count;
+            bool identical = other is not null;
             if(!identical) return false;
             
-            // We don't care about the order here, we are looking for the same numbers and nothing more.
-            int index = 0;
-            while(index < Yeasts.Count && identical)
-            {
-                identical &= other.Yeasts!.Any(item => item == Yeasts[index]);
-                index++;
-            }
+            identical &= Language.CompareEquivalentLists(Yeasts, other!.Yeasts);
             return identical;
         }
 
         /// <summary>
         /// Custom equality operator
         /// </summary>
-        public static bool operator == (ReferenceYeasts left, ReferenceYeasts right)
+        public static bool operator == (ReferenceYeasts? left, ReferenceYeasts? right)
         {
-            return left.Equals(right);
+            if(Language.SameNullity(new [] {left, right}))
+            {
+                if(left is null)
+                {
+                    return true;
+                }
+                left!.Equals(right);
+            }
+            return false;
         }
 
         /// <summary>
         /// Custom inequality operator
         /// </summary>
-        public static bool operator != (ReferenceYeasts left, ReferenceYeasts right)
+        public static bool operator != (ReferenceYeasts? left, ReferenceYeasts? right)
         {
-            return !left.Equals(right);
+            return !(left == right);
         }
 
         /// <summary>

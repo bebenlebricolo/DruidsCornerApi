@@ -1,4 +1,6 @@
-﻿namespace DruidsCornerAPI.Models.DiyDog.IndexedDb
+﻿using DruidsCornerAPI.Tools;
+
+namespace DruidsCornerAPI.Models.DiyDog.IndexedDb
 {
     /// <summary>
     /// Encodes basic information about BrewDog's beer recipe.
@@ -11,38 +13,54 @@
         public List<ReversedPropMapping> Malts {get; set;} = new List<ReversedPropMapping>();  
 
         /// <summary>
-        /// Custom comparison operators
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
         public override bool Equals(object? obj)
         {
-            if(obj is not IndexedMaltDb || obj is null)
+            if(obj is not IndexedMaltDb)
             {
                 return false;
             }
+            return Equals(obj as IndexedMaltDb);
+        }
 
-            var other = obj as IndexedMaltDb;
-            if(other == null)
-            {
-                return false;
-            }
+        /// <summary>
+        /// Custom comparison operators
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(IndexedMaltDb? other)
+        {
+            bool identical = other is not null;
+            if(!identical) return false;
 
-            if(Malts.Count != other.Malts.Count)
-            {
-                return false;
-            }
-
-            bool identical = true;
-            
-            // We don't care about the ordering here
-            int index = 0;
-            while(index < Malts.Count && identical)
-            {
-                identical &= other.Malts.Contains(Malts[index]);
-                index++;
-            }
+            identical &= Language.CompareEquivalentLists(Malts, other!.Malts);
             return identical;
+        }
+
+        /// <summary>
+        /// Custom equality operator
+        /// </summary>
+        public static bool operator == (IndexedMaltDb? left, IndexedMaltDb? right)
+        {
+            if(Language.SameNullity(new [] {left, right}))
+            {
+                if(left is null)
+                {
+                    return true;
+                }
+                left!.Equals(right);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Custom inequality operator
+        /// </summary>
+        public static bool operator != (IndexedMaltDb? left, IndexedMaltDb? right)
+        {
+            return !(left == right);
         }
 
         /// <summary>

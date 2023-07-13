@@ -1,3 +1,5 @@
+using DruidsCornerAPI.Tools;
+
 namespace DruidsCornerAPI.Models.DiyDog.References
 {
     /// <summary>
@@ -19,7 +21,7 @@ namespace DruidsCornerAPI.Models.DiyDog.References
         public override bool Equals(object? obj)
         {
             var other = obj as StyleProperty;
-            bool identical = other != null;
+            bool identical = other is not null;
             if(!identical) return false;
             
             identical &= base.Equals(other as BaseProperty);
@@ -30,17 +32,25 @@ namespace DruidsCornerAPI.Models.DiyDog.References
         /// <summary>
         /// Custom equality operator
         /// </summary>
-        public static bool operator == (StyleProperty left, StyleProperty right)
+        public static bool operator == (StyleProperty? left, StyleProperty? right)
         {
-            return left.Equals(right);
+            if(Language.SameNullity(new [] {left, right}))
+            {
+                if(left is null)
+                {
+                    return true;
+                }
+                left!.Equals(right);
+            }
+            return false;
         }
 
         /// <summary>
         /// Custom inequality operator
         /// </summary>
-        public static bool operator != (StyleProperty left, StyleProperty right)
+        public static bool operator != (StyleProperty? left, StyleProperty? right)
         {
-            return !left.Equals(right);
+            return !(left == right);
         }
 
         /// <summary>

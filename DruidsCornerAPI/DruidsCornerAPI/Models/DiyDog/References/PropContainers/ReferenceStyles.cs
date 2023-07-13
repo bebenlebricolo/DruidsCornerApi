@@ -1,3 +1,5 @@
+using DruidsCornerAPI.Tools;
+
 namespace DruidsCornerAPI.Models.DiyDog.References
 {
     /// <summary>
@@ -11,41 +13,54 @@ namespace DruidsCornerAPI.Models.DiyDog.References
         public List<StyleProperty> Styles {get; set; } = new List<StyleProperty>();  
 
         /// <summary>
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public override bool Equals(object? other)
+        {
+            if(other is not ReferenceStyles)
+            {
+                return false;
+            }
+            return Equals(other as ReferenceStyles);
+        }
+
+        /// <summary>
         /// Custom comparison operators
         /// </summary>
-        /// <param name="obj"></param>
+        /// <param name="other"></param>
         /// <returns></returns>
-        public override bool Equals(object? obj)
+        public bool Equals(ReferenceStyles? other)
         {
-            var other = obj as ReferenceStyles;
-            bool identical = other != null;
-            identical &= Styles.Count == other!.Styles.Count;
+            bool identical = other is not null;
             if(!identical) return false;
             
-            // We don't care about the order here, we are looking for the same numbers and nothing more.
-            int index = 0;
-            while(index < Styles.Count && identical)
-            {
-                identical &= other.Styles!.Any(item => item == Styles[index]);
-                index++;
-            }
+            identical &= Language.CompareEquivalentLists(Styles, other!.Styles);
             return identical;
         }
 
         /// <summary>
         /// Custom equality operator
         /// </summary>
-        public static bool operator == (ReferenceStyles left, ReferenceStyles right)
+        public static bool operator == (ReferenceStyles? left, ReferenceStyles? right)
         {
-            return left.Equals(right);
+            if(Language.SameNullity(new [] {left, right}))
+            {
+                if(left is null)
+                {
+                    return true;
+                }
+                left!.Equals(right);
+            }
+            return false;
         }
 
         /// <summary>
         /// Custom inequality operator
         /// </summary>
-        public static bool operator != (ReferenceStyles left, ReferenceStyles right)
+        public static bool operator != (ReferenceStyles? left, ReferenceStyles? right)
         {
-            return !left.Equals(right);
+            return !(left == right);
         }
 
 

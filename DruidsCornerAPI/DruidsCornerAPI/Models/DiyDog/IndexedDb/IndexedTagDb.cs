@@ -1,4 +1,6 @@
-﻿namespace DruidsCornerAPI.Models.DiyDog.IndexedDb
+﻿using DruidsCornerAPI.Tools;
+
+namespace DruidsCornerAPI.Models.DiyDog.IndexedDb
 {
     /// <summary>
     /// Encodes basic information about BrewDog's beer recipe.
@@ -11,38 +13,54 @@
         public List<ReversedPropMapping> Tags {get; set;} = new List<ReversedPropMapping>();  
         
         /// <summary>
-        /// Custom comparison operators
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
         public override bool Equals(object? obj)
         {
-            if(obj is not IndexedTagDb || obj is null)
+            if(obj is not IndexedTagDb)
             {
                 return false;
             }
+            return Equals(obj as IndexedTagDb);
+        }
 
-            var other = obj as IndexedTagDb;
-            if(other == null)
-            {
-                return false;
-            }
+        /// <summary>
+        /// Custom comparison operators
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(IndexedTagDb? other)
+        {
+            bool identical = other  is not null;
+            if(!identical) return false;
 
-            if(Tags.Count != other.Tags.Count)
-            {
-                return false;
-            }
-
-            bool identical = true;
-            
-            // We don't care about the ordering here
-            int index = 0;
-            while(index < Tags.Count && identical)
-            {
-                identical &= other.Tags.Contains(Tags[index]);
-                index++;
-            }
+            identical &= Language.CompareEquivalentLists(Tags, other!.Tags);
             return identical;
+        }
+
+         /// <summary>
+        /// Custom equality operator
+        /// </summary>
+        public static bool operator == (IndexedTagDb? left, IndexedTagDb? right)
+        {
+            if(Language.SameNullity(new [] {left, right}))
+            {
+                if(left is null)
+                {
+                    return true;
+                }
+                left!.Equals(right);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Custom inequality operator
+        /// </summary>
+        public static bool operator != (IndexedTagDb? left, IndexedTagDb? right)
+        {
+            return !(left == right);
         }
 
         /// <summary>

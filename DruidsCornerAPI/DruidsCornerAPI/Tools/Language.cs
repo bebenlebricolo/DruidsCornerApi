@@ -2,6 +2,11 @@
 using System.Text.Json;
 using System;
 using DruidsCornerAPI.Models.DiyDog.RecipeDb;
+using System.Runtime.CompilerServices;
+using Microsoft.EntityFrameworkCore;
+using System.Reflection.Metadata.Ecma335;
+using System.Numerics;
+using System.Collections;
 
 namespace DruidsCornerAPI.Tools
 {
@@ -63,6 +68,54 @@ namespace DruidsCornerAPI.Tools
                 return false;
             }
             return true;
+        }
+        
+        /// <summary>
+        /// Compares two lists and checks that both lists contain equivalent data with or without order requirement
+        /// Uses the regular Equality operator == : will compare references if not specifically overloaded to compare object's value instead! 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public static bool CompareEquivalentLists<T>(List<T>? list1, List<T>? list2, bool orderSensitive = false)
+        {
+            
+            // We know that both lists are null (thanks to the above line)
+            if(!SameNullity(new [] {list1, list2}))
+            {
+                return false;
+            }
+
+            // Both are null !
+            if(list1 == null)
+            {
+                return true;
+            }
+
+            // element count shall match as well
+            if(list1.Count != list2!.Count)
+            {
+                return false;
+            }
+
+            bool identical = true;
+            int index = 0;
+            if(orderSensitive)
+            {
+                while(index < list1!.Count && identical)
+                {
+                    identical &= list1![index].Equals(list2![index]);
+                    index++;
+                }    
+            }
+            else
+            {
+                while(index < list1!.Count && identical)
+                {
+                    identical &= list2!.Any(item => item.Equals(list2![index]));
+                    index++;
+                }
+            }
+
+            return identical;
         }
     }
 
