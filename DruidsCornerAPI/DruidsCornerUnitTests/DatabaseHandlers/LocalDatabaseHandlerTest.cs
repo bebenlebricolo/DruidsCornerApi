@@ -5,7 +5,6 @@ using DruidsCornerAPI.DatabaseHandlers;
 using DruidsCornerAPI.Models.Config;
 using Microsoft.Extensions.Logging;
 using DruidsCornerAPI.Models.DiyDog.IndexedDb;
-using System.Runtime.CompilerServices;
 
 namespace DruidsCornerUnitTests.DatabaseHandlers
 {
@@ -23,7 +22,7 @@ namespace DruidsCornerUnitTests.DatabaseHandlers
         }
 
         [Test]
-        public async Task CanReadIndexedDbsFromDisk()
+        public async Task TestCanReadIndexedDbsFromDisk()
         {
             var mockLogger = new Mock<ILogger<LocalDatabaseHandler>>();
 
@@ -69,7 +68,7 @@ namespace DruidsCornerUnitTests.DatabaseHandlers
 
 
         [Test]
-        public async Task CanReadReferenceDbsFromDisk()
+        public async Task TestCanReadReferenceDbsFromDisk()
         {
             var mockLogger = new Mock<ILogger<LocalDatabaseHandler>>();
             // Lookup the local directory structure for this test database

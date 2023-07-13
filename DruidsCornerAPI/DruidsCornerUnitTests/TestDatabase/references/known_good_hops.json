@@ -1,16 +1,20 @@
 {
     "hops": [
         {
-            "name" : "Ahtanum",
-            "url" : "https://beermaverick.com/hop/ahtanum/"
+            "name": "Ahtanum",
+            "url": "https://beermaverick.com/hop/ahtanum/",
+            "aliases": [
+                "Alias 1",
+                "Alias 2"
+            ]
         },
         {
-            "name" : "Amarillo",
-            "url" : "https://beermaverick.com/hop/amarillo/"
+            "name": "Amarillo",
+            "url": "https://beermaverick.com/hop/amarillo/"
         },
         {
-            "name" : "Apollo",
-            "url" : "https://beermaverick.com/hop/apollo/"
+            "name": "Apollo",
+            "url": "https://beermaverick.com/hop/apollo/"
         }
     ]
 }

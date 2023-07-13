@@ -272,10 +272,10 @@ namespace DruidsCornerAPI.DatabaseHandlers
 
             try 
             {
-                var file = filepath.Open(FileMode.Open);
-                var referenceHops = await JsonSerializer.DeserializeAsync<T>(file, _jsonOptions);
+                var file = filepath.OpenRead();
+                var refList = await JsonSerializer.DeserializeAsync<T>(file, _jsonOptions);
                 file.Close();
-                return referenceHops;
+                return refList;
             }
             catch (Exception ex) 
             {

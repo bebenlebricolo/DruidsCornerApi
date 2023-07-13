@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Primitives;
-using System.IO;
-
-namespace DruidsCornerAPI.Models.Config
+﻿namespace DruidsCornerAPI.Models.Config
 {
     /// <summary>
     /// Models out the locally deployed database configuration (used in an appsettings.json)

@@ -25,7 +25,7 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
     /// <summary>
     /// Depicts a Beer Recipe
     /// </summary> 
-    public record Recipe
+    public class Recipe
     {
         /// <summary>
         /// Advertized beer name

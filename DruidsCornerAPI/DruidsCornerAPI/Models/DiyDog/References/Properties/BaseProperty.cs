@@ -25,7 +25,7 @@ namespace DruidsCornerAPI.Models.DiyDog.References
     /// Encodes a base property (either yeast, hop, malts or style)
     /// This is the base for all ReferenceProperties (aka "known good" properties in the DiyDogExtractor databases)
     /// </summary>
-    public record BaseProperty
+    public class BaseProperty
     {
         /// <summary>
         /// Property name
@@ -36,6 +36,58 @@ namespace DruidsCornerAPI.Models.DiyDog.References
         /// Url for this base property
         /// </summary>
         public string? Url { get; set; } = null;
+
+        /// <summary>
+        /// Custom comparison operators
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object? obj)
+        {
+            if(obj is not BaseProperty || obj is null)
+            {
+                return false;
+            }
+
+            var other = obj as BaseProperty;
+            if(other == null) 
+            {
+                return false;
+            }
+            bool identical = true;
+
+            identical &= Name == other.Name;
+            identical &= Url == other.Url;
+            return identical;
+        }
+
+        /// <summary>
+        /// Custom equality operator
+        /// </summary>
+        public static bool operator == (BaseProperty left, BaseProperty right)
+        {
+            return left.Equals(right);
+        }
+
+        /// <summary>
+        /// Custom inequality operator
+        /// </summary>
+        public static bool operator != (BaseProperty left, BaseProperty right)
+        {
+            return !left.Equals(right);
+        }
+
+        /// <summary>
+        /// Custom hasher
+        /// </summary>
+        public override int GetHashCode()
+        {
+            var hash = Name.GetHashCode();
+            if(Url != null){
+                hash *= Url.GetHashCode() * 11;
+            }
+            return hash;
+        }
     }
 
 }

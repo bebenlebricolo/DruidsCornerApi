@@ -3,7 +3,7 @@ using DruidsCornerAPI.Models.DiyDog.RecipeDb;
 using DruidsCornerAPI.Tools;
 using System.Text.Json;
 
-namespace DruidsCornerUnitTests.Models.Google
+namespace DruidsCornerUnitTests.Models.Databases
 {
     public class RecipeTests
     {
@@ -13,7 +13,7 @@ namespace DruidsCornerUnitTests.Models.Google
         }
 
         [Test]
-        public void CheckJsonSymetry()
+        public void TestJsonSymmetry()
         {
             var fakeBeer = new Recipe()
             {
@@ -80,10 +80,7 @@ namespace DruidsCornerUnitTests.Models.Google
             var serialized = JsonSerializer.Serialize(fakeBeer, jsonOptions);
             var deserialized = JsonSerializer.Deserialize<Recipe>(serialized, jsonOptions);
 
-            fakeBeer.Equals(deserialized);
-
-
-            fakeBeer.Description = "";
+            Assert.That(fakeBeer, Is.EqualTo(deserialized));
         }
     }
 }

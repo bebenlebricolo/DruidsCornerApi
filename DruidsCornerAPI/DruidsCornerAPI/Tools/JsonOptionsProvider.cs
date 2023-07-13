@@ -24,7 +24,8 @@ namespace DruidsCornerAPI.Tools
                 {
                     new JsonStringEnumConverter(),
                     new DataRecordPolymorphicConverter()
-                }
+                },
+                PropertyNameCaseInsensitive = true
             };
 
             return options;

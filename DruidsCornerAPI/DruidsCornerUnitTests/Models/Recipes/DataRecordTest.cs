@@ -3,7 +3,7 @@ using DruidsCornerAPI.Models.DiyDog.RecipeDb;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
-namespace DruidsCornerUnitTests.Models.Google
+namespace DruidsCornerUnitTests.Models.Databases
 {
     public class DataRecordTests
     {

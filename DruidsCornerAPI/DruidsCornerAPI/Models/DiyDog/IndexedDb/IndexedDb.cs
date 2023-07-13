@@ -26,18 +26,8 @@
     /// <summary>
     /// Encodes basic information about BrewDog's beer recipe.
     /// </summary>
-    public record IndexedDb
+    public interface IndexedDb
     {
-        // /// <summary>
-        // /// Underlying type of indexed database (only available for properties listed in <see cref="IndexedDbPropKind"/> )
-        // /// </summary>
-        // public IndexedDbPropKind Kind {get; set;} = IndexedDbPropKind.Unknown;
-
-        // /// <summary>
-        // /// List of properties in a reversed DB construct
-        // /// </summary>
-        // public List<ReversedPropMapping> properties = new List<ReversedPropMapping>();  
-
         /// <summary>
         /// Checks if an IndexDb can be constructed for the given object
         /// </summary>

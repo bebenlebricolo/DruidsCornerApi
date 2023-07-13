@@ -2,7 +2,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using DruidsCornerAPI.Models.Config;
 
-namespace DruidsCornerUnitTests.Models.Google
+namespace DruidsCornerUnitTests.Models.Config
 {
     public class DeployedDatabaseConfigTest
     {
