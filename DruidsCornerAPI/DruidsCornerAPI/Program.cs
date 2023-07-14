@@ -227,7 +227,6 @@ namespace DruidsCornerAPI
             // Registering available services
             builder.Services.AddSingleton<RecipeService>();
             builder.Services.AddSingleton<SearchService>();
-            //builder.Services.AddTransient<LocalDatabaseHandler>();
 
             var slidingPolicy = "sliding";
             var rateLimitingOptions = new WebRateLimits();
@@ -256,6 +255,7 @@ namespace DruidsCornerAPI
 
             app.UseHttpsRedirection();
             app.UseHttpLogging();
+            
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers().RequireRateLimiting(slidingPolicy);

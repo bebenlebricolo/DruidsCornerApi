@@ -2,26 +2,9 @@
 using DruidsCornerAPI.Models.Config;
 using DruidsCornerAPI.Models.Search;
 using DruidsCornerAPI.Models.DiyDog.RecipeDb;
-using DruidsCornerAPI.Models.Exceptions;
-using Microsoft.Extensions.Logging.Configuration;
-using DruidsCornerAPI.Tools.Logging;
 
 namespace DruidsCornerAPI.Services
 {
-    /// <summary>
-    /// Selects where the database should be retrieved from.
-    /// </summary>
-    public enum DatabaseSourceMode
-    {
-        /// <summary> Database will be retrieved locally (using the appsettings.json configuration)  </summary>
-        Local,
-        
-        /// <summary> Database will be retrieved from Cloud Storage </summary>
-        Cloud,
-
-        /// <summary> Default, used to encode the "Failure" mode, when input data parsing is unsuccessful. </summary>
-        Unknown  
-    }
 
     /// <summary>
     /// Recipe service class ; provides database services abstractions to Controller (and various environment-based behaviours)
@@ -30,7 +13,6 @@ namespace DruidsCornerAPI.Services
     {
         private readonly IConfiguration _configuration;
         private ILogger<RecipeService> _logger;
-        private static string DBModeEnvVarName = "DRUIDSCORNERAPI_DBMODE";
 
         /// <summary>
         /// Standard constructor
@@ -43,48 +25,6 @@ namespace DruidsCornerAPI.Services
             _logger = logger;
         }
 
-    
-        /// <summary>
-        /// Retrieves Database mode from local environment
-        /// </summary>
-        /// <returns></returns>
-        protected DatabaseSourceMode GetMode()
-        {
-            DatabaseSourceMode dbModeEnum;
-           
-            var dbModeEnv = Environment.GetEnvironmentVariable(DBModeEnvVarName);
-            if (false == Enum.TryParse(dbModeEnv, out dbModeEnum))
-            {
-                // Enforce the LocalMode anyway
-                dbModeEnum = DatabaseSourceMode.Local;
-            }
-            return dbModeEnum;
-        }
-
-        /// <summary>
-        /// Builds / retrieves a database handler that suits the local DB environment (either Local or Cloud Based)
-        /// </summary>
-        /// <param name="dbMode"></param>
-        /// <returns></returns>
-        protected IDatabaseHandler GetDatabaseHandler(DatabaseSourceMode dbMode) 
-        {
-            // Local deployment needs proper path handling
-            if (dbMode == DatabaseSourceMode.Local)
-            {
-                var deployedConfig = new DeployedDatabaseConfig();
-                var parsingSuccess = deployedConfig.FromConfig(_configuration);
-                if (!parsingSuccess)
-                {
-                    throw new ConfigException("Could not read configuration (appsettings), failing short.");
-                }
-
-                var dbLogger = ApplicationLogging.LoggerFactory.CreateLogger<LocalDatabaseHandler>();
-                var dbHandler = new LocalDatabaseHandler(deployedConfig, dbLogger);
-                return dbHandler;
-            }
-        
-            throw new NotImplementedException("Whoops ! Not there yet!");
-        }
 
         /// <summary>
         /// Fetches all recipes from database provider
@@ -92,9 +32,7 @@ namespace DruidsCornerAPI.Services
         /// <returns></returns>
         public async Task<List<Recipe>> GetAllRecipesAsync()
         {
-            var dbMode = GetMode();
-            var dbHandler = GetDatabaseHandler(dbMode);
-
+            var dbHandler = DatabaseHandlerFactory.GetDatabaseHandler(_configuration);
             return await dbHandler.GetAllRecipesAsync();
         }
 
@@ -106,9 +44,7 @@ namespace DruidsCornerAPI.Services
         /// <exception cref="NotImplementedException"></exception>
         public async Task<RecipeResult> GetRecipeByNameAsync(string name)
         {
-            var dbMode = GetMode();
-            var dbHandler = GetDatabaseHandler(dbMode);
-
+            var dbHandler = DatabaseHandlerFactory.GetDatabaseHandler(_configuration);
             return await dbHandler.GetRecipeByNameAsync(name);
         }
 
@@ -120,9 +56,7 @@ namespace DruidsCornerAPI.Services
         /// <returns></returns>
         public async Task<Recipe?> GetRecipeByNumberAsync(uint number)
         {
-            var dbMode = GetMode();
-            var dbHandler = GetDatabaseHandler(dbMode);
-
+            var dbHandler = DatabaseHandlerFactory.GetDatabaseHandler(_configuration);
             return await dbHandler.GetRecipeByNumberAsync(number);
         }
 
@@ -133,9 +67,7 @@ namespace DruidsCornerAPI.Services
         /// <returns></returns>
         public async Task<Stream?> GetRecipeImageAsync(uint number)
         {
-            var dbMode = GetMode();
-            var dbHandler = GetDatabaseHandler(dbMode);
-
+            var dbHandler = DatabaseHandlerFactory.GetDatabaseHandler(_configuration);
             return await dbHandler.GetRecipeImageAsync(number);
         }
 
@@ -146,9 +78,7 @@ namespace DruidsCornerAPI.Services
         /// <returns></returns>
         public async Task<Stream?> GetRecipePdfPageAsync(uint number)
         {
-            var dbMode = GetMode();
-            var dbHandler = GetDatabaseHandler(dbMode);
-
+            var dbHandler = DatabaseHandlerFactory.GetDatabaseHandler(_configuration);
             return await dbHandler.GetRecipePdfPageAsync(number);
         }
     }

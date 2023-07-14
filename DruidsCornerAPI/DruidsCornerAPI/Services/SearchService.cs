@@ -4,6 +4,9 @@ using DruidsCornerAPI.DatabaseHandlers;
 using DruidsCornerAPI.Models.DiyDog.RecipeDb;
 using DruidsCornerAPI.Models.DiyDog.IndexedDb;
 using System.Security.Cryptography;
+using DruidsCornerAPI.Models.DiyDog.References;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Identity.Client;
 
 namespace DruidsCornerAPI.Services
 {
@@ -215,6 +218,29 @@ namespace DruidsCornerAPI.Services
 
             return candidatesResults;
         }
+
+        /// <summary>
+        /// Performs a fuzzy search on a list of recipes, using a list of queries and custom field accessor
+        /// </summary>
+        /// <param name="propList">Property list used as a search target</param>
+        /// <param name="queries">List of string queries</param>
+        /// <param name="accessor">Custom accessor expression that returns a List of string from input T property</param>
+        /// <returns></returns>
+        public List<FuzzySearchResult<T>> FuzzySearchInReferenceProperties<T>(List<T> propList, List<string> queries, Func<T, List<string>> accessor) where T : BaseProperty
+        {
+            var candidatesResults = new List<FuzzySearchResult<T>>();
+            foreach(var query in queries)
+            {
+                // Generate a list containing names and aliases all together.
+                // This might need dedicated handling if we need a stronger weight on Name property, but this should work as well, with even weights.
+                var candidate = FuzzySearch.SearchInList<T>(query, propList, item => accessor.Invoke(item));
+                candidatesResults.Add(candidate);
+            }
+
+            candidatesResults.Sort((elem1, elem2) => elem2.Ratio.CompareTo(elem1.Ratio));
+            return candidatesResults;
+        }
+
 #endregion GenericFilters
 
         /// <summary>
@@ -532,5 +558,142 @@ namespace DruidsCornerAPI.Services
 
             return candidates;
         }
+    
+        /// <summary>
+        /// Uses fuzzy search to list available hops using input query
+        /// </summary>
+        /// <param name="names">List of tokens for hop selection</param>
+        /// <param name="dbHandler"></param>
+        /// <param name="minimumMatchScore"></param>
+        /// <returns></returns>
+        public async Task<List<HopProperty>> SearchHopsWithQuery(List<string> names, IDatabaseHandler dbHandler, uint minimumMatchScore = 50)
+        {
+            var refList = await dbHandler.GetReferenceHopsAsync();
+            var hopsCandidates =  FuzzySearchInReferenceProperties(refList!.Hops, names, item => {
+                var list = new List<string>{item.Name};
+                if(item.Aliases != null)
+                {
+                    list.Concat(item.Aliases);
+                }
+                return list;
+            });
+
+            // Removing doubles : https://stackoverflow.com/a/4158364
+            var filteredList = hopsCandidates.GroupBy(item => item.Prop!.Name).Select(group => group.First());
+            hopsCandidates = filteredList.ToList();
+
+            var outputList = new List<HopProperty>();
+            foreach(var elem in hopsCandidates)
+            {
+                if(elem.Ratio >= minimumMatchScore)
+                {
+                    outputList.Add(elem.Prop!);
+                }
+            }
+
+            return outputList;
+        }
+
+        /// <summary>
+        /// Uses fuzzy search to list available malts using input query
+        /// </summary>
+        /// <param name="names">List of tokens for hop selection</param>
+        /// <param name="dbHandler"></param>
+        /// <param name="minimumMatchScore"></param>
+        /// <returns></returns>
+        public async Task<List<MaltProperty>> SearchMaltsWithQuery(List<string> names, IDatabaseHandler dbHandler, uint minimumMatchScore = 50)
+        {
+            var refList = await dbHandler.GetReferenceMaltsAsync();
+            var candidates =  FuzzySearchInReferenceProperties(refList!.Malts, names, item => {
+                var list = new List<string>{item.Name};
+                if(item.Aliases != null)
+                {
+                    list.Concat(item.Aliases);
+                }
+                return list;
+            });
+
+            // Removing doubles : https://stackoverflow.com/a/4158364
+            var filteredList = candidates.GroupBy(item => item.Prop!.Name).Select(group => group.First());
+            candidates = filteredList.ToList();
+
+            var outputList = new List<MaltProperty>();
+            foreach(var elem in candidates)
+            {
+                if(elem.Ratio >= minimumMatchScore)
+                {
+                    outputList.Add(elem.Prop!);
+                }
+            }
+
+            return outputList;
+        }
+
+        /// <summary>
+        /// Uses fuzzy search to list available yeasts using input query
+        /// </summary>
+        /// <param name="names">List of tokens for hop selection</param>
+        /// <param name="dbHandler"></param>
+        /// <param name="minimumMatchScore"></param>
+        /// <returns></returns>
+        public async Task<List<YeastProperty>> SearchYeastsWithQuery(List<string> names, IDatabaseHandler dbHandler, uint minimumMatchScore = 50)
+        {
+            var refList = await dbHandler.GetReferenceYeastsAsync();
+            var candidates =  FuzzySearchInReferenceProperties(refList!.Yeasts, names, item => {
+                var list = new List<string>{item.Name};
+                if(item.Aliases != null)
+                {
+                    list.Concat(item.Aliases);
+                }
+                return list;
+            });
+
+            // Removing doubles : https://stackoverflow.com/a/4158364
+            var filteredList = candidates.GroupBy(item => item.Prop!.Name).Select(group => group.First());
+            candidates = filteredList.ToList();
+
+            var outputList = new List<YeastProperty>();
+            foreach(var elem in candidates)
+            {
+                if(elem.Ratio >= minimumMatchScore)
+                {
+                    outputList.Add(elem.Prop!);
+                }
+            }
+
+            return outputList;
+        }
+        
+        /// <summary>
+        /// Uses fuzzy search to list available yeasts using input query
+        /// </summary>
+        /// <param name="names">List of tokens for hop selection</param>
+        /// <param name="dbHandler"></param>
+        /// <param name="minimumMatchScore"></param>
+        /// <returns></returns>
+        public async Task<List<StyleProperty>> SearchStylesWithQuery(List<string> names, IDatabaseHandler dbHandler, uint minimumMatchScore = 50)
+        {
+            var refList = await dbHandler.GetReferenceStylesAsync();
+            var candidates =  FuzzySearchInReferenceProperties(refList!.Styles, names, item => {
+                var list = new List<string>{item.Name, item.Category};
+                return list;
+            });
+
+            // Removing doubles : https://stackoverflow.com/a/4158364
+            var filteredList = candidates.GroupBy(item => item.Prop!.Name).Select(group => group.First());
+            candidates = filteredList.ToList();
+
+            var outputList = new List<StyleProperty>();
+            foreach(var elem in candidates)
+            {
+                if(elem.Ratio >= minimumMatchScore)
+                {
+                    outputList.Add(elem.Prop!);
+                }
+            }
+
+            return outputList;
+        }
+        
     }
 }

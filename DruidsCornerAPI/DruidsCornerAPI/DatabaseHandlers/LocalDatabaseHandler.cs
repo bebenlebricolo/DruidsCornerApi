@@ -471,5 +471,14 @@ namespace DruidsCornerAPI.DatabaseHandlers
         {
             return await GetIndexedDbAsync(IndexedDbPropKind.FoodPairing) as IndexedFoodPairingDb;
         }
+
+        /// <summary>
+        /// Gets the reference "Extra" ingredients (known good for DiyDog recipes)
+        /// </summary>
+        /// <returns></returns>
+        public Task<ReferenceHops?> GetReferenceExtrasAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

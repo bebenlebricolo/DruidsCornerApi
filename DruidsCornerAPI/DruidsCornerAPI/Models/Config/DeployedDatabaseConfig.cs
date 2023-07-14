@@ -1,4 +1,6 @@
-﻿namespace DruidsCornerAPI.Models.Config
+﻿using System.Runtime.CompilerServices;
+
+namespace DruidsCornerAPI.Models.Config
 {
     /// <summary>
     /// Models out the locally deployed database configuration (used in an appsettings.json)
@@ -49,12 +51,20 @@
         /// </summary>
         public string ReferencesFolderName { get; set; } = "references";
 
+        /// <summary>
+        /// Flags that states whether this configuration object was successfully configured previously or not7
+        /// It is used to prevent multiple re-initialization when it's already initialized/configured appropriately
+        /// Moreover, it allows to skip reading from file system when it's content is already stored in RAM.
+        /// This flag is set by the <see cref="FromConfig"/> methods family.
+        /// </summary>
+        public bool Configured {get; private set;} = false;
+        
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public bool VerifyAllNodesExist()
+        public bool IsValid()
         {
             var success = true;
             // Path.Exists() already takes care about potentially null-values as well.
@@ -84,8 +94,13 @@
             }
 
             RootFolderPath = rootFolderPath;
-
-            return VerifyAllNodesExist();
+            var success = IsValid();
+            if(success)
+            {
+                // Set the flag to allow upper layer code to skip re-initialization steps
+                Configured = true;
+            }
+            return success;
         }
 
         /// <summary>
@@ -118,8 +133,13 @@
                 RootFolderPath = RootFolderPath.Replace(envVarPattern, deployedEnvVarValue);
             }
 
-            success = VerifyAllNodesExist();            
-            return success;
+            success = IsValid();   
+            if(success)
+            {
+                // Set the flag to allow upper layer code to skip re-initialization steps
+                Configured = true;
+            }
+            return success;         
         }
 
         /// <summary>

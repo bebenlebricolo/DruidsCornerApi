@@ -3,7 +3,8 @@ using DruidsCornerAPI.Services;
 using DruidsCornerAPI.Models.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using DruidsCornerAPI.Models.Config;
+using DruidsCornerAPI.Models.DiyDog.References;
 
 namespace DruidsCornerAPI.Controllers
 {
@@ -23,18 +24,30 @@ namespace DruidsCornerAPI.Controllers
 
     public class SearchController : ControllerBase
     {
+        private readonly IConfiguration _configuration;
         private readonly ILogger<SearchController> _logger;
         private readonly RecipeService _recipeService;
+        private readonly SearchService _searchService;
+
+        private readonly DeployedDatabaseConfig _dbConfig;
 
         /// <summary>
         /// Standard constructor
         /// </summary>
-        /// <param name="logger"></param>
-        /// <param name="recipeService"></param>
-        public SearchController(ILogger<SearchController> logger, RecipeService recipeService)
+        /// <param name="configuration">Application configuration</param>
+        /// <param name="logger">System logger for this class</param>
+        /// <param name="recipeService">Recipe service object</param>
+        /// <param name="searchService">Search service object</param>
+        public SearchController(IConfiguration configuration,
+                                ILogger<SearchController> logger,
+                                RecipeService recipeService,
+                                SearchService searchService)
         {
+            _configuration = configuration;
             _logger = logger;
             _recipeService = recipeService;
+            _searchService = searchService;
+            _dbConfig = new DeployedDatabaseConfig();
         }
 
         /// <summary>
@@ -42,7 +55,7 @@ namespace DruidsCornerAPI.Controllers
         /// </summary>
         /// <returns>Recipe list, or NotFound error</returns>
         [HttpGet("all", Name = "List all matching recipes")]
-        [ProducesResponseType(typeof(MultipleRecipeResult), 200)]
+        [ProducesResponseType(typeof(List<Recipe>), 200)]
         public async Task<IActionResult> SearchAllWithMatch()
         {
             try
@@ -56,7 +69,111 @@ namespace DruidsCornerAPI.Controllers
             }
             catch(Exception ex)
             {
-                _logger.LogError($"Caught error while retrieving recipe by id : {ex.Message}");
+                _logger.LogError($"Caught error while retrieving Yeast with fuzzy search : {ex.Message}");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        /// <summary>
+        /// Retrieves all hops that match the input query
+        /// </summary>
+        /// <returns>Recipe list, or NotFound error</returns>
+        [HttpGet("hops", Name = "Find hops that match input request")]
+        [ProducesResponseType(typeof(List<HopProperty>), 200)]
+        public async Task<IActionResult> SearchHopsWithMatch([FromQuery] List<string> names)
+        {
+            try
+            {
+                var dbHandler = DatabaseHandlers.DatabaseHandlerFactory.GetDatabaseHandler(_configuration);
+                var refProp = await _searchService.SearchHopsWithQuery(names, dbHandler);
+                if(refProp.Count == 0)
+                {
+                    return NotFound("No Hops match the input query.");
+                }
+                return Ok(refProp);
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"Caught error while retrieving Hop with fuzzy search : {ex.Message}");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        /// <summary>
+        /// Retrieves all malts that match the input query
+        /// </summary>
+        /// <returns>Recipe list, or NotFound error</returns>
+        [HttpGet("malts", Name = "Find malts that match input request")]
+        [ProducesResponseType(typeof(List<MaltProperty>), 200)]
+        public async Task<IActionResult> SearchMaltsWithMatch([FromQuery] List<string> names)
+        {
+            try
+            {
+                var dbHandler = DatabaseHandlers.DatabaseHandlerFactory.GetDatabaseHandler(_configuration);
+                var refProp = await _searchService.SearchMaltsWithQuery(names, dbHandler);
+                if(refProp.Count == 0)
+                {
+                    return NotFound("No Malt match the input query.");
+                }
+                return Ok(refProp);
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"Caught error while retrieving Malt with fuzzy search : {ex.Message}");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        /// <summary>
+        /// Retrieves all yeasts that match the input query
+        /// </summary>
+        /// <returns>Recipe list, or NotFound error</returns>
+        [HttpGet("yeasts", Name = "Find yeasts that match input request")]
+        [ProducesResponseType(typeof(List<YeastProperty>), 200)]
+        public async Task<IActionResult> SearchYeastsWithMatch([FromQuery] List<string> names)
+        {
+            try
+            {
+                var dbHandler = DatabaseHandlers.DatabaseHandlerFactory.GetDatabaseHandler(_configuration);
+                var refProp = await _searchService.SearchYeastsWithQuery(names, dbHandler);
+                if(refProp.Count == 0)
+                {
+                    return NotFound("No Yeast match the input query.");
+                }
+                return Ok(refProp);
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"Caught error while retrieving Yeast with fuzzy search : {ex.Message}");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        /// <summary>
+        /// Retrieves all styles that match the input query
+        /// </summary>
+        /// <returns>Recipe list, or NotFound error</returns>
+        [HttpGet("styles", Name = "Find styles that match input request")]
+        [ProducesResponseType(typeof(List<StyleProperty>), 200)]
+        public async Task<IActionResult> SearchStylesWithMatch([FromQuery] List<string> names)
+        {
+            try
+            {
+                var dbHandler = DatabaseHandlers.DatabaseHandlerFactory.GetDatabaseHandler(_configuration);
+                var refProp = await _searchService.SearchStylesWithQuery(names, dbHandler);
+                if(refProp.Count == 0)
+                {
+                    return NotFound("No Style match the input query.");
+                }
+                return Ok(refProp);
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"Caught error while retrieving Style with fuzzy search : {ex.Message}");
                 return StatusCode(500, "Internal Server Error");
             }
         }

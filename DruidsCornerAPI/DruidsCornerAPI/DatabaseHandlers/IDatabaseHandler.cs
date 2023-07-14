@@ -67,6 +67,12 @@ namespace DruidsCornerAPI.DatabaseHandlers
         public Task<ReferenceHops?> GetReferenceHopsAsync();
         
         /// <summary>
+        /// Retrieves a known good hops list from current dbs
+        /// </summary>
+        /// <returns>Hops reference object or null</returns>
+        public Task<ReferenceHops?> GetReferenceExtrasAsync();
+
+        /// <summary>
         /// Retrieves a known good malts list from current dbs
         /// </summary>
         /// <returns>Malts reference object or null</returns>
