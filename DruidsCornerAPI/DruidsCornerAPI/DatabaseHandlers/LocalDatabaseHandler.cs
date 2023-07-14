@@ -58,7 +58,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// </summary>
         /// <param name="files">List of filesources to be read</param>
         /// <returns></returns>
-        protected async Task<List<Recipe>> ParseFromIndividualRecipesFilesAsync(FileInfo[] files)
+        protected async Task<List<Recipe>?> ParseFromIndividualRecipesFilesAsync(FileInfo[] files)
         {
             var allRecipesList = new List<Recipe>();
             foreach (var recipeFile in files)
@@ -81,7 +81,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// </summary>
         /// <param name="noCaching">Disables automatic caching to save memory, but slows down data accesses</param>
         /// <returns></returns>
-        public async Task<List<Recipe>> GetAllRecipesAsync(bool noCaching = false)
+        public async Task<List<Recipe>?> GetAllRecipesAsync(bool noCaching = false)
         {
             // Speeding up subsequent calls
             if(_cachedRecipes!= null && _cachedRecipes.Count != 0 && noCaching == false)
@@ -89,7 +89,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
                 return _cachedRecipes;
             }
 
-            var allRecipesList = new List<Recipe>();
+            List<Recipe>? allRecipesList = new List<Recipe>();
 
             var availableRecipes = _dbConfig.GetRecipesFolder().GetFiles("*.json");
             var allRecipesMonoFile = availableRecipes.First<FileInfo>(f => f.Name == "all_recipes.json");
@@ -113,6 +113,11 @@ namespace DruidsCornerAPI.DatabaseHandlers
             if(allRecipesList.Count == 0)
             {
                 allRecipesList = await ParseFromIndividualRecipesFilesAsync(availableRecipes);
+            }
+
+            if(allRecipesList == null)
+            {
+                return null;
             }
 
             // Don't use cache, this will force subsequent calls to perform Disk Access
@@ -183,9 +188,13 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// <param name="name"></param>
         /// <param name="recipeList"></param>
         /// <returns></returns>
-        protected RecipeResult FindByName(string name, List<Recipe> recipeList)
+        protected RecipeResult? FindByName(string name, List<Recipe> recipeList)
         {
             var fuzzyResult = FuzzySearch.SearchInList(name, recipeList, elem => new List<string>{elem.Name});
+            if(fuzzyResult == null)
+            {
+                return null;
+            }
             return new RecipeResult(fuzzyResult.Ratio, fuzzyResult.Prop!);
         }
 
@@ -195,7 +204,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// <param name="name"></param>
         /// <param name="noCaching"></param>
         /// <returns></returns>
-        public async Task<RecipeResult> GetRecipeByNameAsync(string name, bool noCaching = false)
+        public async Task<RecipeResult?> GetRecipeByNameAsync(string name, bool noCaching = false)
         {
             if (_cachedRecipes != null && _cachedRecipes.Count != 0)
             {
@@ -207,6 +216,10 @@ namespace DruidsCornerAPI.DatabaseHandlers
             }
 
             var allRecipes = await GetAllRecipesAsync(noCaching);
+            if(allRecipes == null)
+            {
+                return null;
+            }
             var matchingRecipe = FindByName(name, allRecipes);
             return matchingRecipe;
         }

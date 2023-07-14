@@ -51,6 +51,18 @@ namespace DruidsCornerUnitTests.Services
         }
 
         [Test]
+        public async Task TestSearchEmptyQuery()
+        {
+            Queries query = new Queries(){};
+
+            var mockLogger = new Mock<ILogger<SearchService>>();
+            var searchService = new SearchService(_fakeConfig, mockLogger.Object);
+            
+            var recipes = await searchService.SearchRecipeAsync(query, _localDbHandler);
+            Assert.That(recipes.Count, Is.EqualTo(5));
+        }
+
+        [Test]
         public async Task TestSearchGetSingleProp_Hops()
         {
             var mockLogger = new Mock<ILogger<SearchService>>();

@@ -54,22 +54,24 @@ namespace DruidsCornerAPI.Controllers
         /// Retrieves all available recipes from database
         /// </summary>
         /// <returns>Recipe list, or NotFound error</returns>
-        [HttpGet("all", Name = "List all matching recipes")]
+        [HttpPost("all", Name = "List all matching recipes")]
         [ProducesResponseType(typeof(List<Recipe>), 200)]
-        public async Task<IActionResult> SearchAllWithMatch()
+        public async Task<IActionResult> SearchAllWithMatch([FromBody] Queries queries)
         {
             try
             {
-                var allRecipes = await _recipeService.GetAllRecipesAsync();
-                if (allRecipes.Count != 0)
+                var dbHandler = DatabaseHandlers.DatabaseHandlerFactory.GetDatabaseHandler(_configuration);
+                var candidates = await _searchService.SearchRecipeAsync(queries, dbHandler);
+                if(candidates.Count == 0)
                 {
-                    return Ok(allRecipes);
+                    return NotFound("No Recipe match the input query.");
                 }
-                return NotFound("Could not retrieve recipes");
+                return Ok(candidates);
+
             }
             catch(Exception ex)
             {
-                _logger.LogError($"Caught error while retrieving Yeast with fuzzy search : {ex.Message}");
+                _logger.LogError($"Caught error while retrieving Hop with fuzzy search : {ex.Message}");
                 return StatusCode(500, "Internal Server Error");
             }
         }
@@ -158,12 +160,14 @@ namespace DruidsCornerAPI.Controllers
         /// <returns>Recipe list, or NotFound error</returns>
         [HttpGet("styles", Name = "Find styles that match input request")]
         [ProducesResponseType(typeof(List<StyleProperty>), 200)]
-        public async Task<IActionResult> SearchStylesWithMatch([FromQuery] List<string> names)
+        public async Task<IActionResult> SearchStylesWithMatch([FromQuery] List<string> names,
+                                                               [FromQuery] uint minimumMatchScore = 50)
         {
             try
             {
+                minimumMatchScore = Math.Clamp(minimumMatchScore, 0, 100);
                 var dbHandler = DatabaseHandlers.DatabaseHandlerFactory.GetDatabaseHandler(_configuration);
-                var refProp = await _searchService.SearchStylesWithQuery(names, dbHandler);
+                var refProp = await _searchService.SearchStylesWithQuery(names, dbHandler, minimumMatchScore);
                 if(refProp.Count == 0)
                 {
                     return NotFound("No Style match the input query.");

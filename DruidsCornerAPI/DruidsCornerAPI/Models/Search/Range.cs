@@ -10,11 +10,13 @@ namespace DruidsCornerAPI.Models.Search
         /// <summary>
         /// Range start value
         /// </summary>
+        /// <example>0</example>
         public T Start { get; set; }
 
         /// <summary>
         /// Range end value
         /// </summary> 
+        /// <example>20</example>
         public T End { get; set; }
 
         /// <summary>

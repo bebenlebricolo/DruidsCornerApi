@@ -51,13 +51,23 @@ namespace DruidsCornerAPI.Tools
                 return array[0];
             }
 
+            uint effectiveCount = 0;
             double product = 1.0;
             foreach(double elem in array)
             {
+                if(elem == 0)
+                {
+                    // elements with a value of 0 are just 
+                    // erasing the other values resulting average. 
+                    // Because an alias or name is completely different does not mean we'd like to throw everything away.
+                    continue;
+                }
                 product *= elem;
+                // Same remark, effective count is there to only account for non-zero values.
+                effectiveCount++;
             }
 
-            double result = Math.Pow(product, array.Count);
+            double result = Math.Pow(product, (1.0 / effectiveCount));
             return result;
         }
 

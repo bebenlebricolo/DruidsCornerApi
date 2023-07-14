@@ -1,4 +1,6 @@
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Microsoft.AspNetCore.Components.RenderTree;
 
 namespace DruidsCornerAPI.Models.Search
 {
@@ -12,7 +14,6 @@ namespace DruidsCornerAPI.Models.Search
         /// Queried Alcohol By Volume range
         /// </summary>
         public Range<float>? Abv { get; set; }
-        
         /// <summary>
         /// Queried International Bitterness Units range
         /// </summary>
@@ -109,6 +110,15 @@ namespace DruidsCornerAPI.Models.Search
         public List<string>? FoodPairingList {get; set; }
 
         /// <summary>
+        /// Standard constructor, has a preprocess pass on all fields to make 
+        /// them more relevant for the beer context
+        /// </summary>
+        public Queries()
+        {
+            PreProcessParameters();
+        }
+
+        /// <summary>
         /// Removes doubles from an optional list of string
         /// </summary>
         /// <param name="list"></param>
@@ -149,8 +159,5 @@ namespace DruidsCornerAPI.Models.Search
             RemoveDoubles(FoodPairingList);
             RemoveDoubles(NameList);
         }
-
-
-
     }
 }

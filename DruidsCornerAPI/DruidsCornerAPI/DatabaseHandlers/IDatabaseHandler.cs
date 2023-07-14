@@ -27,7 +27,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// <param name="noCaching">Optional noCaching parameter. If set to true, it'll prevent the database handler to use 
         /// internal caching and save up some memory. Otherwise, it'll cache data and speed up subsequent requests. </param>
         /// <returns>Found recipe alongside it's hit rating</returns>
-        public Task<RecipeResult> GetRecipeByNameAsync(string name, bool noCaching = false);
+        public Task<RecipeResult?> GetRecipeByNameAsync(string name, bool noCaching = false);
 
         /// <summary>
         /// Retrieves all available recipes from database store.
@@ -35,7 +35,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// <param name="noCaching">Optional noCaching parameter. If set to true, it'll prevent the database handler to use 
         /// internal caching and save up some memory. Otherwise, it'll cache data and speed up subsequent requests. </param>
         /// <returns>List of available recipes</returns>
-        public Task<List<Recipe>> GetAllRecipesAsync(bool noCaching = false);
+        public Task<List<Recipe>?> GetAllRecipesAsync(bool noCaching = false);
 
         /// <summary>
         /// Retrieves a recipe's image using it's number/id as a search parameter.

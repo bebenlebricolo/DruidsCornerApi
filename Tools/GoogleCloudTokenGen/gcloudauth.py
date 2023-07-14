@@ -14,6 +14,7 @@ from google_auth_oauthlib.flow import Flow, InstalledAppFlow
 import base64
 import hashlib
 import requests
+import socket
 
 SERVICE_ACCOUNT_FILE_ENV_VAR = "CARLISTAPP_SERVICE_ACCOUNT_FILE"
 SERVICE_ACCOUNT_DEFAULT_FILENAME = "service.json"
@@ -92,6 +93,8 @@ def check_client_can_request_token(target_audience : str) -> tuple[bool, str] :
     pattern = re.compile('https?:\/\/(\w*):([0-9]*)')
     
     candidate_uri = https_candidates[0] if len(https_candidates) != 0 else [x for x in redirect_uris if "http" in x][0]
+    
+    print(f"Opening server, listening to {candidate_uri}")
     matches = re.findall(pattern, candidate_uri)
     (hostname, port_number) = matches[0]
     creds = flow.run_local_server(host="localhost", port=int(port_number)) # type: ignore
@@ -122,10 +125,23 @@ def main():
     with open(test_service_filepath, "r") as file :
         content = json.load(file)
         target_audience = content["name"]
-
-    (success, token) = check_client_can_request_token(target_audience)
-    if success :
-        print(token)
+    
+    try :
+        (success, token) = check_client_can_request_token(target_audience)
+        if success :
+            print(token)
+    except Exception as ex:
+        #print(f"Could not proceed : {ex}")
+        print("Server still up : Trying to force close the socket now")
+        try :
+            server_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            server_socket.setsockopt(socket.SOL_SOCKET ,socket.SO_REUSEADDR, 1)
+            server_socket.bind("https://localhost:4200")
+            server_socket.shutdown(socket.SHUT_RDWR)
+            server_socket.close()
+        except Exception as ex:
+            print(f"Could not force close socket because {ex}")
+    
 
 if __name__ == "__main__" :
     exit(main())

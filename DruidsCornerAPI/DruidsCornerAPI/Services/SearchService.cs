@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using DruidsCornerAPI.Models.DiyDog.References;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Identity.Client;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace DruidsCornerAPI.Services
 {
@@ -162,8 +163,8 @@ namespace DruidsCornerAPI.Services
         public Recipe? FilterOutFermentationTempsDiscrete(Recipe subject, Queries queries)
         {
             return FilterOutRangeValueDiscrete(subject, subject.MethodTimings.Fermentation.Celsius, queries.FermentationTemps);
-        }
 
+        }
 #endregion RangeFilters
 
 #region FuzzySearchFilters
@@ -175,7 +176,7 @@ namespace DruidsCornerAPI.Services
         /// <param name="propMapping">List of ReversedPropMapping from an indexed Db</param>
         /// <param name="propName">Property name serving as the search parameter</param>
         /// <returns></returns>
-        public FuzzySearchResult<ReversedPropMapping> FuzzySearchInIndexedDb(List<ReversedPropMapping> propMapping, string propName)
+        public FuzzySearchResult<ReversedPropMapping>? FuzzySearchInIndexedDb(List<ReversedPropMapping> propMapping, string propName)
         {
             return FuzzySearch.SearchInList(propName, propMapping, elem => new List<string>{elem.Name});
         }
@@ -192,6 +193,11 @@ namespace DruidsCornerAPI.Services
             foreach(var query in queries)  
             {
                 var candidate = FuzzySearchInIndexedDb(propMapping, query);
+                if(candidate == null)
+                {
+                    continue;
+                }
+
                 if(!candidateProps.Any(elem => elem.Prop!.Name == candidate.Prop!.Name))
                 {
                     candidateProps.Add(candidate);
@@ -209,10 +215,19 @@ namespace DruidsCornerAPI.Services
         /// <returns></returns>
         public List<FuzzySearchResult<Recipe>> FuzzySearchInRecipesMultipleQueries(List<Recipe> candidates, List<string> queries, GetProp<Recipe> accessor )
         {
+            if(candidates.Count == 0)
+            {
+                return new List<FuzzySearchResult<Recipe>>();
+            }
+            
             List<FuzzySearchResult<Recipe>> candidatesResults = new List<FuzzySearchResult<Recipe>>();
             foreach(var query in queries)
             {
                 var candidateRecipe = FuzzySearch.SearchInList<Recipe>(query, candidates, accessor);
+                if(candidateRecipe == null)
+                {
+                    continue;
+                }
                 candidatesResults.Add(candidateRecipe);
             }
 
@@ -233,8 +248,11 @@ namespace DruidsCornerAPI.Services
             {
                 // Generate a list containing names and aliases all together.
                 // This might need dedicated handling if we need a stronger weight on Name property, but this should work as well, with even weights.
-                var candidate = FuzzySearch.SearchInList<T>(query, propList, item => accessor.Invoke(item));
-                candidatesResults.Add(candidate);
+                var candidates = FuzzySearch.SearchInListFullResults<T>(query, propList, item => accessor.Invoke(item));
+                foreach(var elem in candidates)
+                {
+                    candidatesResults.Add(elem);
+                }
             }
 
             candidatesResults.Sort((elem1, elem2) => elem2.Ratio.CompareTo(elem1.Ratio));
@@ -272,8 +290,12 @@ namespace DruidsCornerAPI.Services
             if(names != null)
             {
                 var extraMashCandidatesResults = FuzzySearchInRecipesMultipleQueries(candidates, names, c => {
+                    if(c.Ingredients.ExtraMashes == null)
+                    {
+                        return new List<string>();
+                    }
                     // Null values are handled locally in the algorithm
-                    return c.Ingredients.ExtraMashes!.Select(x => x.Name).ToList();
+                    return c.Ingredients.ExtraMashes.Select(x => x.Name).ToList();
                 });
                 candidates = KeepSimilar(candidates, extraMashCandidatesResults);
             }
@@ -293,8 +315,12 @@ namespace DruidsCornerAPI.Services
             if(names != null)
             {
                 var extraBoilCandidatesResults = FuzzySearchInRecipesMultipleQueries(candidates, names, c => {
+                    if(c.Ingredients.ExtraBoils == null)
+                    {
+                        return new List<string>();
+                    }
                     // Null values are handled locally in the algorithm
-                    return c.Ingredients.ExtraBoils!.Select(x => x.Name).ToList();
+                    return c.Ingredients.ExtraBoils.Select(x => x.Name).ToList();
                 });
                 candidates = KeepSimilar(candidates, extraBoilCandidatesResults);
             }
@@ -387,6 +413,7 @@ namespace DruidsCornerAPI.Services
             }
             return candidates;
         }
+
 
         /// <summary>
         /// Small wrapper around <see cref="FuzzySearchInIndexedDbMultipleQueries"/> for the specified type (used for abstraction and testing)
@@ -485,6 +512,10 @@ namespace DruidsCornerAPI.Services
         public async Task<List<Recipe>> SearchRecipeAsync(Queries queries, IDatabaseHandler dbHandler)
         {
             var allRecipes = await dbHandler.GetAllRecipesAsync();
+            if(allRecipes == null)
+            {
+                return new List<Recipe>();
+            }
             
             // Perform filtering on all recipes and skip as early as possible
             List<Recipe> candidates = new List<Recipe>();
@@ -492,25 +523,27 @@ namespace DruidsCornerAPI.Services
             {
                 Recipe? candidate = recipe;
                 candidate = FilterOutAbvDiscrete(candidate, queries);
-                if(candidate == null) break;
+                if(candidate == null) continue;
 
                 candidate = FilterOutEbcDiscrete(candidate, queries);
-                if(candidate == null) break;
+                if(candidate == null) continue;
 
                 candidate = FilterOutIbuDiscrete(candidate, queries);
-                if(candidate == null) break;
+                if(candidate == null) continue;
 
                 candidate = FilterOutTargetOgDiscrete(candidate, queries);
-                if(candidate == null) break;
+                if(candidate == null) continue;
 
                 candidate = FilterOutTargetFgDiscrete(candidate, queries);
-                if(candidate == null) break;
+                if(candidate == null) continue;
 
                 candidate = FilterOutAttenuationLevelDiscrete(candidate, queries);
-                if(candidate == null) break;
+                if(candidate == null) continue;
 
                 candidate = FilterOutMashTempsDiscrete(candidate, queries);
-                if(candidate == null) break;
+                if(candidate == null) continue;
+                
+                // TODO : add a filter for Twists !
                 
                 candidate = FilterOutFermentationTempsDiscrete(candidate, queries);
 

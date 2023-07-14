@@ -203,12 +203,16 @@ namespace DruidsCornerAPI.Tools
         /// <param name="fuzzMode">Optional fuzzy search mode selector</param>
         /// <returns>Tuple of MaxRatio (0-100) and the reference object that has the highest probability</returns>
         /// <throws>NullReferenceException if input list is empty</throws>
-        public static FuzzySearchResult<T> SearchInList<T>(string property, List<T> list, GetProp<T> propAccessor, FuzzMode fuzzMode = FuzzMode.PartialRatio) where T : class
+        public static FuzzySearchResult<T>? SearchInList<T>(string property, List<T> list, GetProp<T> propAccessor, FuzzMode fuzzMode = FuzzMode.PartialRatio) where T : class
         {
             int maxRatio = 0;
+            if(list.Count == 0)
+            {
+                return null;
+            }
 
             // Will throw a null reference exception if list does not contain anything
-            T? mostProbableElem = list.First();
+            T? mostProbableElem = list.FirstOrDefault();
             foreach (var element in list) 
             {
                 var result = SearchSingleSubject<T>(property, element, propAccessor, fuzzMode);

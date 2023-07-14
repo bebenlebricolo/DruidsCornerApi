@@ -33,9 +33,9 @@ namespace DruidsCornerUnitTests.DatabaseHandlers
             var handler = new LocalDatabaseHandler(config, mockLogger.Object);
             var indexedMaltDb = await handler.GetIndexedDbAsync(IndexedDbPropKind.Malts) as IndexedMaltDb;
             Assert.That(indexedMaltDb, Is.Not.Null);
-            Assert.That(indexedMaltDb.Malts.Count, Is.EqualTo(4));
+            Assert.That(indexedMaltDb.Malts.Count, Is.EqualTo(18));
             Assert.That(indexedMaltDb.Malts[3].Name, Is.EqualTo("Black Malt"));
-            Assert.That(indexedMaltDb.Malts[3].FoundInBeers.Contains(136), Is.True);
+            Assert.That(indexedMaltDb.Malts[3].FoundInBeers.Contains(101), Is.True);
         
             var indexedHopDb = await handler.GetIndexedDbAsync(IndexedDbPropKind.Hops) as IndexedHopDb;
             Assert.That(indexedHopDb, Is.Not.Null);

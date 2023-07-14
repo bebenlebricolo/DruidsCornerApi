@@ -47,25 +47,32 @@ namespace DruidsCornerUnitTests.Tools
             var data = GenerateFakeData();
 
             var test1Result = FuzzySearch.SearchInList("test 1", data, elem => new List<string> {elem.Name});
+            Assert.That(test1Result, Is.Not.Null);
             Assert.That(test1Result.Ratio, Is.EqualTo(100));
             Assert.That(test1Result.Prop, Is.EqualTo(data[0]));
 
             var test2Result = FuzzySearch.SearchInList("test 2", data, elem => new List<string> {elem.Name});
+            Assert.That(test2Result, Is.Not.Null);
             Assert.That(test2Result.Prop, Is.EqualTo(data[1]));
 
             var test3Result = FuzzySearch.SearchInList("test 3", data, elem => new List<string> {elem.Name});
+            Assert.That(test3Result, Is.Not.Null);
             Assert.That(test3Result.Prop, Is.EqualTo(data[2]));
 
             var test4Result = FuzzySearch.SearchInList("another 1", data, elem => new List<string> {elem.Name});
+            Assert.That(test4Result, Is.Not.Null);
             Assert.That(test4Result.Prop, Is.EqualTo(data[3]));
 
             var test5Result = FuzzySearch.SearchInList("yet another", data, elem => new List<string> {elem.Name});
+            Assert.That(test5Result, Is.Not.Null);
             Assert.That(test5Result.Prop, Is.EqualTo(data[4]));
 
             var test6Result = FuzzySearch.SearchInList("1 te", data, elem => new List<string> {elem.Name});
+            Assert.That(test6Result, Is.Not.Null);
             Assert.That(test6Result.Prop, Is.EqualTo(data[5]));
 
             var test7Result = FuzzySearch.SearchInList("1 te mis", data, elem => new List<string> {elem.Name});
+            Assert.That(test7Result, Is.Not.Null);
             Assert.That(test7Result.Prop, Is.EqualTo(data[6]));
         }
 
