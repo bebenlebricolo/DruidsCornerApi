@@ -442,11 +442,17 @@ namespace DruidsCornerAPI.Services
         public Recipe? FilterOutTwistsDiscrete(Recipe subject, Queries queries)
         {
             // No filter applied, return the recipe as there is not restrictions applied on it.
-            if(subject.MethodTimings.Twists == null 
-            || subject.MethodTimings.Twists.Count == 0
-            || queries.TwistList == null)
+            if(queries.TwistList == null)
             {
                 return subject;
+            }
+
+            // Reject recipes that don't have any twists.
+            // If query is specified with some twists, it means we need to rule out 
+            // All recipes that don't have any.
+            if(subject.MethodTimings.Twists == null || subject.MethodTimings.Twists.Count == 0 )
+            {
+                return null;
             }
 
             Recipe? output = null;
