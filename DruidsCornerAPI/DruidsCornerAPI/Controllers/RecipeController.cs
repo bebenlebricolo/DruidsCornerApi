@@ -48,7 +48,7 @@ namespace DruidsCornerAPI.Controllers
             try
             {
                 var allRecipes = await _recipeService.GetAllRecipesAsync();
-                if (allRecipes.Count != 0)
+                if(allRecipes != null && allRecipes.Count != 0)
                 {
                     return Ok(allRecipes);
                 }
@@ -113,7 +113,8 @@ namespace DruidsCornerAPI.Controllers
                 probabilityThreshold = Math.Clamp(probabilityThreshold, -1, 100);
                 
                 var recipe = await _recipeService.GetRecipeByNameAsync(name);
-                if (probabilityThreshold != -1 && recipe.Probability < probabilityThreshold)
+                if (recipe == null 
+                || (probabilityThreshold != -1 && recipe.Probability < probabilityThreshold))
                 {
                     return NotFound($"Could not find the requested recipe with query : {name}");
                 }

@@ -30,7 +30,7 @@ namespace DruidsCornerAPI.Services
         /// Fetches all recipes from database provider
         /// </summary>
         /// <returns></returns>
-        public async Task<List<Recipe>> GetAllRecipesAsync()
+        public async Task<List<Recipe>?> GetAllRecipesAsync()
         {
             var dbHandler = DatabaseHandlerFactory.GetDatabaseHandler(_configuration);
             return await dbHandler.GetAllRecipesAsync();
@@ -42,7 +42,7 @@ namespace DruidsCornerAPI.Services
         /// <param name="name"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<RecipeResult> GetRecipeByNameAsync(string name)
+        public async Task<RecipeResult?> GetRecipeByNameAsync(string name)
         {
             var dbHandler = DatabaseHandlerFactory.GetDatabaseHandler(_configuration);
             return await dbHandler.GetRecipeByNameAsync(name);

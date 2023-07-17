@@ -31,6 +31,8 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.Reflection;
 using DruidsCornerAPI.DatabaseHandlers;
+using Google;
+using DruidsCornerAPI.Models.Exceptions;
 
 namespace DruidsCornerAPI
 {
@@ -201,6 +203,7 @@ namespace DruidsCornerAPI
                 });
             });
 
+
             SetAuthentication(builder);
             
             // Nice questions : https://stackoverflow.com/questions/72966528/can-api-key-and-jwt-token-be-used-in-the-same-net-6-webapi
@@ -242,6 +245,12 @@ namespace DruidsCornerAPI
                 }));
 
             var app = builder.Build();
+
+            // This one should be provided at all times
+            if(System.Environment.GetEnvironmentVariable("CLIENT_ID") == null)
+            {
+                throw new ConfigException("The CLIENT_ID environment variable was not set, won't be able to proceed operations.");
+            }
             
             // Configure the HTTP request pipeline.
             app.UseRateLimiter();

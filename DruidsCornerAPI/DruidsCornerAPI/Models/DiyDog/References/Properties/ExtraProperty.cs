@@ -2,6 +2,9 @@ using DruidsCornerAPI.Tools;
 
 namespace DruidsCornerAPI.Models.DiyDog.References
 {
+    /// <summary>
+    /// Depicts the main kinds of extra ingredients found in a recipe
+    /// </summary>
     public enum ExtraKind
     {
         /// <summary>

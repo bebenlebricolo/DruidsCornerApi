@@ -27,6 +27,7 @@ namespace DruidsCornerAPI.Tools
     }
 
 
+    
     /// <summary>
     /// Performs straight forward statistics operation (probably not the best implementations
     /// you would dream of :) )
@@ -34,26 +35,36 @@ namespace DruidsCornerAPI.Tools
     public static class Statistics
     {
         /// <summary>
-        /// Computes the Geometric mean of an input array
+        /// Represents a data contract for further filters to implement.
+        /// For instance, using this function pointer alias in a method's signature will tell you
+        /// that you might be able to use Statistic filters on it (like the GeometricMean.)
+        /// It's the closest I found to mimic C function pointer without the burden of C#/C++ OOP with full object instantiation/constraints.
         /// </summary>
-        /// <param name="array"></param>
+        /// <param name="sample"></param>
+        /// <returns></returns>    
+        public delegate double Filter(IList<double> sample);
+
+        /// <summary>
+        /// Computes the Geometric mean of an input sample
+        /// </summary>
+        /// <param name="sample"></param>
         /// <returns></returns>
-        public static double GeometricMean(IList<double> array)
+        public static double GeometricMean(IList<double> sample)
         {
             // Don't process 
-            if(array.Count == 0)
+            if(sample.Count == 0)
             {
                 return 0;
             }
 
-            if (array.Count == 1)
+            if (sample.Count == 1)
             {
-                return array[0];
+                return sample[0];
             }
 
             uint effectiveCount = 0;
             double product = 1.0;
-            foreach(double elem in array)
+            foreach(double elem in sample)
             {
                 if(elem == 0)
                 {
@@ -70,6 +81,19 @@ namespace DruidsCornerAPI.Tools
             double result = Math.Pow(product, (1.0 / effectiveCount));
             return result;
         }
+
+        /// <summary>
+        /// Straight forward arithmetic mean of a sample
+        /// </summary>
+        /// <param name="sample"></param>
+        /// <returns></returns>
+        public static double ArithmeticMean(IList<double> sample)
+        {
+            double result = sample.Aggregate((item1, item2) => item1 + item2);
+            return result / sample.Count;
+
+        }
+
 
     }
 }

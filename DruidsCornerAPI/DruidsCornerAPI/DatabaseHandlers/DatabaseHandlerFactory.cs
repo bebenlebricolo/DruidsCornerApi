@@ -28,6 +28,9 @@ namespace DruidsCornerAPI.DatabaseHandlers
     {
         private static string DBModeEnvVarName = "DRUIDSCORNERAPI_DBMODE";
         
+        /// <summary>
+        /// Database configuration.
+        /// </summary>
         public static DeployedDatabaseConfig? _dbConfig = null;
 
         /// <summary>

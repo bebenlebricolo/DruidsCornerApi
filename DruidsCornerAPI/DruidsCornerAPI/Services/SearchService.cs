@@ -432,6 +432,36 @@ namespace DruidsCornerAPI.Services
             return candidates;
         }
 
+        /// <summary>
+        /// Filters out MashTemps value on a single recipe (Logical OR).
+        /// If any MashTemp of the targeted recipe match the requested criteria, the recipe will be accepted as a valid one for this filter.
+        /// </summary>
+        /// <param name="subject">Subject recipe on which we'll apply the query filter</param>
+        /// <param name="queries">Queries object which is passed along to carry the filter data</param>
+        /// <returns>Selected recipe (matching the search criterion) or null if subject is filtered out by the search query</returns>
+        public Recipe? FilterOutTwistsDiscrete(Recipe subject, Queries queries)
+        {
+            // No filter applied, return the recipe as there is not restrictions applied on it.
+            if(subject.MethodTimings.Twists == null 
+            || subject.MethodTimings.Twists.Count == 0
+            || queries.TwistList == null)
+            {
+                return subject;
+            }
+
+            Recipe? output = null;
+            GetProp<Recipe> propAccessor = (recipe) => {
+                return recipe.MethodTimings.Twists.Select((twist) => twist.Name).ToList();
+            };
+
+            var fuzzResult = FuzzySearch.SearchSingleSubject(queries.TwistList, subject, propAccessor);
+            if(fuzzResult.Ratio >= 35)
+            {
+                output = fuzzResult.Prop;
+            }
+
+            return output;
+        }
 
 
 
@@ -543,7 +573,8 @@ namespace DruidsCornerAPI.Services
                 candidate = FilterOutMashTempsDiscrete(candidate, queries);
                 if(candidate == null) continue;
                 
-                // TODO : add a filter for Twists !
+                candidate = FilterOutTwistsDiscrete(candidate, queries);
+                if(candidate == null) continue;
                 
                 candidate = FilterOutFermentationTempsDiscrete(candidate, queries);
 
