@@ -449,5 +449,41 @@ namespace DruidsCornerUnitTests.Services
             }
             Assert.That(candidates.Count, Is.EqualTo(4));
         }
+
+        [Test]
+        public async Task TestSearchComplexQuery()
+        {
+            Queries query = new Queries()
+            {
+                Ebc = new Range<float>(10.0f, 150.0f),
+                Abv = new Range<float>(7.0f, 8.0f),
+                Ibu = new Range<float>(10.0f, 50.0f),
+                YeastList = new List<string>(){
+                    "WYeast 1056"
+                },
+                MaltList = new List<string>(){
+                    "Chocolate", 
+                    "Crystal",
+                    "Dark"
+                }
+            };
+
+            var mockLogger = new Mock<ILogger<SearchService>>();
+            var mockDbHandlerLogger = new Mock<ILogger<LocalDatabaseHandler>>();
+            var searchService = new SearchService(_fakeConfig, mockLogger.Object);
+
+            var fullDbPath = TestHelpers.TestDatabaseFinder.FindFullDeployedDB();
+            if(fullDbPath == null || !fullDbPath.Exists)
+            {
+                Assert.Ignore("Could not find local database locally, aborting");
+            }
+
+            var customConfig = new DeployedDatabaseConfig();
+            Assert.That(customConfig.FromRootFolder(fullDbPath.FullName), Is.True);
+            var dbHandler = new LocalDatabaseHandler(customConfig, mockDbHandlerLogger.Object);
+            
+            var recipes = await searchService.SearchRecipeAsync(query, dbHandler);
+            Assert.That(recipes.Count, Is.EqualTo(1));
+        }
     }
 }
