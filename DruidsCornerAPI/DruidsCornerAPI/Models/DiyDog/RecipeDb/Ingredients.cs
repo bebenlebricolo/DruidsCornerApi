@@ -21,12 +21,12 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
         /// <summary>
         /// Optional list of extra boil / fermentation ingredient
         /// </summary>
-        public List<ExtraBoil>? ExtraBoils{ get; set; } = null;
+        public List<ExtraBoil>? ExtraBoil{ get; set; } = null;
         
         /// <summary>
         /// Optional list of extra mash ingredients
         /// </summary>
-        public List<ExtraMash>? ExtraMashes{ get; set; } = null;
+        public List<ExtraMash>? ExtraMash{ get; set; } = null;
 
 
         /// <summary>
@@ -63,8 +63,8 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
             bool identical = other is not null;
             identical &= Language.CompareEquivalentLists(Malts, other!.Malts);
             identical &= Language.CompareEquivalentLists(Hops, other!.Hops);
-            identical &= Language.CompareEquivalentLists(ExtraBoils, other!.ExtraBoils);
-            identical &= Language.CompareEquivalentLists(ExtraMashes, other!.ExtraMashes);
+            identical &= Language.CompareEquivalentLists(ExtraBoil, other!.ExtraBoil);
+            identical &= Language.CompareEquivalentLists(ExtraMash, other!.ExtraMash);
             identical &= Language.CompareEquivalentLists(Yeasts, other!.Yeasts);
             identical &= AlternativeDescription == other!.AlternativeDescription;
 
@@ -72,7 +72,7 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
         }
 
         /// <summary>
-        /// Customc equality operator
+        /// Custom equality operator
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
@@ -91,7 +91,7 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
         }
         
         /// <summary>
-        /// Customc inequality operator
+        /// Custom inequality operator
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
@@ -108,13 +108,13 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
         {
             var hash = Malts.GetHashCode() * 3;
             hash += Hops.GetHashCode() * 3;
-            if(ExtraBoils != null)
+            if(ExtraBoil != null)
             {
-                hash += ExtraBoils.GetHashCode() * 3;
+                hash += ExtraBoil.GetHashCode() * 3;
             }
-            if(ExtraMashes != null)
+            if(ExtraMash != null)
             {
-                hash += ExtraMashes.GetHashCode() * 3;
+                hash += ExtraMash.GetHashCode() * 3;
             }
             hash += Yeasts.GetHashCode() * 3;
             if(AlternativeDescription != null)

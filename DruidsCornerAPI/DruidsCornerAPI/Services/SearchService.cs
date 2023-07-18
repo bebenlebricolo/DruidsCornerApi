@@ -293,12 +293,12 @@ namespace DruidsCornerAPI.Services
             if(names != null)
             {
                 var extraMashCandidatesResults = FuzzySearchInRecipesMultipleQueries(candidates, names, c => {
-                    if(c.Ingredients.ExtraMashes == null)
+                    if(c.Ingredients.ExtraMash == null)
                     {
                         return new List<string>();
                     }
                     // Null values are handled locally in the algorithm
-                    return c.Ingredients.ExtraMashes.Select(x => x.Name).ToList();
+                    return c.Ingredients.ExtraMash.Select(x => x.Name).ToList();
                 });
                 candidates = KeepSimilar(candidates, extraMashCandidatesResults);
             }
@@ -318,12 +318,12 @@ namespace DruidsCornerAPI.Services
             if(names != null)
             {
                 var extraBoilCandidatesResults = FuzzySearchInRecipesMultipleQueries(candidates, names, c => {
-                    if(c.Ingredients.ExtraBoils == null)
+                    if(c.Ingredients.ExtraBoil == null)
                     {
                         return new List<string>();
                     }
                     // Null values are handled locally in the algorithm
-                    return c.Ingredients.ExtraBoils.Select(x => x.Name).ToList();
+                    return c.Ingredients.ExtraBoil.Select(x => x.Name).ToList();
                 });
                 candidates = KeepSimilar(candidates, extraBoilCandidatesResults);
             }
@@ -495,9 +495,9 @@ namespace DruidsCornerAPI.Services
         public Recipe? FilterOutExtraMashDiscrete(Recipe recipe, Queries queries)
         {
             List<string>? propList = null;
-            if(recipe.Ingredients.ExtraMashes != null)
+            if(recipe.Ingredients.ExtraMash != null)
             {
-                propList = recipe.Ingredients.ExtraMashes.Select((extra) => extra.Name).ToList();
+                propList = recipe.Ingredients.ExtraMash.Select((extra) => extra.Name).ToList();
             }
             return FilterOutPropDiscrete(recipe, propList, queries.ExtraMashList);
         }
@@ -512,9 +512,9 @@ namespace DruidsCornerAPI.Services
         public Recipe? FilterOutExtraBoilDiscrete(Recipe recipe, Queries queries)
         {
             List<string>? propList = null;
-            if(recipe.Ingredients.ExtraBoils != null)
+            if(recipe.Ingredients.ExtraBoil != null)
             {
-                propList = recipe.Ingredients.ExtraBoils.Select((extra) => extra.Name).ToList();
+                propList = recipe.Ingredients.ExtraBoil.Select((extra) => extra.Name).ToList();
             }
             return FilterOutPropDiscrete(recipe, propList, queries.ExtraBoilList);
         }

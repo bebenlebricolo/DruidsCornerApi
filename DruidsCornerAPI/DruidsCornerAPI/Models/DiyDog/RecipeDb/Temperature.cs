@@ -47,7 +47,7 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
         }
 
         /// <summary>
-        /// Customc equality operator
+        /// Custom equality operator
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
@@ -66,7 +66,7 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
         }
         
         /// <summary>
-        /// Customc inequality operator
+        /// Custom inequality operator
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>

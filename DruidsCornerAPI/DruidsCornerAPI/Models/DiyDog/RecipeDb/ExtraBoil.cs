@@ -22,7 +22,7 @@
         public string When { get; set; } = "";
 
         /// <summary>
-        /// Attribute of this ingredient. Usually encodes the kind of profile this ingredient probides, such as "Bittering, Flavour, Aroma, etc."
+        /// Attribute of this ingredient. Usually encodes the kind of profile this ingredient provides, such as "Bittering, Flavour, Aroma, etc."
         /// </summary>
         public string Attribute { get; set; } = "";
     }

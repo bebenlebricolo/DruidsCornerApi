@@ -1,6 +1,7 @@
 using DruidsCornerAPI.Models;
 using DruidsCornerAPI.Models.DiyDog.RecipeDb;
 using DruidsCornerAPI.Tools;
+using Google.Apis.CloudIdentity.v1.Data;
 using System.Text.Json;
 
 namespace DruidsCornerUnitTests.Models.Databases
@@ -60,6 +61,14 @@ namespace DruidsCornerUnitTests.Models.Databases
                     Yeasts = new List<Yeast>
                     { 
                         new Yeast {Name = "Wyeast American Ale 1056", ManufacturerLink = "https://wyeastlab.com/product/american-ale/"}
+                    },
+                    ExtraBoil = new List<ExtraBoil>(){
+                        new ExtraBoil(){Name = "Test extra 1"},
+                        new ExtraBoil(){Name = "Test extra 2"}
+                    },
+                    ExtraMash = new List<ExtraMash>(){
+                        new ExtraMash(){Name = "Test extra mash 1"},
+                        new ExtraMash(){Name = "Test extra mash 2"}
                     }
                 },
                 Name = "Fake name",
