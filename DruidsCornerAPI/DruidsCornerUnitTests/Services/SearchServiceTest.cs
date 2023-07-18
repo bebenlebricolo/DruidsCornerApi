@@ -17,8 +17,7 @@ namespace DruidsCornerUnitTests.Services
         private IConfiguration _fakeConfig;
         private LocalDatabaseHandler _localDbHandler;
 
-        [SetUp]
-        public void Setup()
+        public SearchServiceTest()
         {
             _localTestDbFolder = TestHelpers.TestDatabaseFinder.FindTestDatabase();
             _fakeConfig = TestHelpers.ConfiHelper.GenerateEmptyFakeConfig();
@@ -28,6 +27,11 @@ namespace DruidsCornerUnitTests.Services
             var deployedConfig = new DeployedDatabaseConfig();
             deployedConfig.FromRootFolder(_localTestDbFolder!.FullName);
             _localDbHandler = new LocalDatabaseHandler(deployedConfig, mockDbLogger.Object);
+        }
+
+        [SetUp]
+        public void Setup()
+        {
         }
 
 
@@ -75,7 +79,8 @@ namespace DruidsCornerUnitTests.Services
 
             var reversedMappingDb = await _localDbHandler.GetIndexedHopDbAsync();
             var candidates = await _localDbHandler.GetAllRecipesAsync();
-            var recipes = searchService.GetMatchingRecipeByHops(candidates, reversedMappingDb, queryList);
+            Assert.That(candidates, Is.Not.Null);
+            var recipes = searchService.GetMatchingRecipeByHops(candidates!, reversedMappingDb, queryList);
             Assert.That(recipes.Count, Is.EqualTo(3));
         }
 
@@ -92,7 +97,9 @@ namespace DruidsCornerUnitTests.Services
 
             var reversedMappingDb = await _localDbHandler.GetIndexedMaltDbAsync();
             var candidates = await _localDbHandler.GetAllRecipesAsync();
-            var recipes = searchService.GetMatchingRecipeByMalts(candidates, reversedMappingDb, queryList);
+            Assert.That(candidates, Is.Not.Null);
+
+            var recipes = searchService.GetMatchingRecipeByMalts(candidates!, reversedMappingDb, queryList);
             Assert.That(recipes.Count, Is.EqualTo(5));
         }
 
@@ -109,7 +116,9 @@ namespace DruidsCornerUnitTests.Services
 
             var reversedMappingDb = await _localDbHandler.GetIndexedYeastDbAsync();
             var candidates = await _localDbHandler.GetAllRecipesAsync();
-            var recipes = searchService.GetMatchingRecipeByYeasts(candidates, reversedMappingDb, queryList);
+            Assert.That(candidates, Is.Not.Null);
+
+            var recipes = searchService.GetMatchingRecipeByYeasts(candidates!, reversedMappingDb, queryList);
             Assert.That(recipes.Count, Is.EqualTo(1));
         }
     }

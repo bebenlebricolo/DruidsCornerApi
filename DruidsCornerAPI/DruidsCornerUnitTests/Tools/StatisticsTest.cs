@@ -1,6 +1,9 @@
 using DruidsCornerAPI.Tools;
 using NUnit.Framework.Internal;
 
+// Don't care about their constraint model
+#pragma warning disable NUnit2005
+
 namespace DruidsCornerUnitTests.Tools
 {
 
@@ -20,7 +23,8 @@ namespace DruidsCornerUnitTests.Tools
            };
 
            var result = Statistics.GeometricMean(data);
-           Assert.AreEqual(result, 17.35, 0.1);
+           
+           Assert.AreEqual(17.35, result , 0.1);
         }
 
         [Test]
@@ -30,7 +34,7 @@ namespace DruidsCornerUnitTests.Tools
            };
 
            var result = Statistics.GeometricMean(data);
-           Assert.AreEqual(result, 0.0, 0.01);
+           Assert.AreEqual(0.0, result, 0.01);
         }
 
         [Test]
@@ -44,7 +48,7 @@ namespace DruidsCornerUnitTests.Tools
             // but as zeros in a product erases all other values, it's far too selective for our needs (if any string has a 0 matching score,
             // it takes everything down even though the other values might have been very close to 100!) 
            var result = Statistics.GeometricMean(data);
-           Assert.AreEqual(result, 9.05, 0.01);
+           Assert.AreEqual(9.05, result, 0.01);
         }
     }
 }
