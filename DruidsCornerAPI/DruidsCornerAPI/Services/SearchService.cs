@@ -8,6 +8,9 @@ using DruidsCornerAPI.Models.DiyDog.References;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Identity.Client;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using System.Runtime.CompilerServices;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using DruidsCornerAPI.Controllers;
 
 namespace DruidsCornerAPI.Services
 {
@@ -433,40 +436,87 @@ namespace DruidsCornerAPI.Services
         }
 
         /// <summary>
-        /// Filters out MashTemps value on a single recipe (Logical OR).
-        /// If any MashTemp of the targeted recipe match the requested criteria, the recipe will be accepted as a valid one for this filter.
+        /// Filters out discrete properties from a single recipe
         /// </summary>
-        /// <param name="subject">Subject recipe on which we'll apply the query filter</param>
+        /// <param name="recipe">Subject recipe on which we'll apply the query filter</param>
+        /// <param name="subjectPropList">Recipe targeted properties listed as string</param>
         /// <param name="queries">Queries object which is passed along to carry the filter data</param>
         /// <returns>Selected recipe (matching the search criterion) or null if subject is filtered out by the search query</returns>
-        public Recipe? FilterOutTwistsDiscrete(Recipe subject, Queries queries)
+        public Recipe? FilterOutPropDiscrete(Recipe recipe, List<string>? subjectPropList, List<string>? queries)
         {
             // No filter applied, return the recipe as there is not restrictions applied on it.
-            if(queries.TwistList == null)
+            if(queries == null)
             {
-                return subject;
+                return recipe;
             }
 
             // Reject recipes that don't have any twists.
             // If query is specified with some twists, it means we need to rule out 
             // All recipes that don't have any.
-            if(subject.MethodTimings.Twists == null || subject.MethodTimings.Twists.Count == 0 )
+            if(subjectPropList == null || subjectPropList.Count == 0 )
             {
                 return null;
             }
 
             Recipe? output = null;
-            GetProp<Recipe> propAccessor = (recipe) => {
-                return recipe.MethodTimings.Twists.Select((twist) => twist.Name).ToList();
-            };
-
-            var fuzzResult = FuzzySearch.SearchSingleSubject(queries.TwistList, subject, propAccessor);
+            var fuzzResult = FuzzySearch.SearchSingleSubject(queries, recipe, subjectPropList);
             if(fuzzResult.Ratio >= 35)
             {
                 output = fuzzResult.Prop;
             }
 
             return output;
+        }
+
+        /// <summary>
+        /// Filters out Twist values on a single recipe (Logical OR).
+        /// If any Twist of the targeted recipe match the requested criteria, the recipe will be accepted as a valid one for this filter.
+        /// </summary>
+        /// <param name="recipe">recipe recipe on which we'll apply the query filter</param>
+        /// <param name="queries">Queries object which is passed along to carry the filter data</param>
+        /// <returns>Selected recipe (matching the search criterion) or null if recipe is filtered out by the search query</returns>
+        public Recipe? FilterOutTwistsDiscrete(Recipe recipe, Queries queries)
+        {
+            List<string>? propList = null;
+            if(recipe.MethodTimings.Twists != null)
+            {
+                propList = recipe.MethodTimings.Twists.Select((twist) => twist.Name).ToList();
+            }
+            return FilterOutPropDiscrete(recipe, propList, queries.TwistList);
+        }
+
+        /// <summary>
+        /// Filters out MashTemps value on a single recipe (Logical OR).
+        /// If any MashTemp of the targeted recipe match the requested criteria, the recipe will be accepted as a valid one for this filter.
+        /// </summary>
+        /// <param name="recipe">Subject recipe on which we'll apply the query filter</param>
+        /// <param name="queries">Queries object which is passed along to carry the filter data</param>
+        /// <returns>Selected recipe (matching the search criterion) or null if subject is filtered out by the search query</returns>
+        public Recipe? FilterOutExtraMashDiscrete(Recipe recipe, Queries queries)
+        {
+            List<string>? propList = null;
+            if(recipe.Ingredients.ExtraMashes != null)
+            {
+                propList = recipe.Ingredients.ExtraMashes.Select((extra) => extra.Name).ToList();
+            }
+            return FilterOutPropDiscrete(recipe, propList, queries.ExtraMashList);
+        }
+
+        /// <summary>
+        /// Filters out MashTemps value on a single recipe (Logical OR).
+        /// If any MashTemp of the targeted recipe match the requested criteria, the recipe will be accepted as a valid one for this filter.
+        /// </summary>
+        /// <param name="recipe">Subject recipe on which we'll apply the query filter</param>
+        /// <param name="queries">Queries object which is passed along to carry the filter data</param>
+        /// <returns>Selected recipe (matching the search criterion) or null if subject is filtered out by the search query</returns>
+        public Recipe? FilterOutExtraBoilDiscrete(Recipe recipe, Queries queries)
+        {
+            List<string>? propList = null;
+            if(recipe.Ingredients.ExtraBoils != null)
+            {
+                propList = recipe.Ingredients.ExtraBoils.Select((extra) => extra.Name).ToList();
+            }
+            return FilterOutPropDiscrete(recipe, propList, queries.ExtraBoilList);
         }
 
 
@@ -580,6 +630,12 @@ namespace DruidsCornerAPI.Services
                 if(candidate == null) continue;
                 
                 candidate = FilterOutTwistsDiscrete(candidate, queries);
+                if(candidate == null) continue;
+
+                candidate = FilterOutExtraBoilDiscrete(candidate, queries);
+                if(candidate == null) continue;
+
+                candidate = FilterOutExtraMashDiscrete(candidate, queries);
                 if(candidate == null) continue;
                 
                 candidate = FilterOutFermentationTempsDiscrete(candidate, queries);

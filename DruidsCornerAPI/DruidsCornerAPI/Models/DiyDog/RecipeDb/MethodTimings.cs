@@ -25,7 +25,7 @@ namespace DruidsCornerAPI.Models.DiyDog.RecipeDb
         /// <summary>
         /// Recipe twists (custom ingredients)
         /// </summary>
-        public List<Twist> Twists { get; set; } = new List<Twist>();
+        public List<Twist>? Twists { get; set; } = new List<Twist>();
 
         /// <summary>
         /// Custom comparison operators

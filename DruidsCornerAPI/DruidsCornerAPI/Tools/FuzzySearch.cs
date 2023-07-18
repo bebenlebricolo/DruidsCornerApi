@@ -189,19 +189,18 @@ namespace DruidsCornerAPI.Tools
         /// </summary>
         /// <param name="properties">List of queries properties (logical OR)</param>
         /// <param name="subject">Input subject that'll be tested against</param>
-        /// <param name="propAccessor">Delegate method that accesses the inner field of the Subject object</param>
+        /// <param name="subjectProperties">List of properties belonging to the input subject</param>
         /// <param name="fuzzMode">Optional fuzzy search mode selector</param>
         /// <param name="filter">Statistic filter which runs on result data distributions. Defaults to GeometricMean</param>
         /// <returns>FuzzySearchResult for this element</returns>
         public static FuzzySearchResult<T> SearchSingleSubject<T>(List<string> properties,
                                                                   T subject,
-                                                                  GetProp<T> propAccessor,
+                                                                  List<string>? subjectProperties,
                                                                   FuzzMode fuzzMode = FuzzMode.PartialRatio,
                                                                   Statistics.Filter? filter = null) where T : class 
         {
             // Stores multiple ratios
-            List<string>? objectProps = propAccessor.Invoke(subject);
-            if(objectProps == null)
+            if(subjectProperties == null)
             {
                 return new FuzzySearchResult<T>(0, subject);
             }
@@ -219,12 +218,33 @@ namespace DruidsCornerAPI.Tools
             int globalRatio  = 0;
             foreach(var property in properties)
             {
-                var singlePropRatio = ComputeGlobalRatioSingleProp(property, objectProps, fuzzMode, filter);
+                var singlePropRatio = ComputeGlobalRatioSingleProp(property, subjectProperties, fuzzMode, filter);
                 allRatios.Add(singlePropRatio);
             }
 
             globalRatio = Convert.ToInt32(filter.Invoke(allRatios));
             return new FuzzySearchResult<T>(globalRatio, subject);
+        }
+
+        /// <summary>
+        /// Handles fuzzy search on a single subject, and uses the potential list of properties with GeometricMean in order to discriminate elements
+        /// Uses a list of properties that'll be used as a search criterion (using a logical OR combination)
+        /// </summary>
+        /// <param name="properties">List of queries properties (logical OR)</param>
+        /// <param name="subject">Input subject that'll be tested against</param>
+        /// <param name="propAccessor">Delegate method that accesses the inner field of the Subject object</param>
+        /// <param name="fuzzMode">Optional fuzzy search mode selector</param>
+        /// <param name="filter">Statistic filter which runs on result data distributions. Defaults to GeometricMean</param>
+        /// <returns>FuzzySearchResult for this element</returns>
+        public static FuzzySearchResult<T> SearchSingleSubject<T>(List<string> properties,
+                                                                  T subject,
+                                                                  GetProp<T> propAccessor,
+                                                                  FuzzMode fuzzMode = FuzzMode.PartialRatio,
+                                                                  Statistics.Filter? filter = null) where T : class 
+        {
+            // Stores multiple ratios
+            List<string>? objectProps = propAccessor.Invoke(subject);
+            return SearchSingleSubject(properties, subject, objectProps, fuzzMode, filter);
         }
 
         /// <summary>
