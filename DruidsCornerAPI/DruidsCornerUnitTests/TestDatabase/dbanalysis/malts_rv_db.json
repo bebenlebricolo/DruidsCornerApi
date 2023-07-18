@@ -1,0 +1,158 @@
+{
+    "malts": [
+        {
+            "name": "Acidulated Malt",
+            "foundInBeers": [
+                111,
+                114,
+                121
+            ]
+        },
+        {
+            "name": "Amber Malt",
+            "foundInBeers": [
+                15,
+                22,
+                24,
+                25
+            ]
+        },
+        {
+            "name": "Beech Smoked Malt",
+            "foundInBeers": [
+                49,
+                51,
+                101
+            ]
+        },
+        {
+            "name": "Black Malt",
+            "foundInBeers": [
+                47,
+                65,
+                101
+            ]
+        },
+        {
+            "name": "Extra Pale",
+            "foundInBeers": [
+                1,
+                2,
+                3,
+                6,
+                7,
+                11,
+                12,
+                15,
+                16
+            ]
+        },
+        {
+            "name": "Extra Pale - Maris Otter",
+            "foundInBeers": [
+                4,
+                5,
+                9
+            ]
+        },
+        {
+            "name": "CaraMalt",
+            "foundInBeers": [
+                2,
+                3,
+                4,
+                5,
+                6
+            ]
+        },
+        {
+            "name": "CaraMunich I",
+            "foundInBeers": [
+                17,
+                177
+            ]
+        },
+        {
+            "name": "CaraPils",
+            "foundInBeers": [
+                277,
+                299
+            ]
+        },
+        {
+            "name": "CaraRed",
+            "foundInBeers": [
+                169
+            ]
+        },
+        {
+            "name": "Carafa Special I",
+            "foundInBeers": [
+                6,
+                7,
+                35
+            ]
+        },
+        {
+            "name": "Carafa Special II",
+            "foundInBeers": [
+                75,
+                103
+            ]
+        },
+        {
+            "name": "Carafa Special III",
+            "foundInBeers": [
+                4,
+                6,
+                7
+            ]
+        },
+        {
+            "name": "Chocolate Malt",
+            "foundInBeers": [
+                4,
+                21,
+                25,
+                27,
+                28
+            ]
+        },
+        {
+            "name": "Crystal",
+            "foundInBeers": [
+                11,
+                24,
+                42
+            ]
+        },
+        {
+            "name": "Crystal 120",
+            "foundInBeers": [
+                3,
+                25,
+                40
+            ]
+        },
+        {
+            "name": "Crystal 150",
+            "foundInBeers": [
+                3,
+                19,
+                20,
+                25,
+                26,
+                32,
+                35
+            ]
+        },
+        {
+            "name": "Crystal 60",
+            "foundInBeers": [
+                25,
+                413,
+                414
+            ]
+        }
+    ]
+}

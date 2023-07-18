@@ -1,0 +1,38 @@
+{
+    "yeasts": [
+        {
+            "name": "Lalvin - EC-1118",
+            "foundInBeers": [
+                50
+            ]
+        },
+        {
+            "name": "SafAle - WB-06",
+            "foundInBeers": [
+                326
+            ]
+        },
+        {
+            "name": "Safale - BE-134",
+            "foundInBeers": [
+                368
+            ]
+        },
+        {
+            "name": "Safale - US-05",
+            "foundInBeers": [
+                15,
+                24
+            ]
+        },
+        {
+            "name": "Saflager - S-189",
+            "foundInBeers": [
+                5,
+                13,
+                17,
+                42
+            ]
+        }
+    ]
+}

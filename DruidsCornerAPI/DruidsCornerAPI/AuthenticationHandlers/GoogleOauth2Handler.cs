@@ -5,20 +5,33 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using System.Text.Json;
 
 namespace DruidsCornerAPI.AuthenticationHandlers
 {
+    /// <summary>
+    /// Basic options
+    /// </summary>
     public class BasicAuthenticationOptions : AuthenticationSchemeOptions
     {
-
+        // Nothing to do here
     }
 
-    // see custom authenticators : https://dotnetcorecentral.com/blog/authentication-handler-in-asp-net-core/
+    /// <summary>
+    /// Custom Google authenticator
+    /// </summary>
+    /// <see aref="https://dotnetcorecentral.com/blog/authentication-handler-in-asp-net-core/"/> 
     public class GoogleOauth2AuthenticationHandler : AuthenticationHandler<BasicAuthenticationOptions>
     {
         private ILogger<GoogleOauth2AuthenticationHandler> _logger;
 
+        /// <summary>
+        /// Standard constructor
+        /// </summary>
+        /// <param name="options"></param>
+        /// <param name="loggerFactory"></param>
+        /// <param name="encoder"></param>
+        /// <param name="clock"></param>
+        /// <param name="logger"></param>
         public GoogleOauth2AuthenticationHandler(IOptionsMonitor<BasicAuthenticationOptions> options,
                                                  ILoggerFactory loggerFactory,
                                                  UrlEncoder encoder,
@@ -28,6 +41,10 @@ namespace DruidsCornerAPI.AuthenticationHandlers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Provides authentication to Google's services
+        /// </summary>
+        /// <returns></returns>
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             // Authorization Header is absent, this should not pass !
@@ -63,12 +80,10 @@ namespace DruidsCornerAPI.AuthenticationHandlers
 
             try
             {
-                //var responseContent = await response.Content.ReadAsStringAsync<OAuthAccessToken>();
-                //var accessToken = JsonSerializer.Deserialize<OAuthAccessToken>(responseContent);
                 var accessToken = await response.Content.ReadFromJsonAsync<OAuthAccessToken>();
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Email, accessToken.email)
+                    new Claim(ClaimTypes.Email, accessToken!.email)
                 };
                 var identity = new ClaimsIdentity(claims, Scheme.Name);
                 var principal = new System.Security.Principal.GenericPrincipal(identity, null);

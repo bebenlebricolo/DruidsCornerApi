@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Primitives;
-using System.IO;
+﻿using System.Runtime.CompilerServices;
 
 namespace DruidsCornerAPI.Models.Config
 {
@@ -46,7 +45,63 @@ namespace DruidsCornerAPI.Models.Config
         /// Encodes the name of reversed indexed databases
         /// </summary>
         public string IndexedDbFolderName { get; set; } = "dbanalysis";
+        
+        /// <summary>
+        /// Encodes the name of the references file databases
+        /// </summary>
+        public string ReferencesFolderName { get; set; } = "references";
 
+        /// <summary>
+        /// Flags that states whether this configuration object was successfully configured previously or not7
+        /// It is used to prevent multiple re-initialization when it's already initialized/configured appropriately
+        /// Moreover, it allows to skip reading from file system when it's content is already stored in RAM.
+        /// This flag is set by the <see cref="FromConfig"/> methods family.
+        /// </summary>
+        public bool Configured {get; private set;} = false;
+        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public bool IsValid()
+        {
+            var success = true;
+            // Path.Exists() already takes care about potentially null-values as well.
+            success &= Path.Exists(RootFolderPath);
+            
+            success &= GetRootFolder().Exists;
+            success &= GetImagesFolder().Exists;
+            success &= GetRecipesFolder().Exists;
+            success &= GetPdfPagesFolder().Exists;
+            success &= GetIndexedDbFolder().Exists;
+            success &= GetReferencesFolder().Exists;
+
+            return success;
+        }
+
+        /// <summary>
+        /// Used as a standalone way of retrieving a deployed database config from local directory structure.
+        /// Essentially used in tests
+        /// </summary>
+        /// <param name="rootFolderPath"></param>
+        /// <returns></returns>
+        public bool FromRootFolder(string rootFolderPath)
+        {
+            if(!Path.Exists(RootFolderPath))
+            {
+                return false;
+            }
+
+            RootFolderPath = rootFolderPath;
+            var success = IsValid();
+            if(success)
+            {
+                // Set the flag to allow upper layer code to skip re-initialization steps
+                Configured = true;
+            }
+            return success;
+        }
 
         /// <summary>
         /// Tries to read members from the "DeployedDatabaseConfig" section
@@ -61,12 +116,14 @@ namespace DruidsCornerAPI.Models.Config
             var imagesFolderName = section.GetValue<string>(nameof(ImagesFolderName));
             var recipesFolderName = section.GetValue<string>(nameof(RecipesFolderName));
             var indexedDbFolderName = section.GetValue<string>(nameof(IndexedDbFolderName));
+            var referencesFolderName = section.GetValue<string>(nameof(ReferencesFolderName));
 
             RootFolderPath = rootFolderName ?? RootFolderPath;
             PdfPagesFolderName = pdfPagesFolderName ?? PdfPagesFolderName;
             ImagesFolderName = imagesFolderName ?? ImagesFolderName;
             RecipesFolderName = recipesFolderName ?? RecipesFolderName;
             IndexedDbFolderName = indexedDbFolderName ?? IndexedDbFolderName;
+            ReferencesFolderName = referencesFolderName ?? ReferencesFolderName;
 
             // String substitution with env variable value
             string? deployedEnvVarValue = Environment.GetEnvironmentVariable(DeployedDBEnvVarName);
@@ -76,16 +133,13 @@ namespace DruidsCornerAPI.Models.Config
                 RootFolderPath = RootFolderPath.Replace(envVarPattern, deployedEnvVarValue);
             }
 
-            // Path.Exists() already takes care about potentially null-values as well.
-            success &= Path.Exists(RootFolderPath);
-            
-            success &= GetRootFolder().Exists;
-            success &= GetImagesFolder().Exists;
-            success &= GetRecipesFolder().Exists;
-            success &= GetPdfPagesFolder().Exists;
-            success &= GetIndexedDbFolder().Exists;
-
-            return success;
+            success = IsValid();   
+            if(success)
+            {
+                // Set the flag to allow upper layer code to skip re-initialization steps
+                Configured = true;
+            }
+            return success;         
         }
 
         /// <summary>
@@ -103,30 +157,58 @@ namespace DruidsCornerAPI.Models.Config
             return FromConfigSection(section);
         }
 
+        /// <summary>
+        /// Fetches the root folder of the local file database
+        /// </summary>
         public DirectoryInfo GetRootFolder()
         {
             return new DirectoryInfo(RootFolderPath);
         }
         
         
+        /// <summary>
+        /// Retrieves the Recipes folder for the locally deployed database
+        /// </summary>
+        /// <returns>DirectoryInfo for the requested path</returns>
         public DirectoryInfo GetRecipesFolder()
         {
             return new DirectoryInfo(Path.Combine(RootFolderPath, RecipesFolderName));
         }
 
+        /// <summary>
+        /// Fetches the image folder for the locally deployed database
+        /// </summary>
+        /// <returns>DirectoryInfo for the requested path</returns>
         public DirectoryInfo GetImagesFolder()
         {
             return new DirectoryInfo(Path.Combine(RootFolderPath, ImagesFolderName));
         }
 
+        /// <summary>
+        /// Retrieves the PDF pages folder for the local deployed database.
+        /// </summary>
+        /// <returns>DirectoryInfo for the requested path</returns>
         public DirectoryInfo GetPdfPagesFolder()
         {
             return new DirectoryInfo(Path.Combine(RootFolderPath, PdfPagesFolderName));
         }
 
+        /// <summary>
+        /// Retrieves the indexed database folder for the locally deployed database
+        /// </summary>
+        /// <returns></returns>
         public DirectoryInfo GetIndexedDbFolder()
         {
             return new DirectoryInfo(Path.Combine(RootFolderPath, IndexedDbFolderName));
+        }
+
+        /// <summary>
+        /// Retrieves the indexed database folder for the locally deployed database
+        /// </summary>
+        /// <returns></returns>
+        public DirectoryInfo GetReferencesFolder()
+        {
+            return new DirectoryInfo(Path.Combine(RootFolderPath, ReferencesFolderName));
         }
     }
 }

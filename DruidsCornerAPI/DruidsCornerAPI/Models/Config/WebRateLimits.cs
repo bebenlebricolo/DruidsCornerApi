@@ -1,8 +1,14 @@
 ﻿
 namespace DruidsCornerAPI.Models.Config
 {
+    /// <summary>
+    /// Stores Web rate limits (used to configure Rest Api rate limits)
+    /// </summary>
     public record WebRateLimits
     {
+        /// <summary>
+        /// Section name, used to retrieve the Json object from a local configuration file (usually an appsettings.json file)
+        /// </summary>
         public static readonly string SectionName = nameof(WebRateLimits);
 
         /// <summary>
@@ -15,7 +21,14 @@ namespace DruidsCornerAPI.Models.Config
         /// </summary>
         public int WindowSeconds { get; set; } = 12;
 
+        /// <summary>
+        /// How many segments per window are allowed for this rate
+        /// </summary>
         public int SegmentsPerWindow {get; set;} = 6;
+        
+        /// <summary>
+        /// How many requests can be queued
+        /// </summary>
         public int QueueLimit {get; set;} = 3;
 
         /// <summary>

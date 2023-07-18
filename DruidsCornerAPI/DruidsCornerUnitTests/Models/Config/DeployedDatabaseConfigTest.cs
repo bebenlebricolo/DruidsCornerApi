@@ -2,7 +2,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using DruidsCornerAPI.Models.Config;
 
-namespace DruidsCornerUnitTests.Models.Google
+namespace DruidsCornerUnitTests.Models.Config
 {
     public class DeployedDatabaseConfigTest
     {
@@ -29,12 +29,12 @@ namespace DruidsCornerUnitTests.Models.Google
             var configuration = builder.Build();
 
             var deployedDatabaseConfig = new DeployedDatabaseConfig();
-            Assert.IsFalse(deployedDatabaseConfig.FromConfig(configuration));
-            Assert.AreEqual(deployedDatabaseConfig.RootFolderPath, "Value1");
-            Assert.AreEqual(deployedDatabaseConfig.ImagesFolderName, "Value2");
-            Assert.AreEqual(deployedDatabaseConfig.PdfPagesFolderName, "Value3");
-            Assert.AreEqual(deployedDatabaseConfig.RecipesFolderName, "Value4");
-            Assert.AreEqual(deployedDatabaseConfig.IndexedDbFolderName, "Value5");
+            Assert.That(!deployedDatabaseConfig.FromConfig(configuration));
+            Assert.That(deployedDatabaseConfig.RootFolderPath, Is.EqualTo("Value1"));
+            Assert.That(deployedDatabaseConfig.ImagesFolderName, Is.EqualTo("Value2"));
+            Assert.That(deployedDatabaseConfig.PdfPagesFolderName, Is.EqualTo("Value3"));
+            Assert.That(deployedDatabaseConfig.RecipesFolderName, Is.EqualTo("Value4"));
+            Assert.That(deployedDatabaseConfig.IndexedDbFolderName, Is.EqualTo("Value5"));
         }
     }
 }

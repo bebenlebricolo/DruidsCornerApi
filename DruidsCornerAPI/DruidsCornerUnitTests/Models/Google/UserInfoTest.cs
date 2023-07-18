@@ -31,7 +31,7 @@ namespace DruidsCornerUnitTests.Models.Google
             var serialized = JsonSerializer.Serialize(userInfo);
             var deserialized = JsonSerializer.Deserialize<UserInfo>(serialized);   
 
-            Assert.AreEqual(userInfo, deserialized);
+            Assert.That(userInfo, Is.EqualTo(deserialized));
         }
     }
 }

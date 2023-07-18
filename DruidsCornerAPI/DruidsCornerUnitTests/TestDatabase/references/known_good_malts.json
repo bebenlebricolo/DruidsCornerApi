@@ -1,0 +1,22 @@
+{
+    "malts": [
+        {
+            "name" : "Acidulated Malt",
+            "aliases" : [
+                "Acidulated"
+            ],
+            "manufacturer":"Weyermann",
+            "url":"https://www.weyermann.de/en-gb/product/weyermann-acidulated-malt-3/"
+        },
+        {
+            "name" : "Amber Malt",
+            "manufacturer":"Simpsons",
+            "url":"https://www.simpsonsmalt.co.uk/our-malts/amber-malt/"
+        },
+        {
+            "name" : "Black Malt",
+            "manufacturer":"Simpsons",
+            "url" : "https://www.simpsonsmalt.co.uk/our-malts/black-malt/"
+        }
+    ]
+}

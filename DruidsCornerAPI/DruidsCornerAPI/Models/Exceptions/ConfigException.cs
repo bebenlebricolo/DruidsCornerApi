@@ -1,5 +1,8 @@
 ﻿namespace DruidsCornerAPI.Models.Exceptions
 {
+    /// <summary>
+    /// Custom configuration exception. Used to state that configuration is messed up.
+    /// </summary>
     public class ConfigException : Exception
     {
         /// <summary>

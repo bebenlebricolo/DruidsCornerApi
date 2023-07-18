@@ -1,9 +1,12 @@
-﻿using DruidsCornerAPI.Models.Config;
-using DruidsCornerAPI.Models.DiyDog;
+﻿using System.Text.Json;
+
 using DruidsCornerAPI.Tools;
-using Microsoft.Extensions.Azure;
-using System.Text.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using DruidsCornerAPI.Models.Config;
+using DruidsCornerAPI.Models.Search;
+using DruidsCornerAPI.Models.DiyDog.RecipeDb;
+using DruidsCornerAPI.Models.DiyDog.References;
+using DruidsCornerAPI.Models.DiyDog.IndexedDb;
+
 
 namespace DruidsCornerAPI.DatabaseHandlers
 {
@@ -13,6 +16,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
     public class LocalDatabaseHandler : IDatabaseHandler
     {
         private DeployedDatabaseConfig _dbConfig;
+        private ILogger<LocalDatabaseHandler> _logger;
 
         private List<Recipe> _cachedRecipes;
         private JsonSerializerOptions _jsonOptions;
@@ -20,10 +24,12 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// <summary>
         /// Constructs a LocalDatabaseHandler using a given DeployedDatabaseConfig as an input (points to folders)
         /// </summary>
-        /// <param name="config"></param>
-        public LocalDatabaseHandler(DeployedDatabaseConfig config)
+        /// <param name="config">Deployed database configuration (used to read from disk)</param>
+        /// <param name="logger">System's logger</param>
+        public LocalDatabaseHandler(DeployedDatabaseConfig config, ILogger<LocalDatabaseHandler> logger)
         {
             _dbConfig = config;
+            _logger = logger;
             _cachedRecipes = new List<Recipe>();
             _jsonOptions = JsonOptionsProvider.GetModelsJsonOptions();
         }
@@ -52,13 +58,14 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// </summary>
         /// <param name="files">List of filesources to be read</param>
         /// <returns></returns>
-        protected async Task<List<Recipe>> ParseFromIndividualRecipesFilesAsync(FileInfo[] files)
+        protected async Task<List<Recipe>?> ParseFromIndividualRecipesFilesAsync(FileInfo[] files)
         {
             var allRecipesList = new List<Recipe>();
             foreach (var recipeFile in files)
             {
                 var file = recipeFile.OpenRead();
                 var parsedRecipe = await JsonSerializer.DeserializeAsync<Recipe>(file, _jsonOptions);
+                file.Close();
 
                 if (parsedRecipe != null)
                 {
@@ -74,7 +81,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// </summary>
         /// <param name="noCaching">Disables automatic caching to save memory, but slows down data accesses</param>
         /// <returns></returns>
-        public async Task<List<Recipe>> GetAllRecipesAsync(bool noCaching = false)
+        public async Task<List<Recipe>?> GetAllRecipesAsync(bool noCaching = false)
         {
             // Speeding up subsequent calls
             if(_cachedRecipes!= null && _cachedRecipes.Count != 0 && noCaching == false)
@@ -82,7 +89,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
                 return _cachedRecipes;
             }
 
-            var allRecipesList = new List<Recipe>();
+            List<Recipe>? allRecipesList = new List<Recipe>();
 
             var availableRecipes = _dbConfig.GetRecipesFolder().GetFiles("*.json");
             var allRecipesMonoFile = availableRecipes.First<FileInfo>(f => f.Name == "all_recipes.json");
@@ -106,6 +113,11 @@ namespace DruidsCornerAPI.DatabaseHandlers
             if(allRecipesList.Count == 0)
             {
                 allRecipesList = await ParseFromIndividualRecipesFilesAsync(availableRecipes);
+            }
+
+            if(allRecipesList == null)
+            {
+                return null;
             }
 
             // Don't use cache, this will force subsequent calls to perform Disk Access
@@ -176,9 +188,14 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// <param name="name"></param>
         /// <param name="recipeList"></param>
         /// <returns></returns>
-        protected Recipe? FindByName(string name, List<Recipe> recipeList)
+        protected RecipeResult? FindByName(string name, List<Recipe> recipeList)
         {
-            return recipeList.First(r => r.Name.ToLower() == name.ToLower());
+            var fuzzyResult = FuzzySearch.SearchInList(name, recipeList, elem => new List<string>{elem.Name});
+            if(fuzzyResult == null)
+            {
+                return null;
+            }
+            return new RecipeResult(fuzzyResult.Ratio, fuzzyResult.Prop!);
         }
 
         /// <summary>
@@ -187,7 +204,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
         /// <param name="name"></param>
         /// <param name="noCaching"></param>
         /// <returns></returns>
-        public async Task<Recipe?> GetRecipeByNameAsync(string name, bool noCaching = false)
+        public async Task<RecipeResult?> GetRecipeByNameAsync(string name, bool noCaching = false)
         {
             if (_cachedRecipes != null && _cachedRecipes.Count != 0)
             {
@@ -199,6 +216,10 @@ namespace DruidsCornerAPI.DatabaseHandlers
             }
 
             var allRecipes = await GetAllRecipesAsync(noCaching);
+            if(allRecipes == null)
+            {
+                return null;
+            }
             var matchingRecipe = FindByName(name, allRecipes);
             return matchingRecipe;
         }
@@ -215,7 +236,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
             if (recipe != null)
             {
                 // This path is a local path relative to Root Folder
-                var filePath = new FileInfo((recipe.Image as FileRecord).Path);
+                var filePath = new FileInfo((recipe!.Image as FileRecord)!.Path);
                 var candidate = _dbConfig.GetImagesFolder().GetFiles(filePath.Name).First();
                 if (candidate != null)
                 {
@@ -246,6 +267,231 @@ namespace DruidsCornerAPI.DatabaseHandlers
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Read reference properties Json file from disk and return the deserialized objects
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        protected async Task<T?> ReadRefFromDiskAsync<T>(string filename) where T : class?
+        {
+            var filepath = _dbConfig.GetReferencesFolder().GetFiles(filename).First();
+            if(filepath == null)
+            {
+                return null;
+            }
+
+            try 
+            {
+                var file = filepath.OpenRead();
+                var refList = await JsonSerializer.DeserializeAsync<T>(file, _jsonOptions);
+                file.Close();
+                return refList;
+            }
+            catch (Exception ex) 
+            {
+                _logger.LogError($"Could not read reference {filename} from disk : {ex.Message}");
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ReferenceHops?> GetReferenceHopsAsync()
+        {   
+            return await ReadRefFromDiskAsync<ReferenceHops>("known_good_hops.json");
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ReferenceMalts?> GetReferenceMaltsAsync()
+        {
+            return await ReadRefFromDiskAsync<ReferenceMalts>("known_good_malts.json");
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ReferenceYeasts?> GetReferenceYeastsAsync()
+        {
+            return await ReadRefFromDiskAsync<ReferenceYeasts>("known_good_yeasts.json");
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ReferenceStyles?> GetReferenceStylesAsync()
+        {
+            return await ReadRefFromDiskAsync<ReferenceStyles>("known_good_styles.json");
+        }
+
+
+        /// <summary>
+        /// Reads from local file
+        /// </summary>
+        /// <param name="kind"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        protected async Task<IndexedDb?> ReadFromFile(IndexedDbPropKind kind, FileInfo path)
+        {
+            var file = path.OpenRead();
+            IndexedDb? indexedDb = null;
+            try
+            {
+                switch(kind)
+                {
+                    case IndexedDbPropKind.Hops :
+                        indexedDb = await JsonSerializer.DeserializeAsync<IndexedHopDb>(file, _jsonOptions);
+                        break;
+
+                    case IndexedDbPropKind.Malts :
+                        indexedDb = await JsonSerializer.DeserializeAsync<IndexedMaltDb>(file, _jsonOptions);
+                        break;
+                    
+                    case IndexedDbPropKind.Yeasts :
+                        indexedDb = await JsonSerializer.DeserializeAsync<IndexedYeastDb>(file, _jsonOptions);
+                        break;
+
+                    case IndexedDbPropKind.Styles :
+                        indexedDb = await JsonSerializer.DeserializeAsync<IndexedStyleDb>(file, _jsonOptions);
+                        break;
+
+                    case IndexedDbPropKind.Tags :
+                        indexedDb = await JsonSerializer.DeserializeAsync<IndexedTagDb>(file, _jsonOptions);
+                        break;
+
+                    case IndexedDbPropKind.FoodPairing :
+                        indexedDb = await JsonSerializer.DeserializeAsync<IndexedFoodPairingDb>(file, _jsonOptions);
+                        break;
+
+                    default:
+                        _logger.LogError($"Unsupported property name : {kind}");
+                        return null;
+                }
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"Could not read IndexedDb from file : {ex.Message}");
+            }
+            file.Close();
+            return indexedDb;
+        }
+
+
+        /// <summary>
+        /// Gets an Indexed database from disk
+        /// </summary>
+        /// TODO : remove this mess and implement polymorphic Json deserialization (...)
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<IndexedDb?> GetIndexedDbAsync(IndexedDbPropKind kind)
+        {
+            string filename;
+            switch(kind)
+            {
+                case IndexedDbPropKind.Hops :
+                    filename = "hops_rv_db.json";
+                    break;
+                case IndexedDbPropKind.Malts :
+                    filename = "malts_rv_db.json";
+                    break;
+                case IndexedDbPropKind.Yeasts :
+                    filename = "yeasts_rv_db.json";
+                    break;
+                case IndexedDbPropKind.Styles :
+                    filename = "styles_rv_db.json";
+                    break;
+                case IndexedDbPropKind.Tags :
+                    filename = "tags_rv_db.json";
+                    break;
+                case IndexedDbPropKind.FoodPairing :
+                    filename = "foodPairing_rv_db.json";
+                    break;
+                default:
+                    _logger.LogError($"Unsupported property name : {kind}");
+                    return null;
+            }
+        
+            var filepath = _dbConfig.GetIndexedDbFolder().GetFiles(filename).First();
+            if(filepath == null)
+            {
+                _logger.LogError($"Could not find Indexed DB file on disk");
+                return null;
+            }
+
+            var indexedDb = await ReadFromFile(kind, filepath);
+            return indexedDb;
+        }
+
+        /// <summary>
+        /// Retrieves an Indexed Malt Database
+        /// </summary>
+        /// <returns>Indexed database or null</returns>
+        public async Task<IndexedMaltDb?> GetIndexedMaltDbAsync()
+        {
+            return await GetIndexedDbAsync(IndexedDbPropKind.Malts) as IndexedMaltDb;
+        }
+
+        /// <summary>
+        /// Retrieves an Indexed Hop Database
+        /// </summary>
+        /// <returns>Indexed database or null</returns>
+        public async Task<IndexedHopDb?> GetIndexedHopDbAsync()
+        {
+            return await GetIndexedDbAsync(IndexedDbPropKind.Hops) as IndexedHopDb;
+        }
+
+        /// <summary>
+        /// Retrieves an Indexed Style Database
+        /// </summary>
+        /// <returns>Indexed database or null</returns>
+        public async Task<IndexedStyleDb?> GetIndexedStyleDbAsync()
+        {
+            return await GetIndexedDbAsync(IndexedDbPropKind.Styles) as IndexedStyleDb;
+        }
+
+        /// <summary>
+        /// Retrieves an Indexed Style Database
+        /// </summary>
+        /// <returns>Indexed database or null</returns>
+        public async Task<IndexedYeastDb?> GetIndexedYeastDbAsync()
+        {
+            return await GetIndexedDbAsync(IndexedDbPropKind.Yeasts) as IndexedYeastDb;
+        }
+
+        /// <summary>
+        /// Retrieves an Indexed Tag Database
+        /// </summary>
+        /// <returns>Indexed database or null</returns>
+        public async Task<IndexedTagDb?> GetIndexedTagDbAsync()
+        {
+            return await GetIndexedDbAsync(IndexedDbPropKind.Tags) as IndexedTagDb;
+        }
+
+        /// <summary>
+        /// Retrieves an Indexed FoodPairing Database
+        /// </summary>
+        /// <returns>Indexed database or null</returns>
+        public async Task<IndexedFoodPairingDb?> GetIndexedFoodPairingDbAsync()
+        {
+            return await GetIndexedDbAsync(IndexedDbPropKind.FoodPairing) as IndexedFoodPairingDb;
+        }
+
+        /// <summary>
+        /// Gets the reference "Extra" ingredients (known good for DiyDog recipes)
+        /// </summary>
+        /// <returns></returns>
+        public Task<ReferenceHops?> GetReferenceExtrasAsync()
+        {
+            throw new NotImplementedException();
         }
     }
 }

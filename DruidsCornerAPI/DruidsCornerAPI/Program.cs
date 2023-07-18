@@ -1,8 +1,9 @@
 using DruidsCornerAPI.AuthenticationHandlers;
-using DruidsCornerAPI.Models.DiyDog;
+using DruidsCornerAPI.Models.DiyDog.RecipeDb;
 using DruidsCornerAPI.Services;
 using DruidsCornerAPI.Models.Config;
 using DruidsCornerAPI.Tools;
+using DruidsCornerAPI.Tools.Logging;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -29,6 +30,9 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.Reflection;
+using DruidsCornerAPI.DatabaseHandlers;
+using Google;
+using DruidsCornerAPI.Models.Exceptions;
 
 namespace DruidsCornerAPI
 {
@@ -37,8 +41,11 @@ namespace DruidsCornerAPI
     /// </summary>
     public class Program
     {
+        /// <summary>
+        /// Custom OAuth2 authentication Scheme name
+        /// Used when authenticating user through the passed token
+        /// </summary>
         protected static readonly string OAuth2Scheme = "OAuth2";
-
 
         private static void AddOpenApi(IServiceCollection services)
         {
@@ -151,7 +158,6 @@ namespace DruidsCornerAPI
               //.AddScheme<BasicAuthenticationOptions, GoogleOauth2AuthenticationHandler>("Custom", null);
         }
 
-
         /// <summary>
         /// Main entry poiint for app startup
         /// </summary>
@@ -197,6 +203,7 @@ namespace DruidsCornerAPI
                 });
             });
 
+
             SetAuthentication(builder);
             
             // Nice questions : https://stackoverflow.com/questions/72966528/can-api-key-and-jwt-token-be-used-in-the-same-net-6-webapi
@@ -222,6 +229,7 @@ namespace DruidsCornerAPI
 
             // Registering available services
             builder.Services.AddSingleton<RecipeService>();
+            builder.Services.AddSingleton<SearchService>();
 
             var slidingPolicy = "sliding";
             var rateLimitingOptions = new WebRateLimits();
@@ -237,6 +245,12 @@ namespace DruidsCornerAPI
                 }));
 
             var app = builder.Build();
+
+            // This one should be provided at all times
+            if(System.Environment.GetEnvironmentVariable("CLIENT_ID") == null)
+            {
+                throw new ConfigException("The CLIENT_ID environment variable was not set, won't be able to proceed operations.");
+            }
             
             // Configure the HTTP request pipeline.
             app.UseRateLimiter();
@@ -250,10 +264,13 @@ namespace DruidsCornerAPI
 
             app.UseHttpsRedirection();
             app.UseHttpLogging();
+            
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers().RequireRateLimiting(slidingPolicy);
-
+            
+            // Set the logger factory config to ApplicationLogging util
+            ApplicationLogging.LoggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
             app.Run();
         }
     }
