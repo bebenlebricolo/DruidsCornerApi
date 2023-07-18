@@ -31,6 +31,18 @@
             ]
         },
         {
+            "name": "Laid Back Amber Beer",
+            "foundInBeers": [
+                3
+            ]
+        },
+        {
+            "name": "Twisted Merciless Stout",
+            "foundInBeers": [
+                4
+            ]
+        },
+        {
             "name": "A Blend Of Two Barrel-aged Imperial Saisons",
             "foundInBeers": [
                 89

@@ -45,9 +45,9 @@ namespace DruidsCornerUnitTests.DatabaseHandlers
 
             var indexedStyleDb = await handler.GetIndexedDbAsync(IndexedDbPropKind.Styles) as IndexedStyleDb;
             Assert.That(indexedStyleDb, Is.Not.Null);
-            Assert.That(indexedStyleDb.Styles.Count, Is.EqualTo(6));
-            Assert.That(indexedStyleDb.Styles[5].Name, Is.EqualTo("A Blend Of Two Barrel-aged Imperial Saisons"));
-            Assert.That(indexedStyleDb.Styles[5].FoundInBeers.Contains(89), Is.True);
+            Assert.That(indexedStyleDb.Styles.Count, Is.EqualTo(8));
+            Assert.That(indexedStyleDb.Styles[5].Name, Is.EqualTo("Laid Back Amber Beer"));
+            Assert.That(indexedStyleDb.Styles[5].FoundInBeers.Contains(3), Is.True);
 
             var indexedTagDb = await handler.GetIndexedDbAsync(IndexedDbPropKind.Tags) as IndexedTagDb;
             Assert.That(indexedTagDb, Is.Not.Null);

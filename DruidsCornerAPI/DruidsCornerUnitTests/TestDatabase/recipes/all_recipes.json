@@ -539,7 +539,13 @@
                         "name": "Wyeast 1272 - American Ale II\u0099"
                     }
                 ],
-                "extraMash": null,
+                "extraMash": [
+                    {
+                        "name": "Honey",
+                        "kgs": 0.7,
+                        "lbs": 1.54
+                    }
+                ],
                 "extraBoil": null,
                 "alternativeDescription": null
             },
@@ -666,7 +672,14 @@
                     }
                 ],
                 "extraMash": null,
-                "extraBoil": null,
+                "extraBoil": [
+                    {
+                        "name": "Coffee beans",
+                        "amount": 6.0,
+                        "when": "End",
+                        "attribute": "Flavour"
+                    }
+                ],
                 "alternativeDescription": null
             },
             "methodTimings": {

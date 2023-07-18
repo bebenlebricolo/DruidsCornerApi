@@ -623,6 +623,9 @@ namespace DruidsCornerAPI.Services
                 candidate = FilterOutTargetFgDiscrete(candidate, queries);
                 if(candidate == null) continue;
 
+                candidate = FilterOutPhDiscrete(candidate, queries);
+                if(candidate == null) continue;
+
                 candidate = FilterOutAttenuationLevelDiscrete(candidate, queries);
                 if(candidate == null) continue;
 
