@@ -1,7 +1,5 @@
 FROM europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-base as build
 
-ARG CLIENT_ID
-ENV CLIENT_ID=$CLIENT_ID
 ENV DRUIDSCORNERAPI_DIR=/app/deployed
 ENV DRUIDSCORNERAPI_DBMODE=Local
 
@@ -18,9 +16,6 @@ RUN dotnet publish /${ROOT_DIR}/DruidsCornerAPI/DruidsCornerAPI.csproj -c Releas
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS druidscornerapi-deploy
 EXPOSE 80
 EXPOSE 443
-
-ARG CLIENT_ID
-ENV CLIENT_ID=$CLIENT_ID
 
 # Note : this time the db is deployed under /app/diydog-db because the COPY instruction below takes "deployed" folder content and copies 
 # it to the /app/* folder instead (removing the "deployed" folder as a result)

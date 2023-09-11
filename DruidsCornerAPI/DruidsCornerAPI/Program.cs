@@ -139,27 +139,23 @@ namespace DruidsCornerAPI
               {
                   //
               })
-              //.AddGoogle(OAuth2Scheme, options =>
-              //{
-              //    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-              //    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-              //})
               .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
-                options.Audience = System.Environment.GetEnvironmentVariable("CLIENT_ID");
-                options.Authority = "https://accounts.google.com";
-                options.ClaimsIssuer = "https://accounts.google.com";
-                //options.TokenValidationParameters = new TokenValidationParameters
-                //{
-                //    RequireAudience = true,
-                //    RequireExpirationTime = true,
-                //};
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                   RequireAudience = true,
+                   RequireExpirationTime = true,
+                   RequireSignedTokens = true,
+                   ValidIssuers = new List<string>{
+                        "https://securetoken.google.com/druids-corner-cloud",
+                        "https://accounts.google.com"
+                   }
+                };
             });
-              //.AddScheme<BasicAuthenticationOptions, GoogleOauth2AuthenticationHandler>("Custom", null);
         }
 
         /// <summary>
-        /// Main entry poiint for app startup
+        /// Main entry point for app startup
         /// </summary>
         /// <param name="args"></param> 
         public static void Main(string[] args)
@@ -246,12 +242,6 @@ namespace DruidsCornerAPI
 
             var app = builder.Build();
 
-            // This one should be provided at all times
-            if(System.Environment.GetEnvironmentVariable("CLIENT_ID") == null)
-            {
-                throw new ConfigException("The CLIENT_ID environment variable was not set, won't be able to proceed operations.");
-            }
-            
             // Configure the HTTP request pipeline.
             app.UseRateLimiter();
             app.UseCors("AllowAll");
@@ -262,7 +252,7 @@ namespace DruidsCornerAPI
                 options.OAuthClientId(builder.Configuration["Authentication:Google:ClientId"]);
             });
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseHttpLogging();
             
             app.UseAuthentication();

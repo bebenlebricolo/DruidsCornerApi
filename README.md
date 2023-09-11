@@ -21,6 +21,7 @@
   - [Docker build](#docker-build)
     - [Optional : authenticate to Google Cloud services to enable Artifact Registry access](#optional--authenticate-to-google-cloud-services-to-enable-artifact-registry-access)
     - [Full build steps](#full-build-steps)
+- [Running docker container locally with ports mapped](#running-docker-container-locally-with-ports-mapped)
 
 # DruidsCornerApi
 Druid's Corner API
@@ -155,13 +156,18 @@ docker tag druidscornerapi-base europe-docker.pkg.dev/druids-corner-cloud/druids
 # Optional (if docker is configured and authenticated)
 docker push europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-base
 
-export CLIENT_ID="<The web client id used>"
 # Then build the deployment image
-docker build -f Dockerfile.deploy . -t druidscornerapi-deploy --build-arg CLIENT_ID=$CLIENT_ID
+docker build -f Dockerfile.deploy . -t druidscornerapi-deploy
 # Or build and stop before image stripping down so that the dev environment is still there
-docker build -f Dockerfile.deploy --target build . -t druidscornerapi-deploy --build-arg CLIENT_ID=$CLIENT_ID
+docker build -f Dockerfile.deploy --target build . -t druidscornerapi-deploy
 
 # Optional (same as above) : push to Google Artifact Registry
 docker tag druidscornerapi-deploy europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-deploy
 docker push europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-deploy
+```
+
+# Running docker container locally with ports mapped
+```bash
+  docker pull europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-deploy:latest
+  docker run --rm -p 8000:80 europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-deploy:latest 
 ```

@@ -58,7 +58,7 @@ jobs:
     - name: Build Docker image (with UnitTests)
       working-directory: DruidsCornerAPI 
       run : |
-        docker build -f Dockerfile.deploy --target build . -t druidscornerapi-build --build-arg CLIENT_ID=${{ secrets.DRUIDS_CORNER_CLOUD_CLIENT_ID }}
+        docker build -f Dockerfile.deploy --target build . -t druidscornerapi-build
 
     - name: Test
       run: docker run --name testing_container druidscornerapi-build  "dotnet" "test" "DruidsCornerUnitTests" "-l:junit" "-c" "Release" 
@@ -75,7 +75,7 @@ jobs:
     - name: Build Docker image for deployment (stripped down version)
       working-directory: DruidsCornerAPI 
       run : |
-        docker build -f Dockerfile.deploy . -t druidscornerapi-deploy --build-arg CLIENT_ID=${{ secrets.DRUIDS_CORNER_CLOUD_CLIENT_ID }}
+        docker build -f Dockerfile.deploy . -t druidscornerapi-deploy
         docker tag druidscornerapi-deploy $CONTAINER_REG_ZONE/$GCP_PROJECT_ID/$CONTAINER_REGISTRY/druidscornerapi-deploy:$IMAGE_TAG
     
     - name: Publish image

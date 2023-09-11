@@ -2,6 +2,9 @@
 .vs
 .vscode
 
+# Private configs and readmes that won't be publicly exposed
+.private
+
 # Development binaries
 [Bb]uild
 bin
