@@ -53,6 +53,9 @@ public class CustomJwtHandler : JwtBearerHandler
         //   3.2 In the fetched keys, retrieve the one that has the same kid
         //   3.3 Use this to validate the signature of the token
         
+        // Google : https://developers.google.com/identity/sign-in/web/backend-auth?hl=en
+        // Firebase : https://firebase.google.com/docs/auth/admin/verify-id-tokens#c
+        
         var claimsPrincipal = GetClaims(token);
         return AuthenticateResult.Success(new AuthenticationTicket(claimsPrincipal, "CustomJwtBearer"));
     }
