@@ -79,8 +79,9 @@ public class IdentityProviderHandler
     /// Used to trigger a specific Identity provider to refresh its keys
     /// </summary>
     /// <param name="provider"></param>
+    /// <param name="forceRefresh">Forces keys refresh (bypasses internal checks)</param>
     /// <returns></returns>
-    private async Task<bool> RefreshKeysSingleProvider(IdentityProviderKind provider)
+    private async Task<bool> RefreshKeysSingleProvider(IdentityProviderKind provider, bool forceRefresh = false)
     {
         if (!_availableProviders.Contains(provider))
         {
@@ -91,10 +92,10 @@ public class IdentityProviderHandler
         switch (provider)
         {
             case IdentityProviderKind.Google:
-                return await RefreshGoogleKeys();
+                return await RefreshGoogleKeys(forceRefresh);
 
             case IdentityProviderKind.Firebase:
-                return await RefreshFirebaseKeys();
+                return await RefreshFirebaseKeys(forceRefresh);
 
             // Default use cases - unsupported operations
             case IdentityProviderKind.Facebook:
@@ -151,48 +152,83 @@ public class IdentityProviderHandler
     }
 
     /// <summary>
-    /// Calls Google Identity provider and loads the new keys in memory
+    /// Calls Firebase Identity provider and loads the new keys in memory
+    /// Only refresh data if this is the first time this method is called, or data is expired.
+    /// The force refresh mode bypasses all checks and trigger the refreshing unilaterally. 
     /// </summary>
+    /// <param name="forceRefresh">Bypasses all internal checks and forces keys to be fetched once again.</param>
     /// <returns></returns>
-    private async Task<bool> RefreshFirebaseKeys()
+    private async Task<bool> RefreshFirebaseKeys(bool forceRefresh = false)
     {
-        var response = await _httpClient.GetAsync(FirebaseKeysUrl);
-        var storedKey = await HandleGoogleFirebaseResponseData(response, IdentityProviderKind.Firebase);
+        const IdentityProviderKind identityProviderKind = IdentityProviderKind.Firebase;
+        bool willRefresh = forceRefresh;
+        willRefresh |= !_storedKeys.ContainsKey(identityProviderKind);
+        willRefresh |= _storedKeys.ContainsKey(identityProviderKind) &&
+                       _storedKeys[identityProviderKind].ExpirationDate <= DateTime.Now;
 
-        if (storedKey != null)
+        if (willRefresh)
         {
-            // Add the new keys to the stored keys container
-            _storedKeys[IdentityProviderKind.Firebase] = storedKey;
-            return true;
+            var response = await _httpClient.GetAsync(FirebaseKeysUrl);
+            var storedKey = await HandleGoogleFirebaseResponseData(response, identityProviderKind);
+
+            if (storedKey != null)
+            {
+                // Flushes previous keys (needed when keys are effectively rotated for good)
+                _storedKeys.Clear();
+                // Add the new keys to the stored keys container
+                _storedKeys[identityProviderKind] = storedKey;
+                return true;
+            }
+
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     /// <summary>
     /// Calls Google Identity provider and loads the new keys in memory
+    /// Only refresh data if this is the first time this method is called, or data is expired.
+    /// The force refresh mode bypasses all checks and trigger the refreshing unilaterally. 
     /// </summary>
+    /// <param name="forceRefresh">Bypasses all internal checks and forces keys to be fetched once again.</param>
     /// <returns></returns>
-    private async Task<bool> RefreshGoogleKeys()
+    private async Task<bool> RefreshGoogleKeys(bool forceRefresh = false)
     {
-        var response = await _httpClient.GetAsync(GoogleKeysUrl);
-        var storedKey = await HandleGoogleFirebaseResponseData(response, IdentityProviderKind.Google);
+        const IdentityProviderKind identityProviderKind = IdentityProviderKind.Google;
+        bool willRefresh = forceRefresh;
+        willRefresh |= !_storedKeys.ContainsKey(identityProviderKind);
+        willRefresh |= _storedKeys.ContainsKey(identityProviderKind) &&
+                       _storedKeys[identityProviderKind].ExpirationDate <= DateTime.Now;
 
-        if (storedKey != null)
+        if (willRefresh)
         {
-            // Add the new keys to the stored keys container
-            _storedKeys[IdentityProviderKind.Google] = storedKey;
-            return true;
+            var response = await _httpClient.GetAsync(GoogleKeysUrl);
+            var storedKey = await HandleGoogleFirebaseResponseData(response, identityProviderKind);
+
+            if (storedKey != null)
+            {
+                // Flushes previous keys (needed when keys are effectively rotated for good)
+                _storedKeys.Clear();
+                // Add the new keys to the stored keys container
+                _storedKeys[identityProviderKind] = storedKey;
+                return true;
+            }
+
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     /// <summary>
-    /// Refresh all keys at once
+    /// Refresh all keys at once.
+    /// Each existing key is first audited to check if it needs to be refreshed, otherwise the cached version is used.
+    /// The forceRefresh parameter bypasses all checks and forces retrieval of new keys
     /// </summary>
+    /// <param name="forceRefresh">Forces all keys to be refreshed, even if the expiration date is not reached yet</param>
     /// <returns></returns>
-    public async Task<bool> RefreshKeys()
+    public async Task<bool> RefreshKeys(bool forceRefresh = false)
     {
         bool result = true;
         foreach (var provider in _availableProviders)
@@ -200,11 +236,11 @@ public class IdentityProviderHandler
             switch (provider)
             {
                 case IdentityProviderKind.Firebase:
-                    result &= await RefreshFirebaseKeys();
+                    result &= await RefreshFirebaseKeys(forceRefresh);
                     break;
 
                 case IdentityProviderKind.Google:
-                    result &= await RefreshGoogleKeys();
+                    result &= await RefreshGoogleKeys(forceRefresh);
                     break;
 
                 // Pass on to the rest of the code, we don't want that to be 
@@ -245,8 +281,30 @@ public class IdentityProviderHandler
                 return null;
             }
         }
-        
+
         // Should not
         return _storedKeys[identityProviderKind];
+    }
+
+    /// <summary>
+    /// Retrieve a signing keys container using the KeyId as the search criteria.
+    /// The KeyId is used in JWT tokens in order to find the appropriate public signature that was used to
+    /// sign the JWT token. This is a crucial part for JWT signature validation, and only the registered IdentityProviders can be verified.
+    /// </summary>
+    /// <param name="keyId">Key Id as used in the authorization bearer header</param>
+    /// <returns></returns>
+    public IdentityProviderSigningKeyContainer? FindKeysFromKeyId(string keyId)
+    {
+        IdentityProviderSigningKeyContainer? target = null;
+        foreach (var keysContainer in _storedKeys)
+        {
+            if (keysContainer.Value.KeysDictionary.ContainsKey(keyId))
+            {
+                target = keysContainer.Value;
+                break;
+            }
+        }
+
+        return target;
     }
 }

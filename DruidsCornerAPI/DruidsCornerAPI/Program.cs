@@ -146,7 +146,24 @@ namespace DruidsCornerAPI
                        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                    })
                    .AddCookie()
-                   .AddScheme<JwtBearerOptions, CustomJwtHandler>(JwtBearerDefaults.AuthenticationScheme, options => { });
+                   .AddScheme<JwtBearerOptions, CustomJwtHandler>(JwtBearerDefaults.AuthenticationScheme,
+                                                                  options =>
+                                                                  {
+                                                                      options.TokenValidationParameters = new TokenValidationParameters()
+                                                                      {
+                                                                          ClockSkew = TimeSpan.FromSeconds(5),
+                                                                          ValidAudiences = new List<string>()
+                                                                          {
+                                                                              "druids-corner-cloud"
+                                                                          },
+                                                                          ValidIssuers = new List<string>()
+                                                                          {
+                                                                              "https://securetoken.google.com/druids-corner-cloud",
+                                                                              "accounts.google.com",
+                                                                              "https://accounts.google.com"
+                                                                          }
+                                                                      };
+                                                                  });
         }
 
         /// <summary>
@@ -225,8 +242,11 @@ namespace DruidsCornerAPI
             builder.Logging.AddConsole();
 
             // Registering available services
+            builder.Services.AddTransient<HttpClient>();
             builder.Services.AddSingleton<RecipeService>();
             builder.Services.AddSingleton<SearchService>();
+            builder.Services.AddSingleton<IdentityProviderHandler>();
+
 
             var slidingPolicy = "sliding";
             var rateLimitingOptions = new WebRateLimits();

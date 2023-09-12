@@ -1,6 +1,6 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=6571a0a8_002D8156_002D4c57_002D8a2a_002D148604528d8e/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="IdentityProviderHandlerTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=5c0da3af_002Db0e4_002D459a_002D860e_002D87590c9f3ba5/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="TestAudiencesValidation" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
-    &lt;TestId&gt;NUnit3x::05FF9973-4919-4DC6-ABBA-C2E30B867164::net7.0::DruidsCornerUnitTests.AuthenticationHandlers.IdentityProviderHandlerTests&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::926A056C-D634-4C48-BE84-F18BC006F782::net7.0::DruidsCornerApiIntegrationTests.AuthMiddlewareTest.TestAudiencesValidation&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
