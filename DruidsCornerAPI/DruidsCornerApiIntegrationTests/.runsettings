@@ -6,6 +6,7 @@
             <ANDROID_GUEST_ACCESS_TOKEN>test</ANDROID_GUEST_ACCESS_TOKEN>
             <GOOGLE_ACCESS_TOKEN>test</GOOGLE_ACCESS_TOKEN>
             <DRUIDSCORNERAPI_DIR>test</DRUIDSCORNERAPI_DIR>
+            <DRUIDSCORNERAPI_CONFIG_DIR>test</DRUIDSCORNERAPI_CONFIG_DIR>
         </EnvironmentVariables>
     </RunConfiguration>
 </RunSettings>
