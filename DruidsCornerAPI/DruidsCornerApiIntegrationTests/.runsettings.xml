@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+    <RunConfiguration>
+        <EnvironmentVariables>
+            <FIREBASE_ACCESS_TOKEN>"sfsdf"</FIREBASE_ACCESS_TOKEN>
+            <GOOGLE_ACCESS_TOKEN>"sfsdf"</GOOGLE_ACCESS_TOKEN>
+            <DRUIDSCORNERAPI_DIR>"where the project is located"</DRUIDSCORNERAPI_DIR>
+        </EnvironmentVariables>
+    </RunConfiguration>
+</RunSettings>

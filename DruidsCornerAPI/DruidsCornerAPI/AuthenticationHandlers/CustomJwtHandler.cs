@@ -3,6 +3,7 @@ using System.Text.Encodings.Web;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using DruidsCornerAPI.Models.Authentication;
 using Microsoft.Net.Http.Headers;
 using Microsoft.AspNetCore.Authentication;
@@ -116,37 +117,95 @@ public class CustomJwtHandler : JwtBearerHandler
             return AuthenticateResult.Fail("Invalid token signature.");
         }
 
+        // Identity Provider provide their key signatures using various systems, 
+        // Firebase and Google provide a similar one (all hosted in google's servers)
+        bool validSignature = false;
+        switch (targetKeysContainer.Kind)
+        {
+            case IdentityProviderKind.Firebase:
+                validSignature = ValidateFirebaseTokenSignature(handler, targetKeysContainer.KeysDictionary[kid], token);
+                break;
 
-        var publicKey = RSA.Create();
-        var pemKey = targetKeysContainer.KeysDictionary[kid];
-        pemKey = pemKey.Replace("-----BEGIN CERTIFICATE-----", "");
-        pemKey = pemKey.Replace("-----END CERTIFICATE-----", "");
-        pemKey = pemKey.Replace("\n", "");
-        publicKey.ImportFromPem(pemKey.ToCharArray());
-        var securityKey = new RsaSecurityKey(publicKey);
+            case IdentityProviderKind.Google:
+                validSignature = ValidateGoogleTokenSignature(handler, targetKeysContainer.KeysDictionary[kid], token);
+                break;
+
+            // Other kinds of providers are not implemented yet
+            case IdentityProviderKind.Facebook:
+            case IdentityProviderKind.Github:
+            case IdentityProviderKind.Unknown:
+            default:
+                break;
+        }
+
+
+        if (validSignature)
+        {
+            var claimsPrincipal = GetClaims(jwtToken);
+            return AuthenticateResult.Success(new AuthenticationTicket(claimsPrincipal, "CustomJwtBearer"));
+        }
+        else
+        {
+            return AuthenticateResult.Fail("Invalid token.");
+        }
+    }
+
+    private bool ValidateFirebaseTokenSignature(JwtSecurityTokenHandler handler, string rawKey, string token)
+    {
+        // Firebase : https://firebase.google.com/docs/auth/admin/verify-id-tokens#c
+        var cert = X509Certificate2.CreateFromPem(rawKey.ToCharArray());
+        var publicKey = cert.GetPublicKey();
+        var rsa = RSA.Create();
+        rsa.ImportRSAPublicKey(publicKey, out _);
+        var securityKey = new RsaSecurityKey(rsa);
         try
         {
-            var json = handler.ValidateToken(token,
-                                             new TokenValidationParameters()
-                                             {
-                                                 ValidateAudience = false,
-                                                 ValidateLifetime = false,
-                                                 ValidateIssuer = false,
-                                                 IssuerSigningKey = securityKey
-                                             },
-                                             out _);
+            handler.ValidateToken(token,
+                                  new TokenValidationParameters()
+                                  {
+                                      ValidateAudience = false,
+                                      ValidateLifetime = false,
+                                      ValidateIssuer = false,
+                                      IssuerSigningKey = securityKey
+                                  },
+                                  out _);
         }
         catch (Exception ex)
         {
             Logger.LogWarning("Token signature verification failed");
-            return AuthenticateResult.Fail("Invalid token.");
+            return false;
         }
 
-        // Google : https://developers.google.com/identity/sign-in/web/backend-auth?hl=en
-        // Firebase : https://firebase.google.com/docs/auth/admin/verify-id-tokens#c
+        return true;
+    }
 
-        var claimsPrincipal = GetClaims(jwtToken);
-        return AuthenticateResult.Success(new AuthenticationTicket(claimsPrincipal, "CustomJwtBearer"));
+    private bool ValidateGoogleTokenSignature(JwtSecurityTokenHandler handler, string rawKey, string token)
+    {
+        // Google : https://developers.google.com/identity/sign-in/web/backend-auth?hl=en
+        var cert = X509Certificate2.CreateFromPem(rawKey.ToCharArray());
+        var publicKey = cert.GetPublicKey();
+        var rsa = RSA.Create();
+        rsa.ImportRSAPublicKey(publicKey, out _);
+        var securityKey = new RsaSecurityKey(rsa);
+        try
+        {
+            handler.ValidateToken(token,
+                                  new TokenValidationParameters()
+                                  {
+                                      ValidateAudience = false,
+                                      ValidateLifetime = false,
+                                      ValidateIssuer = false,
+                                      IssuerSigningKey = securityKey
+                                  },
+                                  out _);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning("Token signature verification failed");
+            return false;
+        }
+
+        return true;
     }
 
     private ClaimsPrincipal GetClaims(JwtSecurityToken token)
