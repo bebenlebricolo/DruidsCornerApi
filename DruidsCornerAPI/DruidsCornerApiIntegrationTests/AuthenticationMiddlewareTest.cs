@@ -1,62 +1,95 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using DruidsCornerAPI;
 using DruidsCornerAPI.Models.Config;
+using DruidsCornerAPI.Models.DiyDog.RecipeDb;
 using Microsoft.Extensions.Configuration;
 
 namespace DruidsCornerApiIntegrationTests;
 
 public class AuthMiddlewareTest
 {
-    private readonly WebApplicationFactory<Program> _factory;
-
-    public AuthMiddlewareTest()
-    {
-        _factory = new WebApplicationFactory<Program>();
-    }
+    private readonly WebApplicationFactory<Program> _factory = new();
+    private const string FirebaseAccessTokenEnvVarName = "FIREBASE_ACCESS_TOKEN";
+    private const string AndroidGuestTokenEnvVarName = "ANDROID_GUEST_ACCESS_TOKEN";
+    private const string GoogleAccessTokenEnvVarName = "GOOGLE_ACCESS_TOKEN";
+    private const string DeployedDbEnvVarName = "DRUIDSCORNERAPI_DIR";
+    private const string BearerConstant = "Bearer";
 
     [SetUp]
     public void Setup()
     {
+        // First, we need to check that the local DB is accessible
+        Assert.That(System.Environment.GetEnvironmentVariable(DeployedDbEnvVarName), Is.Not.Null);
+        var dbConfig = new DeployedDatabaseConfig();
+        Assert.That(dbConfig.FromConfig(GetConfiguration()), Is.True);
     }
 
     public IConfiguration GetConfiguration()
     {
-        var appSettings = @"{
-                ""DeployedDatabaseConfig"":{
-                    ""RootFolderPath"": ""${DRUIDSCORNERAPI_DIR}/diydog-db"",
-                    ""ImagesFolderName"": ""images"",
-                    ""PdfPagesFolderName"": ""pdf_pages"",
-                    ""RecipesFolderName"" :  ""recipes"",
-                    ""IndexedDbFolderName"" :  ""dbanalysis""
-                  }
-            }";
+        var appSettings = new
+        {
+            DeployedDatabaseConfig = new
+            {
+                RootFolderPath = "${" + DeployedDbEnvVarName + "}/diydog-db",
+                ImagesFolderName = "images",
+                PdfPagesFolderName = "pdf_pages",
+                RecipesFolderName = "recipes",
+                IndexedDbFolderName = "dbanalysis"
+            }
+        };
+        string json = JsonSerializer.Serialize(appSettings);
         var builder = new ConfigurationBuilder();
-        builder.AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(appSettings)));
+        builder.AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(json)));
 
         var configuration = builder.Build();
         return configuration;
     }
 
-    [Test]
-    public async Task TestAudiencesValidation()
+    private async Task PerformTokenValidation_Real(string token)
     {
-        // First, we need to check that the local DB is accessible
-        Assert.That(System.Environment.GetEnvironmentVariable("DRUIDSCORNERAPI_DIR"), Is.Not.Null);
-
         // Check that we can open the local database
         var client = _factory.CreateClient();
-        var dbConfig = new DeployedDatabaseConfig();
-        Assert.That(dbConfig.FromConfig(GetConfiguration()), Is.True);
-        
+
         // Then try to get all recipes from local database
         var request = new HttpRequestMessage(HttpMethod.Get, "http://localhost/recipe/all");
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer",
-                                                                      "eyJhbGciOiJSUzI1NiIsImtpZCI6IjE5MGFkMTE4YTk0MGFkYzlmMmY1Mzc2YjM1MjkyZmVkZThjMmQwZWUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vZHJ1aWRzLWNvcm5lci1jbG91ZCIsImF1ZCI6ImRydWlkcy1jb3JuZXItY2xvdWQiLCJhdXRoX3RpbWUiOjE2OTQ1NzIzNTIsInVzZXJfaWQiOiJxajI1ZWg3aEpPV3NhUlRPZEJCZkxOZzNmck4yIiwic3ViIjoicWoyNWVoN2hKT1dzYVJUT2RCQmZMTmczZnJOMiIsImlhdCI6MTY5NDU3MjM1MiwiZXhwIjoxNjk0NTc1OTUyLCJlbWFpbCI6ImJlbm9pdHRhcnJhZGVAaG90bWFpbC5mciIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJiZW5vaXR0YXJyYWRlQGhvdG1haWwuZnIiXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.BN_YKE3Vmp3W-ngTnrhBARA_-h59hhs-NXRltdv_rGEfiFMTB46LhUfBxkIznpEoxv_Wr77dIPo8kEPoj91o8bTPMd0UiSDcaWr9gtki5yfMI7catHJNGjj7IZvp_U2RY_Plz_-aRuLD8--kqiqibG7jmwClWihAdifv64CvDikwM4NqDpnNQ1gT32b7H_q7JxZY3fYFOG_hswDkwAQ3NJF8gbIeMUEQI3j1N9h8jLc4Ji0OVriym1wvkcSTdsjlY5_hOJb4Ulw9WYw4eWsr6gSJiA_f9C1HOHxFjHVuqhOm8QAO9Gj3BvT8u6G3OrA2Ohe3tp7vdRNRdZHrFtJ-NQ");
+        request.Headers.Authorization = new AuthenticationHeaderValue(BearerConstant, token);
 
         var response = await client.SendAsync(request);
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+
+        var recipes = await JsonSerializer.DeserializeAsync<List<Recipe>>(await response.Content.ReadAsStreamAsync());
+        Assert.That(recipes, Is.Not.Null);
+        Assert.That(recipes!.Count, Is.GreaterThan(0));
+    }
+    
+    [Test]
+    public async Task TestFirebaseTokenValidation_Real()
+    {
+        var token = System.Environment.GetEnvironmentVariable(FirebaseAccessTokenEnvVarName);
+        Assert.That(token, Is.Not.Null);
+
+        await PerformTokenValidation_Real(token!);
+    }
+    
+    [Test]
+    public async Task TestGoogleTokenValidation_Real()
+    {
+        var token = System.Environment.GetEnvironmentVariable(GoogleAccessTokenEnvVarName);
+        Assert.That(token, Is.Not.Null);
+
+        await PerformTokenValidation_Real(token!);
+    }
+    
+    [Test]
+    public async Task TestAndroidGuestTokenValidation_Real()
+    {
+        var token = System.Environment.GetEnvironmentVariable(AndroidGuestTokenEnvVarName);
+        Assert.That(token, Is.Not.Null);
+
+        await PerformTokenValidation_Real(token!);
     }
 }

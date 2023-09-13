@@ -29,6 +29,10 @@
 
 
 
+    <ItemGroup>
+      <Content Include=".config\AuthenticationConfig.json" />
+    </ItemGroup>
+
     <PropertyGroup>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>

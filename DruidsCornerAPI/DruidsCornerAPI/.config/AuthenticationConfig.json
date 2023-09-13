@@ -1,0 +1,14 @@
+{
+  "JwtSettings": {
+    "ValidIssuers": [
+      "iss 0",
+      "iss 1",
+      "iss 2"
+    ],
+    "ValidAudiences": [
+      "aud 0",
+      "aud 1",
+      "aud 2"
+    ]
+  }
+}

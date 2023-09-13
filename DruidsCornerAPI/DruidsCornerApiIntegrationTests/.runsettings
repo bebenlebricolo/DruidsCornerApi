@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+    <RunConfiguration>
+        <EnvironmentVariables>
+            <FIREBASE_ACCESS_TOKEN>test</FIREBASE_ACCESS_TOKEN>
+            <ANDROID_GUEST_ACCESS_TOKEN>test</ANDROID_GUEST_ACCESS_TOKEN>
+            <GOOGLE_ACCESS_TOKEN>test</GOOGLE_ACCESS_TOKEN>
+            <DRUIDSCORNERAPI_DIR>test</DRUIDSCORNERAPI_DIR>
+        </EnvironmentVariables>
+    </RunConfiguration>
+</RunSettings>
