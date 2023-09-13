@@ -44,7 +44,6 @@ namespace DruidsCornerAPI
         /// </summary>
         protected static readonly string OAuth2Scheme = "OAuth2";
 
-
         private static void AddOpenApi(IServiceCollection services)
         {
             services.AddSwaggerGen(options =>
@@ -133,8 +132,10 @@ namespace DruidsCornerAPI
             });
         }
 
+        
         private static void SetAuthentication(WebApplicationBuilder builder)
         {
+            var authConfig = Task.Run(async () => await AuthConfigReader.ReadFromConfigFolderAsync()).Result; 
             builder.Services.AddAuthentication(options =>
                    {
                        // If an authentication cookie is present, use it to get authentication information
@@ -152,16 +153,8 @@ namespace DruidsCornerAPI
                                                                       options.TokenValidationParameters = new TokenValidationParameters()
                                                                       {
                                                                           ClockSkew = TimeSpan.FromSeconds(5),
-                                                                          ValidAudiences = new List<string>()
-                                                                          {
-                                                                              "druids-corner-cloud"
-                                                                          },
-                                                                          ValidIssuers = new List<string>()
-                                                                          {
-                                                                              "https://securetoken.google.com/druids-corner-cloud",
-                                                                              "accounts.google.com",
-                                                                              "https://accounts.google.com"
-                                                                          }
+                                                                          ValidAudiences = authConfig.JwtSettings.ValidAudiences,
+                                                                          ValidIssuers = authConfig.JwtSettings.ValidIssuers
                                                                       };
                                                                   });
         }

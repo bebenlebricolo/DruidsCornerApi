@@ -173,8 +173,6 @@ public class IdentityProviderHandler
 
             if (storedKey != null)
             {
-                // Flushes previous keys (needed when keys are effectively rotated for good)
-                _storedKeys.Clear();
                 // Add the new keys to the stored keys container
                 _storedKeys[identityProviderKind] = storedKey;
                 return true;
@@ -208,8 +206,6 @@ public class IdentityProviderHandler
 
             if (storedKey != null)
             {
-                // Flushes previous keys (needed when keys are effectively rotated for good)
-                _storedKeys.Clear();
                 // Add the new keys to the stored keys container
                 _storedKeys[identityProviderKind] = storedKey;
                 return true;
