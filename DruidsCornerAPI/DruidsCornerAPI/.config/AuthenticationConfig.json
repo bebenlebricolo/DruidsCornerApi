@@ -1,0 +1,12 @@
+{
+  "AuthenticationConfig": {
+    "JwtSettings" : {
+      "ValidIssuers": [
+        "issuers list"
+      ],
+      "ValidAudiences": [
+        "audiences list"
+      ]
+    }
+  }
+}

@@ -1,9 +1,9 @@
 FROM europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-base as build
 
-ARG CLIENT_ID
-ENV CLIENT_ID=$CLIENT_ID
 ENV DRUIDSCORNERAPI_DIR=/app/deployed
 ENV DRUIDSCORNERAPI_DBMODE=Local
+ENV CONFIG_DIR=/root/.config/DruidsCornerAPI
+ENV DRUIDSCORNERAPI_CONFIG_DIR=${CONFIG_DIR}
 
 # Take the whole sources, we also want to embed the tests in order to run them from within the container (as part of CI/CD worfklow)
 COPY  . ${ROOT_DIR}
@@ -13,20 +13,22 @@ WORKDIR /${ROOT_DIR}
 # Build the whole thing in Release mode
 RUN dotnet build DruidsCornerAPI.sln -c Release
 RUN dotnet publish /${ROOT_DIR}/DruidsCornerAPI/DruidsCornerAPI.csproj -c Release -o /app/deployed /p:UseAppHost=false
+RUN mkdir $HOME/.config/DruidsCornerAPI/
+RUN cp DruidsCornerAPI/.config/AuthenticationConfig.json ${CONFIG_DIR}
 
 # Stripped down version
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS druidscornerapi-deploy
 EXPOSE 80
 EXPOSE 443
 
-ARG CLIENT_ID
-ENV CLIENT_ID=$CLIENT_ID
-
 # Note : this time the db is deployed under /app/diydog-db because the COPY instruction below takes "deployed" folder content and copies 
 # it to the /app/* folder instead (removing the "deployed" folder as a result)
 ENV DRUIDSCORNERAPI_DIR=/app
+ENV CONFIG_DIR=/root/.config/DruidsCornerAPI
 ENV DRUIDSCORNERAPI_DBMODE=Local
+ENV DRUIDSCORNERAPI_CONFIG_DIR=${CONFIG_DIR}
 
 WORKDIR /app
 COPY --from=build /app/deployed .
+COPY --from=build ${CONFIG_DIR} ${CONFIG_DIR}
 ENTRYPOINT ["dotnet", "DruidsCornerAPI.dll"]

@@ -16,11 +16,16 @@
 - [Manual test and run workflow](#manual-test-and-run-workflow)
   - [Use the gcloudauth python tool](#use-the-gcloudauth-python-tool)
   - [Use the generated token (valid for 1 hour) to connect to the WebApi](#use-the-generated-token-valid-for-1-hour-to-connect-to-the-webapi)
+- [Unit testing and Integration testing](#unit-testing-and-integration-testing)
+  - [Unit Tests](#unit-tests)
+  - [Integration Tests](#integration-tests)
+    - [Access Token generation / retrieval](#access-token-generation--retrieval)
 - [Build and publishing the API remotely](#build-and-publishing-the-api-remotely)
   - [Requirements](#requirements)
   - [Docker build](#docker-build)
     - [Optional : authenticate to Google Cloud services to enable Artifact Registry access](#optional--authenticate-to-google-cloud-services-to-enable-artifact-registry-access)
     - [Full build steps](#full-build-steps)
+- [Running docker container locally with ports mapped](#running-docker-container-locally-with-ports-mapped)
 
 # DruidsCornerApi
 Druid's Corner API
@@ -117,6 +122,63 @@ Simply add the token to any `HTTPS` request headers :
   curl -H "Authorization: Bearer <token>" https://<hostname>/<controller>/<endpoint>
 ```
 
+# Unit testing and Integration testing
+This project embeds both Unit Tests and Integration Tests, both using the NUnit test framework.
+For both cases, some configuration files are used (`.runsettings`) to configure the test execution environment, and particularly the environment variables.
+Environment variables are used in the testing context to provide the runners with external configuration that needs to be provided for the tests to run.
+
+## Unit Tests
+Unit tests (DruidsCornerApiTests) are used to isolate smaller parts of the code, the so-called "unit" size is quite variable and varies across each tests.
+More often than not, the aim is to remove complex dependencies, while keeping smaller ones. They were mostly developed to help writing the code and stabilizing interfaces without having to run the whole thing every time (that's what you would expect from unit tests after all).
+Sometimes, they also provide some level of non-regression tests, where some functionalities (such as the Query and Search services) and tested for consistency and reliability.
+
+Disclaimer (for myself and others) : as this project is still under the "prototype" development state, it's still quite rare to find tests that enforces every api contract and checks for error recoveries behaviors (like "testing that this component behaves as I want in case of this, this and this error cases").
+Sooooo it'll come, when I have time to polish the webserver and make it more bullet-proof. For now, we need to move on with the bare-minimum
+> Side note : the "bare minimum" illustrated in this project is still quite far of the real bare-minimum written with shitty code... Because I think it's better to have a prototype that already lays out the right foundations for later :smile:
+
+
+## Integration Tests
+Integration tests runs the entire server and hosts it locally, while the test runner sends http requests to it as if it was a real production server.
+The idea is to test the actual implementation with all bits and pieces tied together, and reproduce client-side workflows.
+It's also one of the only easy ways to test out the middlewares behaviors. It was particularly useful to develop custom JWT authenticators, because I had to verify the various JWT signatures coming for various token Identity Providers and the default JwtTokenHandler is not meant to achieve such tasks, so it was necessary to test the whole server for that to get to see the authenticator being stressed under real-world use cases.
+
+### Access Token generation / retrieval
+JWT Access Tokens need to be generated/retrieved and passed to the integration tests in the form of environment variables.
+This was done this way in order to ensure that no token is hardcoded in the codebase, everything is hidden from the versioning system and thus, to the OpenSource community (because this is critical and sensitive information).
+
+1. **Android guest access token**
+   
+    Android guest access token can be generated while calling the [DruidsCornerAuthGateway](https://github.com/bebenlebricolo/DruidsCornerAuthGateway) server with the appropriate apikey.
+    Apikeys are specific to each client and are restricted in usage.
+    To get the token, use this Api :
+    ```bash
+    curl  -X GET '{hostname}/auth/public-access-token?apikey={apikey}' --header 'x-android-package: {package name}' --header 'x-android-package: {android certificate}' 
+    ```
+    *Note that this call differs for each client kinds. For now, only the Android client mode is supported, and this mode requires the android package name with its signing certificate to be sent as headers.*
+
+2. **Firebase access token** (real user)
+    
+    A token can be retrieved by the firebase project using this call :
+    ```bash
+    curl  -X POST 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={apikey}' \
+      --header 'Accept: application/json' \
+      --header 'x-android-package: {package name}' \
+      --header 'x-android-cert: {package cert}' \
+      --header 'Content-Type: application/json' \
+      --data-raw '{
+      "email" : "someuser@someemail.com",
+      "password" : "somepassword",
+      "returnSecureToken" : true
+    }'
+    ```
+
+3. **Google access token (OAuth2), real user**
+
+    A Jwt token can be retrieved from Google services (called `id_token` in their doc, not to be confused with their `access_token` which is a proprietary format).
+    This can be achieved either through the use of the Python Tool (as mentioned in section [Use the gcloudauth python tool ](#use-the-gcloudauth-python-tool)) or by using a token retrieved while authenticating through the Android App (a bit more complex to do but still achievable).
+
+All 3 tokens are required in the [.runsettings](DruidsCornerAPI/DruidsCornerApiIntegrationTests/.runsettings) file. 
+A template file can be found at : [DruidsCornerAPI/DruidsCornerApiIntegrationTests/template.runsettings.xml](DruidsCornerAPI/DruidsCornerApiIntegrationTests/template.runsettings.xml)
 
 # Build and publishing the API remotely
 ## Requirements 
@@ -155,13 +217,18 @@ docker tag druidscornerapi-base europe-docker.pkg.dev/druids-corner-cloud/druids
 # Optional (if docker is configured and authenticated)
 docker push europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-base
 
-export CLIENT_ID="<The web client id used>"
 # Then build the deployment image
-docker build -f Dockerfile.deploy . -t druidscornerapi-deploy --build-arg CLIENT_ID=$CLIENT_ID
+docker build -f Dockerfile.deploy . -t druidscornerapi-deploy
 # Or build and stop before image stripping down so that the dev environment is still there
-docker build -f Dockerfile.deploy --target build . -t druidscornerapi-deploy --build-arg CLIENT_ID=$CLIENT_ID
+docker build -f Dockerfile.deploy --target build . -t druidscornerapi-deploy
 
 # Optional (same as above) : push to Google Artifact Registry
 docker tag druidscornerapi-deploy europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-deploy
 docker push europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-deploy
+```
+
+# Running docker container locally with ports mapped
+```bash
+  docker pull europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-deploy:latest
+  docker run --rm -p 8000:80 europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-deploy:latest 
 ```

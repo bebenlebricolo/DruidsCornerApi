@@ -1,0 +1,9 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=6b63f167_002Dcced_002D42b0_002D9ee2_002D48bfe703e86f/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;And&gt;
+    &lt;Namespace&gt;DruidsCornerApiIntegrationTests&lt;/Namespace&gt;
+    &lt;Project Location="/home/groben/Documents/Repos/DruidsCornerApi/DruidsCornerAPI/DruidsCornerApiIntegrationTests" Presentation="&amp;lt;DruidsCornerApiIntegrationTests&amp;gt;" /&gt;
+  &lt;/And&gt;
+&lt;/SessionState&gt;</s:String>
+	
+	<s:String x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestRunner/RunConfigurationFilename/@EntryValue">/home/groben/Documents/Repos/DruidsCornerApi/DruidsCornerAPI/DruidsCornerApiIntegrationTests/.runsettings.xml</s:String></wpf:ResourceDictionary>

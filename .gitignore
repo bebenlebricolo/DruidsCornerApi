@@ -1,6 +1,10 @@
 # Visual studio and VSCode outputs and config
 .vs
 .vscode
+.idea
+
+# Private configs and readmes that won't be publicly exposed
+.private
 
 # Development binaries
 [Bb]uild

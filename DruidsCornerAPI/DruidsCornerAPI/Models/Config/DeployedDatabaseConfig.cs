@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using DruidsCornerAPI.Models.Exceptions;
 
 namespace DruidsCornerAPI.Models.Config
 {
@@ -128,10 +129,20 @@ namespace DruidsCornerAPI.Models.Config
             // String substitution with env variable value
             string? deployedEnvVarValue = Environment.GetEnvironmentVariable(DeployedDBEnvVarName);
             var envVarPattern = $"${{{DeployedDBEnvVarName}}}";
-            if(deployedEnvVarValue is not null)
+            if (RootFolderPath.Contains(envVarPattern))
             {
-                RootFolderPath = RootFolderPath.Replace(envVarPattern, deployedEnvVarValue);
+                if (deployedEnvVarValue != null)
+                {
+                    RootFolderPath = RootFolderPath.Replace(envVarPattern, deployedEnvVarValue);
+                }
+                else
+                {
+                    // That's not supposed to happen
+                    throw new
+                        ConfigException($"The environment variable {DeployedDBEnvVarName} was referenced in the config section but environment does not contain any value for it.'");
+                }
             }
+            
 
             success = IsValid();   
             if(success)
