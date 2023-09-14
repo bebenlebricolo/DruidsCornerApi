@@ -5,6 +5,8 @@
 
 # Private configs and readmes that won't be publicly exposed
 .private
+.runsettings
+AuthenticationConfig.json
 
 # Development binaries
 [Bb]uild

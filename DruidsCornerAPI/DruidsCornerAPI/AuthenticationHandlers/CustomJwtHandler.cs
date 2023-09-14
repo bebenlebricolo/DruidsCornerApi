@@ -86,7 +86,13 @@ public class CustomJwtHandler : JwtBearerHandler
             // We have rejected some audiences
             if (rejectedAudiences.Count != 0)
             {
-                Logger.LogWarning($"Received bad token with wrong audiences. Audiences : {jwtToken.Audiences}");
+                var audiencesList = "";
+                foreach (var aud in jwtToken.Audiences)
+                {
+                    audiencesList += aud + " ";
+                }
+                audiencesList.TrimEnd();
+                Logger.LogWarning($"Received bad token with wrong audiences. Audiences : {audiencesList}");
                 return AuthenticateResult.Fail("Invalid token, your client is not authorized.");
             }
         }
