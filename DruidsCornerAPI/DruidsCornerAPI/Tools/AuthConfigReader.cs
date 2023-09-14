@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using DruidsCornerAPI.Models.Config;
 
@@ -31,11 +32,11 @@ public class AuthConfigReader
         var configDir = System.Environment.GetEnvironmentVariable(ConfigurationDirEnvVarName);
         if (configDir == null  || !Directory.Exists(configDir))
         {
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                configDir = Path.Join(System.Environment.GetEnvironmentVariable("HOME"), $"/.config/{BaseConfigDirName}");
+                configDir = Path.Join(System.Environment.GetEnvironmentVariable("HOME"), $".config/{BaseConfigDirName}");
             }
-            else if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 configDir = Path.Join(Environment.SpecialFolder.ApplicationData.ToString(), BaseConfigDirName);
             }
