@@ -1,0 +1,10 @@
+{
+  "JwtSettings": {
+    "ValidIssuers": [
+     "issuer 1"
+    ],
+    "ValidAudiences": [
+      "audience 1"
+    ]
+  }
+}
