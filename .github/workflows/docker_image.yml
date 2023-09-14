@@ -58,6 +58,7 @@ jobs:
     - name: Build Docker image (with UnitTests)
       working-directory: DruidsCornerAPI 
       run : |
+        echo "${{ secrets.DRUIDS_CORNER_CLOUD_AUTHCONFIGJSON }}" > DruidsCornerAPI/.config/AuthenticationConfig.json
         docker build -f Dockerfile.deploy --target build . -t druidscornerapi-build
 
     - name: Test
@@ -75,6 +76,7 @@ jobs:
     - name: Build Docker image for deployment (stripped down version)
       working-directory: DruidsCornerAPI 
       run : |
+        echo "${{ secrets.DRUIDS_CORNER_CLOUD_AUTHCONFIGJSON }}" > DruidsCornerAPI/.config/AuthenticationConfig.json
         docker build -f Dockerfile.deploy . -t druidscornerapi-deploy
         docker tag druidscornerapi-deploy $CONTAINER_REG_ZONE/$GCP_PROJECT_ID/$CONTAINER_REGISTRY/druidscornerapi-deploy:$IMAGE_TAG
     
