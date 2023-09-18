@@ -56,7 +56,7 @@ jobs:
       if: github.event.inputs.build_base == 'true'
       with:
         dbpath: $BUCKET_DBPATH
-        gcrtag: ghcr.io/${{ github.actor }}/druidscornerapi-base
+        ghcrtag: ghcr.io/${{ github.actor }}/druidscornerapi-base
         imgtag : $IMAGE_TAG
         keyfile: ${{ secrets.DRUIDS_CORNER_CLOUD_CICD_SA_KEYFILE }}
 
