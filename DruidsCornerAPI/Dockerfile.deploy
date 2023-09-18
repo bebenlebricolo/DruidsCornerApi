@@ -1,4 +1,9 @@
-FROM europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-base as build
+FROM ghcr.io/bebenlebricolo/druidscornerapi-base as build
+
+#########################################################################################################
+######################################### Build image ###################################################
+#########################################################################################################
+
 
 ENV DRUIDSCORNERAPI_DIR=/app/deployed
 ENV DRUIDSCORNERAPI_DBMODE=Local
@@ -16,7 +21,11 @@ RUN dotnet publish /${ROOT_DIR}/DruidsCornerAPI/DruidsCornerAPI.csproj -c Releas
 RUN mkdir $HOME/.config/DruidsCornerAPI/
 RUN cp DruidsCornerAPI/.config/AuthenticationConfig.json ${CONFIG_DIR}
 
-# Stripped down version
+
+#########################################################################################################
+######################################### Runtime image #################################################
+#########################################################################################################
+
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS druidscornerapi-deploy
 EXPOSE 80
 EXPOSE 443

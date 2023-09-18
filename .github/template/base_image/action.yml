@@ -8,7 +8,7 @@ inputs:
   
   # Google Cloud Artifact registry full tag used by docker
   # In the form {region}/{project}/{registry}
-  gcrtag:
+  ghcrtag:
     required: true
     type: string
 
@@ -32,10 +32,10 @@ runs:
     shell: bash
     run : |
       docker build -f Dockerfile.base . -t druidscornerapi-base --build-arg SA_KEYFILE='${{ inputs.keyfile }}' --build-arg BUCKET_DBPATH=${{ inputs.dbpath }}
-      docker tag druidscornerapi-base ${{ inputs.gcrtag }}/druidscornerapi-base:${{ inputs.imgtag }}
+      docker tag druidscornerapi-base ${{ inputs.ghcrtag }}:${{ inputs.imgtag }}
 
   - name: Publish image
     shell: bash
     run : |
-      docker push ${{ inputs.gcrtag }}/druidscornerapi-base:${{ inputs.imgtag }}
+      docker push ${{ inputs.ghcrtag }}:${{ inputs.imgtag }}
     

@@ -23,6 +23,7 @@
 - [Build and publishing the API remotely](#build-and-publishing-the-api-remotely)
   - [Requirements](#requirements)
   - [Docker build](#docker-build)
+    - [Connecting to Github Container registry](#connecting-to-github-container-registry)
     - [Optional : authenticate to Google Cloud services to enable Artifact Registry access](#optional--authenticate-to-google-cloud-services-to-enable-artifact-registry-access)
     - [Full build steps](#full-build-steps)
 - [Running docker container locally with ports mapped](#running-docker-container-locally-with-ports-mapped)
@@ -187,6 +188,15 @@ A template file can be found at : [DruidsCornerAPI/DruidsCornerApiIntegrationTes
   * Install gcloud tools from Google download areas (tried with linux distro managed packages but they prevent further gcloud plugin installation so better resort to the original installers in gcloud...)
 
 ## Docker build
+### Connecting to Github Container registry
+The base image is hosted in Github container registry as it's a publicly available image.
+In order to connect to Github Container registry ([as per depicted here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry))
+
+```bash
+export PAT=<Github PAT with packages:write/read accesses>
+echo $PAT | docker login ghcr.io -u <your username> --password-stdin
+```
+
 ### Optional : authenticate to Google Cloud services to enable Artifact Registry access
 
 ```bash
@@ -212,13 +222,13 @@ export SA_KEYFILE="$(cat somefile.json)"
 docker build -f Dockerfile.base . -t druidscornerapi-base --build-arg BUCKET_DBPATH=$BUCKET_DBPATH --build-arg SA_KEYFILE=$SA_KEYFILE
 
 # Required in order to build the "deploy" image, or you'll need to login to Artifact registry with Gcloud first and configure Docker to pull from it
-docker tag druidscornerapi-base europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-base
+docker tag druidscornerapi-base ghcr.io/<github username>/druidscornerapi-base
 
 # Optional (if docker is configured and authenticated)
-docker push europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-base
+docker push docker push ghcr.io/<github username>/druidscornerapi-base
 
 # Then build the deployment image
-docker build -f Dockerfile.deploy . -t druidscornerapi-deploy
+docker build -f Dockerfile.deploy . -t druidscornerapi-deploy 
 # Or build and stop before image stripping down so that the dev environment is still there
 docker build -f Dockerfile.deploy --target build . -t druidscornerapi-deploy
 
