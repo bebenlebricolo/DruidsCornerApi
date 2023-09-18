@@ -188,7 +188,6 @@ A template file can be found at : [DruidsCornerAPI/DruidsCornerApiIntegrationTes
   * Install gcloud tools from Google download areas (tried with linux distro managed packages but they prevent further gcloud plugin installation so better resort to the original installers in gcloud...)
 
 ## Docker build
-
 ### Connecting to Github Container registry
 The base image is hosted in Github container registry as it's a publicly available image.
 In order to connect to Github Container registry ([as per depicted here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry))
@@ -220,18 +219,18 @@ cd DruidsCornerApi
 # -> This allows docker to download DiyDogExtracted database directly from GS buckets through service account authentication
 export BUCKET_DBPATH="gs://bucket path on google"
 export SA_KEYFILE="$(cat somefile.json)"
-docker build -f Dockerfile.base . -t druidscornerapi-base 
+docker build -f Dockerfile.base . -t druidscornerapi-base --build-arg BUCKET_DBPATH=$BUCKET_DBPATH --build-arg SA_KEYFILE=$SA_KEYFILE
 
 # Required in order to build the "deploy" image, or you'll need to login to Artifact registry with Gcloud first and configure Docker to pull from it
-docker tag druidscornerapi-base c
+docker tag druidscornerapi-base ghcr.io/<github username>/druidscornerapi-base
 
 # Optional (if docker is configured and authenticated)
-docker push docker push ghcr.io/druids-corner-cloud/druidscornerapi-base
+docker push docker push ghcr.io/<github username>/druidscornerapi-base
 
 # Then build the deployment image
-docker build -f Dockerfile.deploy . -t druidscornerapi-deploy --build-arg BUCKET_DBPATH=$BUCKET_DBPATH --build-arg SA_KEYFILE=$SA_KEYFILE
+docker build -f Dockerfile.deploy . -t druidscornerapi-deploy 
 # Or build and stop before image stripping down so that the dev environment is still there
-docker build -f Dockerfile.deploy --target build . -t druidscornerapi-deploy --build-arg BUCKET_DBPATH=$BUCKET_DBPATH --build-arg SA_KEYFILE=$SA_KEYFILE
+docker build -f Dockerfile.deploy --target build . -t druidscornerapi-deploy
 
 # Optional (same as above) : push to Google Artifact Registry
 docker tag druidscornerapi-deploy europe-docker.pkg.dev/druids-corner-cloud/druidscornercloud-registry/druidscornerapi-deploy

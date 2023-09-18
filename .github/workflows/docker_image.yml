@@ -46,12 +46,17 @@ jobs:
         gcloud auth activate-service-account '${{ secrets.DRUIDS_CORNER_CLOUD_CICD_SA }}' --key-file=keyfile.json
         gcloud auth configure-docker $CONTAINER_REG_ZONE
 
+    - name: Authenticate docker against Github 
+      run: |        
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor}} --password-stdin
+
+        
     - name: Build base image
       uses: "./.github/template/base_image"
       if: github.event.inputs.build_base == 'true'
       with:
         dbpath: $BUCKET_DBPATH
-        gcrtag: $CONTAINER_REG_ZONE/$GCP_PROJECT_ID/$CONTAINER_REGISTRY
+        gcrtag: ghcr.io/${{ github.actor }}/druidscornerapi-base
         imgtag : $IMAGE_TAG
         keyfile: ${{ secrets.DRUIDS_CORNER_CLOUD_CICD_SA_KEYFILE }}
 

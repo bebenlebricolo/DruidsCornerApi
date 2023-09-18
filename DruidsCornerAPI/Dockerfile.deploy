@@ -1,28 +1,9 @@
-#########################################################################################################
-######################################### Prep image ####################################################
-#########################################################################################################
-
-FROM ghcr.io/bebenlebricolo/druidscornerapi-base as prep
-
-ARG SA_KEYFILE
-ARG BUCKET_DBPATH
-
-RUN printf '%s' "${SA_KEYFILE}" > /tmp/sa_keyfile.json
-RUN gcloud auth activate-service-account --key-file=/tmp/sa_keyfile.json
-
-# Download the database using gsutil now
-RUN gsutil cp ${BUCKET_DBPATH} /tmp/diydog-db.zip
-RUN mkdir -p /app/deployed/diydog-db
-RUN unzip /tmp/diydog-db.zip -d /app/deployed/diydog-db
-RUN mv /app/deployed/diydog-db/deployed/* /app/deployed/diydog-db/ && rm -r /app/deployed/diydog-db/deployed
-RUN rm /tmp/diydog-db.zip
-
+FROM ghcr.io/bebenlebricolo/druidscornerapi-base as build
 
 #########################################################################################################
 ######################################### Build image ###################################################
 #########################################################################################################
 
-FROM prep as build
 
 ENV DRUIDSCORNERAPI_DIR=/app/deployed
 ENV DRUIDSCORNERAPI_DBMODE=Local
