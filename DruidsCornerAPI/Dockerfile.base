@@ -5,8 +5,7 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0 AS druidscornerapi-base
 # EXPOSE 80
 # EXPOSE 443
 
-ARG SA_KEYFILE
-ARG BUCKET_DBPATH
+
 
 
 ENV ROOT_DIR="DruidsCornerAPI"
@@ -42,12 +41,4 @@ RUN /opt/google-cloud-sdk/platform/bundledpythonunix/bin/pip3.9 uninstall --quie
 
 RUN rm /tmp/google-cloud-cli-437.0.1-linux-x86_64.tar.gz
 
-RUN printf '%s' "${SA_KEYFILE}" > /tmp/sa_keyfile.json
-RUN gcloud auth activate-service-account --key-file=/tmp/sa_keyfile.json
 
-# Download the database using gsutil now
-RUN gsutil cp ${BUCKET_DBPATH} /tmp/diydog-db.zip
-RUN mkdir -p /app/deployed/diydog-db
-RUN unzip /tmp/diydog-db.zip -d /app/deployed/diydog-db
-RUN mv /app/deployed/diydog-db/deployed/* /app/deployed/diydog-db/ && rm -r /app/deployed/diydog-db/deployed
-RUN rm /tmp/diydog-db.zip
