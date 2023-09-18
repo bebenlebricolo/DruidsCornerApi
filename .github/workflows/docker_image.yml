@@ -36,6 +36,9 @@ env:
 
 jobs:
   build:
+    
+    # Permissions required in order to push some packages to the Github Container Registry
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
