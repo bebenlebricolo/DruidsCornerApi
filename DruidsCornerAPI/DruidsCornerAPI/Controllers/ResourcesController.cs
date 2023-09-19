@@ -38,8 +38,7 @@ namespace DruidsCornerAPI.Controllers
         ///     Image source (buffered stream), or NotFoundError(404)
         /// </returns>
         [HttpGet("image", Name = "Fetches beer's image")]
-        [ProducesResponseType(500)]
-        [Produces("application/octet-stream")]
+        [Produces("application/octet-stream", "application/json")]
         [ProducesResponseType(typeof(FileStreamResult), 200)]
         public async Task<IActionResult> FetchSingleImage([FromQuery] uint number)
         {
@@ -69,7 +68,7 @@ namespace DruidsCornerAPI.Controllers
         ///     Pdf page source, buffered stream or NotFoundError(404)
         /// </returns>
         [HttpGet("pdf", Name = "Fetches beer's pdf page")]
-        [Produces("application/octet-stream")]
+        [Produces("application/octet-stream", "application/json")]
         [ProducesResponseType(typeof(FileStreamResult), 200)]
         public async Task<IActionResult> FetchSinglePdf([FromQuery] uint number)
         {
