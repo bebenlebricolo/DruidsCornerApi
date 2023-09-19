@@ -27,12 +27,20 @@ on:
         required: true
         default: false
         type: boolean
+      
+      auto_deploy:
+        description: 'Automatically deploys the latest revision to GCP, only active when new image is pushed'
+        required: true
+        default: false
+        type: boolean
 env:
   BUCKET_DBPATH: ${{ secrets.DRUIDS_CORNER_CLOUD_BUCKET_DBPATH }}
   CONTAINER_REG_ZONE : europe-docker.pkg.dev
   CONTAINER_REGISTRY : druidscornercloud-registry
   GCP_PROJECT_ID : druids-corner-cloud
   IMAGE_TAG: latest
+  GCP_DEPLOY_REGION: europe-west1
+  GCP_DEPLOY_SERVICE_NAME: druidscornerapi
 
 jobs:
   build:
@@ -93,6 +101,14 @@ jobs:
       run : |
         docker push $CONTAINER_REG_ZONE/$GCP_PROJECT_ID/$CONTAINER_REGISTRY/druidscornerapi-deploy:$IMAGE_TAG
         
+    - name: Deploy latest image to GCP
+      if: ( github.event.inputs.force_publish == 'true' ) || ( github.ref == 'refs/heads/main' ) && ( github.event.inputs.auto_deploy == 'true' )
+      run : |
+        gcloud run deploy $GCP_DEPLOY_SERVICE_NAME \
+        --image=$CONTAINER_REG_ZONE/$GCP_PROJECT_ID/$CONTAINER_REGISTRY/druidscornerapi-deploy:$IMAGE_TAG \
+        --region=$GCP_DEPLOY_REGION \
+        --project=$GCP_PROJECT_ID \
+        && gcloud run services update-traffic $GCP_DEPLOY_SERVICE_NAME --to-latest
         
       
     
