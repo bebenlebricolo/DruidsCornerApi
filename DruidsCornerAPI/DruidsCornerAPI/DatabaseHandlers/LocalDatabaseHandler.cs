@@ -162,7 +162,8 @@ namespace DruidsCornerAPI.DatabaseHandlers
                 }
             }
 
-            var matchingFile = _dbConfig.GetRecipesFolder().GetFiles("*.json").First(f =>
+            // Returns a null FileInfo in case none is found
+            var matchingFile = _dbConfig.GetRecipesFolder().GetFiles("*.json").FirstOrDefault(f =>
             {
                 var right = f.Name.Split('_')[1];
                 var numberString = right.Replace(".json", "");
@@ -172,7 +173,7 @@ namespace DruidsCornerAPI.DatabaseHandlers
                     return decoded == number;
                 }
                 return false;
-            });
+            }, null);
 
             Recipe? recipe = null;
             if(matchingFile != null)

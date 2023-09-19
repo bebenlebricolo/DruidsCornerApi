@@ -104,5 +104,24 @@ namespace DruidsCornerUnitTests.DatabaseHandlers
             Assert.That(refYeasts.Yeasts[2].Manufacturer, Is.EqualTo("Fermentis"));
             Assert.That(refYeasts.Yeasts[2].Aliases!.Contains("S189"), Is.True);
         }
+
+        [Test]
+        public async Task TestSafeFailNumberOutOfBounds()
+        {
+            var mockLogger = new Mock<ILogger<LocalDatabaseHandler>>();
+            // Lookup the local directory structure for this test database
+            var config = new DeployedDatabaseConfig();
+            Assert.That(config.FromRootFolder(_localTestDbFolder!.FullName), Is.True);
+            
+            var handler = new LocalDatabaseHandler(config, mockLogger.Object);
+            
+            // Should not throw any exception, this should be a safe scenario
+            var recipe = await handler.GetRecipeByNumberAsync(0);
+            Assert.That(recipe, Is.Null);
+
+            // Should not throw any exception, this should be a safe scenario
+            recipe = await handler.GetRecipeByNumberAsync(8888888);
+            Assert.That(recipe, Is.Null);
+        }
     }
 }
