@@ -145,6 +145,24 @@ namespace DruidsCornerAPI.DatabaseHandlers
             return recipe;
         }
 
+        private FileInfo? GetSingleFileByRecipeNumber(uint number)
+        {
+            // Returns a null FileInfo in case none is found
+            var matchingFile = _dbConfig.GetRecipesFolder().GetFiles("*.json").FirstOrDefault(f =>
+            {
+                var right = f.Name.Split('_')[1];
+                var numberString = right.Replace(".json", "");
+                uint decoded = 0;
+                if(uint.TryParse(numberString, out decoded))
+                {
+                    return decoded == number;
+                }
+                return false;
+            }, null);
+
+            return matchingFile;
+        }
+
         /// <summary>
         /// Asynchronously retrieves a recipe using its base number / id in the database.
         /// </summary>
@@ -155,29 +173,33 @@ namespace DruidsCornerAPI.DatabaseHandlers
         {
             if(_cachedRecipes != null && _cachedRecipes.Count != 0 && noCaching == false)
             {
-                var cachedRecipe = _cachedRecipes.First<Recipe>(r => r.Number == number);
+                var cachedRecipe = _cachedRecipes.FirstOrDefault(r => r!.Number == number, null);
                 if(cachedRecipe != null)
                 {
                     return cachedRecipe;
                 }
             }
 
-            var matchingFile = _dbConfig.GetRecipesFolder().GetFiles("*.json").First(f =>
-            {
-                var right = f.Name.Split('_')[1];
-                var numberString = right.Replace(".json", "");
-                uint decoded = 0;
-                if(uint.TryParse(numberString, out decoded))
-                {
-                    return decoded == number;
-                }
-                return false;
-            });
-
+            // Try with single files first
             Recipe? recipe = null;
+            var matchingFile = GetSingleFileByRecipeNumber(number); 
             if(matchingFile != null)
             {
                 recipe = await ReadSingleRecipeAsync(matchingFile);
+            }
+
+            // Try with the monolithic allRecipes.json file in case of failure
+            if(recipe == null)
+            {
+                var allRecipes = await GetAllRecipesAsync(noCaching);
+            
+                // No need to continue further
+                if(allRecipes == null)
+                {
+                    return recipe;
+                }
+
+                recipe = allRecipes.FirstOrDefault(elem => elem!.Number == number, null);
             }
             return recipe;
         }

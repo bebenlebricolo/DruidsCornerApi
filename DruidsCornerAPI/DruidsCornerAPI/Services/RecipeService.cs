@@ -13,18 +13,29 @@ namespace DruidsCornerAPI.Services
     {
         private readonly IConfiguration _configuration;
         private ILogger<RecipeService> _logger;
+        private IDatabaseHandler? _dbHandler;
 
         /// <summary>
         /// Standard constructor
         /// </summary>
-        /// <param name="configuration"></param>
-        /// <param name="logger"></param>
-        public RecipeService(IConfiguration configuration, ILogger<RecipeService> logger)
+        /// <param name="configuration">Base configuration for the webapi</param>
+        /// <param name="logger">Logger for this service</param>
+        /// <param name="databaseHandler">Database handler. Left null, it'll trigger this service to retrieve the right version based on the configuration</param>
+        public RecipeService(IConfiguration configuration, ILogger<RecipeService> logger, IDatabaseHandler? databaseHandler = null)
         {
             _configuration = configuration;
             _logger = logger;
+            _dbHandler = databaseHandler;
         }
 
+        private IDatabaseHandler GetDatabaseHandler()
+        {
+            if(_dbHandler == null)
+            {
+                _dbHandler = DatabaseHandlerFactory.GetDatabaseHandler(_configuration); 
+            }
+            return _dbHandler;
+        }
 
         /// <summary>
         /// Fetches all recipes from database provider
@@ -32,8 +43,7 @@ namespace DruidsCornerAPI.Services
         /// <returns></returns>
         public async Task<List<Recipe>?> GetAllRecipesAsync()
         {
-            var dbHandler = DatabaseHandlerFactory.GetDatabaseHandler(_configuration);
-            return await dbHandler.GetAllRecipesAsync();
+            return await GetDatabaseHandler().GetAllRecipesAsync();
         }
 
         /// <summary>
@@ -44,8 +54,7 @@ namespace DruidsCornerAPI.Services
         /// <exception cref="NotImplementedException"></exception>
         public async Task<RecipeResult?> GetRecipeByNameAsync(string name)
         {
-            var dbHandler = DatabaseHandlerFactory.GetDatabaseHandler(_configuration);
-            return await dbHandler.GetRecipeByNameAsync(name);
+            return await GetDatabaseHandler().GetRecipeByNameAsync(name);
         }
 
 
@@ -56,8 +65,7 @@ namespace DruidsCornerAPI.Services
         /// <returns></returns>
         public async Task<Recipe?> GetRecipeByNumberAsync(uint number)
         {
-            var dbHandler = DatabaseHandlerFactory.GetDatabaseHandler(_configuration);
-            return await dbHandler.GetRecipeByNumberAsync(number);
+            return await GetDatabaseHandler().GetRecipeByNumberAsync(number);
         }
 
         /// <summary>
@@ -67,8 +75,7 @@ namespace DruidsCornerAPI.Services
         /// <returns></returns>
         public async Task<Stream?> GetRecipeImageAsync(uint number)
         {
-            var dbHandler = DatabaseHandlerFactory.GetDatabaseHandler(_configuration);
-            return await dbHandler.GetRecipeImageAsync(number);
+            return await GetDatabaseHandler().GetRecipeImageAsync(number);
         }
 
         /// <summary>
@@ -78,8 +85,7 @@ namespace DruidsCornerAPI.Services
         /// <returns></returns>
         public async Task<Stream?> GetRecipePdfPageAsync(uint number)
         {
-            var dbHandler = DatabaseHandlerFactory.GetDatabaseHandler(_configuration);
-            return await dbHandler.GetRecipePdfPageAsync(number);
+            return await GetDatabaseHandler().GetRecipePdfPageAsync(number);
         }
     }
 }
