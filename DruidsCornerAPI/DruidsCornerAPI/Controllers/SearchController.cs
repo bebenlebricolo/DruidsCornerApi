@@ -15,7 +15,7 @@ namespace DruidsCornerAPI.Controllers
     [Authorize]
     [Route("search")]
     [ProducesResponseType(200)]
-    // 300 is produced whenever accessing the http endpoint -> redirects to https adress with 302 status code (automatically done by GCP)
+    // 300 is produced whenever accessing the http endpoint -> redirects to https address with 302 status code (automatically done by GCP)
     [ProducesResponseType(302)]
     [ProducesResponseType(401)]
     [ProducesResponseType(403)]
