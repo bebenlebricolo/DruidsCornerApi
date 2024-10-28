@@ -5,9 +5,9 @@ VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DruidsCornerAPI", "DruidsCornerAPI\DruidsCornerAPI.csproj", "{30A0C83F-F33F-47FC-8BCA-4B6988E2BA62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DruidsCornerUnitTests", "DruidsCornerUnitTests\DruidsCornerUnitTests.csproj", "{05FF9973-4919-4DC6-ABBA-C2E30B867164}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DruidsCornerUnitTests", "DruidsCornerUnitTests\DruidsCornerUnitTests.csproj", "{05FF9973-4919-4DC6-ABBA-C2E30B867164}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DruidsCornerApiIntegrationTests", "DruidsCornerApiIntegrationTests\DruidsCornerApiIntegrationTests.csproj", "{926A056C-D634-4C48-BE84-F18BC006F782}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DruidsCornerApiIntegrationTests", "DruidsCornerApiIntegrationTests\DruidsCornerApiIntegrationTests.csproj", "{926A056C-D634-4C48-BE84-F18BC006F782}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
